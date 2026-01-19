@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: fastapi-best-practices
 description: Use this skill when creating or modifying Python backend services with FastAPI. It defines API design, security, and testing standards.
 ---

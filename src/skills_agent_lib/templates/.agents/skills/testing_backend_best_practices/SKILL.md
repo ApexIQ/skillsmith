@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: backend-testing
 description: Use this skill when writing tests for Python backend services. It covers unit, integration, and security testing standards.
 ---

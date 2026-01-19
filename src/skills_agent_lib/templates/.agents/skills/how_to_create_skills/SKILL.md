@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: how-to-create-skills
 description: Use this skill when creating new agentic skills. It defines the format, structure, and best practices for writing effective SKILL.md files.
 ---
@@ -24,6 +25,7 @@ skills/
 ### Required: YAML Frontmatter
 ```yaml
 ---
+version: 0.1.0
 name: my-skill-name
 description: A clear description of what this skill does and when to use it.
 ---

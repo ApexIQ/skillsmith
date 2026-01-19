@@ -88,10 +88,16 @@ View the library of portable expertise.
 skills-agent list
 ```
 
-### Add a Specific Skill
-Add a single skill to an existing project.
+### Update Skills
+Sync local project skills with the library and latest best practices.
 ```bash
-skills-agent add memory-patterns
+skills-agent update
+```
+
+### Validate Skills
+Verify skill structure, metadata, and link integrity.
+```bash
+skills-agent lint --local
 ```
 
 ---
@@ -102,7 +108,6 @@ We are evolving `skills-agent` into a central hub for agentic expertise. Our upc
 
 - **Central Skill Registry**: A hosted platform to browse, search, and share community-verified skills.
 - **Framework Integrations**: Native scaffolding for Agno, LangChain, CrewAI, and more.
-- **Skill Versioning**: Intelligent `update` command to sync new best practices without overwriting project-specific notes.
 - **TUI Mode**: An interactive terminal interface for selecting and managing skills.
 - **Agent Self-Installation**: APIs that allow agents to autonomously search for and install the skills they need to complete a task.
 

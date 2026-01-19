@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: agentic-workflow
 description: Use this skill when building agentic systems. Covers the agentic loop, tool usage, and iterative task execution patterns from Anthropic.
 ---

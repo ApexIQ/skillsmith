@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: context-engineering
 description: Use this skill for optimizing AI context windows. Covers context sizing, prioritization, and avoiding context overflow.
 ---

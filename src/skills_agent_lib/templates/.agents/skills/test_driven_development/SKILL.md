@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: test-driven-development
 description: Use this skill when developing new features using TDD. It guides through writing failing tests first, then implementing code to pass them.
 ---
@@ -45,7 +46,8 @@ def calculate_discount(price, percentage):
 // 1. Red
 test('clicking delete removes item from list', async () => {
   render(<ItemList items={mockItems} />);
-  await user.click(screen.getByRole('button', { name: /delete/i }));
+  await user.click(screen.getByRole('button', { version: 0.1.0
+name: /delete/i }));
   expect(screen.queryByText(mockItems[0].name)).not.toBeInTheDocument();
 });
 ```

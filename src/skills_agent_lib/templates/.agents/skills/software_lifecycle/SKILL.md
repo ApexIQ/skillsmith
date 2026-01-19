@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: software-lifecycle
 description: Use this skill at the start of any new feature or bug fix. It defines the standard operating procedure for shipping code.
 ---

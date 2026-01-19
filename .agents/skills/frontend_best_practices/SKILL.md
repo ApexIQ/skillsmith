@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: frontend-best-practices
 description: Use this skill when creating or modifying React frontend components. It defines UI/UX, styling, and architecture standards.
 ---

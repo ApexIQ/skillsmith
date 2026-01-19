@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: how-to-research
 description: Use this skill when exploring a new codebase or topic. It provides strategies for effective research.
 ---

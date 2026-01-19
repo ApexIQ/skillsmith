@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: integration-testing
 description: Use this skill when testing the full-stack integration between frontend and backend. Covers contract testing and E2E patterns.
 ---
@@ -36,12 +37,15 @@ test('user can complete checkout', async ({ page }) => {
   await page.goto('/products');
   
   // 2. Interact
-  await page.getByRole('button', { name: 'Add to Cart' }).click();
-  await page.getByRole('link', { name: 'Checkout' }).click();
+  await page.getByRole('button', { version: 0.1.0
+name: 'Add to Cart' }).click();
+  await page.getByRole('link', { version: 0.1.0
+name: 'Checkout' }).click();
   
   // 3. Fill form
   await page.getByLabel('Email').fill('test@example.com');
-  await page.getByRole('button', { name: 'Place Order' }).click();
+  await page.getByRole('button', { version: 0.1.0
+name: 'Place Order' }).click();
 
   // 4. Verify
   await expect(page.getByText('Order Confirmed')).toBeVisible();

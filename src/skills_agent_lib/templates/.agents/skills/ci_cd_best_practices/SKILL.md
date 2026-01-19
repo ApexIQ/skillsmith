@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: ci-cd-best-practices
 description: Use this skill when setting up or improving CI/CD pipelines. Covers automation, testing, and deployment best practices.
 ---
@@ -40,6 +41,7 @@ description: Use this skill when setting up or improving CI/CD pipelines. Covers
 
 ## 5. Example Workflow (GitHub Actions)
 ```yaml
+version: 0.1.0
 name: CI
 
 on: [push, pull_request]

@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: agent-collaboration
 description: Use this skill when coordinating multiple AI agents. Covers multi-agent patterns, handoffs, and orchestration strategies.
 ---

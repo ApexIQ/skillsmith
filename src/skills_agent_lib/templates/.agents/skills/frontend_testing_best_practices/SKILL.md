@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: frontend-testing
 description: Use this skill when writing tests for React/Vue/Angular frontend applications. It covers component testing with modern testing libraries.
 ---
@@ -14,7 +15,8 @@ description: Use this skill when writing tests for React/Vue/Angular frontend ap
 
 ## 2. Core Principles
 *   **Prioritize Behavior:**
-    *   ✅ `screen.getByRole('button', { name: /submit/i })` (What user sees)
+    *   ✅ `screen.getByRole('button', { version: 0.1.0
+name: /submit/i })` (What user sees)
     *   ❌ `container.querySelector('.btn-primary')` (Implementation detail)
 *   **Accessibility First:** Use `getByRole` queries. Forces accessible HTML.
 *   **Mock External Dependencies:** Don't hit real APIs.
@@ -33,7 +35,8 @@ test('submitting the form shows success message', async () => {
 
   // 1. Arrange (Find elements)
   const input = screen.getByLabelText(/email/i);
-  const button = screen.getByRole('button', { name: /submit/i });
+  const button = screen.getByRole('button', { version: 0.1.0
+name: /submit/i });
 
   // 2. Act (User interaction)
   await user.type(input, 'test@example.com');

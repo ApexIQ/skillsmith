@@ -1,4 +1,5 @@
 ---
+version: 0.1.0
 name: security-audit
 description: Use this skill when reviewing code for security vulnerabilities. It covers OWASP Top 10 and common web security patterns.
 ---
