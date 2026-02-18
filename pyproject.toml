@@ -1,6 +1,6 @@
 [project]
 name = "skillsmith"
-version = "0.5.2"
+version = "0.5.3"
 description = "The premier agentic skills library for professional AI engineering"
 readme = "README.md"
 requires-python = ">=3.9"
