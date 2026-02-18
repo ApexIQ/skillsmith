@@ -1,6 +1,7 @@
 ---
 name: context_optimization
 description: Techniques to manage token usage and keep the Agent's brain fast.
+version: 1.0.0
 role: Architect
 tags:
   - gsd

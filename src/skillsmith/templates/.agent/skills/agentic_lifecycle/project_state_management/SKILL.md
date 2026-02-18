@@ -1,6 +1,7 @@
 ---
 name: project_state_management
 description: Maintain clear project context and avoid hallucinations using GSD State Files.
+version: 1.0.0
 role: Project Manager
 tags:
   - gsd

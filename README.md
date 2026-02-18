@@ -1,210 +1,154 @@
-# 🧠 skillsmith
+# skillsmith
 
 [![PyPI version](https://img.shields.io/pypi/v/skillsmith.svg)](https://pypi.org/project/skillsmith/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**The universal agent platform. One install. Every AI coding tool. Instantly smart.**
+`skillsmith` is a Python CLI for bootstrapping agent-ready project context.
 
-`skillsmith` is a CLI tool that scaffolds industry-standard `.agent` structures into any project and automatically configures **every major AI coding assistant** — Gemini CLI, Claude Code, Cursor, Windsurf, and GitHub Copilot — to use your project's skills, context, and workflows.
+It scaffolds a standard `.agent/` workspace, generates platform-specific instruction files (Claude, Gemini, Cursor, Windsurf, Copilot), manages local skills, and can expose installed skills through an MCP server.
 
----
-
-## 🚀 Quick Start
-
-Initialize a new project with best-practice agent context in seconds:
+## Quick Start
 
 ```bash
-# Install the library
 pip install skillsmith
-
-# Scaffold the .agent structure and AGENTS.md
 skillsmith init
 ```
 
----
+## What It Generates
 
-## ✨ Key Features
+Running `skillsmith init` creates:
 
-- **🌐 Universal Agent Platform** *(v0.3.0)*: Auto-generates platform-specific config files for Gemini, Claude, Cursor, Windsurf, and Copilot.
-- **600+ Skills (Categorized)**: Massive library organized into 9 broad categories (Security, Data-AI, Infrastructure...).
-- **GSD Protocol**: Built-in Discuss → Plan → Execute → Verify workflow for reliable agent output.
-- **Smart Append**: If platform config files already exist, skillsmith appends its config without overwriting your rules.
-- **23 Core Skills**: Out-of-the-box expertise for TDD, Security Audits, Context Engineering, and more.
-- **AGENTS.md Standard**: Native support for the [agents.md](https://agents.md) open standard ("README for Agents").
-- **State Management**: `PROJECT.md`, `ROADMAP.md`, and `STATE.md` templates prevent AI context rot.
-- **Portable & Modular**: Add only the skills you need for your specific tech stack.
+- `AGENTS.md`
+- `GEMINI.md`
+- `CLAUDE.md`
+- `.cursorrules`
+- `.cursor/rules/skillsmith.mdc`
+- `.windsurfrules`
+- `.github/copilot-instructions.md`
+- `.agent/` with state/templates and installed starter skills
 
-### 🔌 Platform Compatibility
+`.agent/` includes:
 
-| Platform | Auto-Generated File | Format Source |
-|---|---|---|
-| **Gemini CLI** | `GEMINI.md` | [geminicli.com](https://geminicli.com) |
-| **Claude Code** | `CLAUDE.md` | [docs.anthropic.com](https://docs.anthropic.com) |
-| **Cursor** | `.cursorrules` + `.cursor/rules/skillsmith.mdc` | [cursor.com/docs](https://cursor.com/docs) |
-| **Windsurf** | `.windsurfrules` | [docs.windsurf.com](https://docs.windsurf.com) |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | [docs.github.com](https://docs.github.com) |
+- `PROJECT.md`
+- `ROADMAP.md`
+- `STATE.md`
+- `prd.md`
+- `guides/`, `plans/`, `workflows/`
+- `skills/`
 
----
+## Current Starter Skills
 
-## 🛠 Included Skills library
+The current bundled starter pack installs three lifecycle skills by default:
 
-The library contains **626 skills** across 9 major categories:
-1. **Architecture** (60 skills)
-2. **Business** (37 skills)
-3. **Data-AI** (92 skills)
-4. **Development** (81 skills)
-5. **General** (128 skills)
-6. **Infrastructure** (78 skills)
-7. **Security** (112 skills)
-8. **Testing** (22 skills)
-9. **Workflow** (16 skills)
+- `atomic_execution`
+- `context_optimization`
+- `project_state_management`
 
-Run `skillsmith list --list-categories` to explore.
+These are installed under `.agent/skills/agentic_lifecycle/...`.
 
-| Category | Skill | Description |
-|----------|-------|-------------|
-| **AI Strategy** | `memory-patterns` | Manage agent context window and long-term memory. |
-| | `prompt-engineering` | Best practices for few-shot and chain-of-thought prompts. |
-| **Engineering** | `test-driven-development` | Structured TDD (Red → Green → Refactor) for agents. |
-| **Security** | `security-audit` | OWASP-based security checklists for automated reviews. |
-| **Fullstack** | `fastapi-best-practices` | Patterns for high-performance Python backends. |
+## CLI Commands
 
----
+### Initialize
 
-## 📖 Directory Structure
-
-When you run `skillsmith init`, it creates:
-
-```text
-.
-├── AGENTS.md                          # Universal agent instructions (Codex, OpenCode)
-├── GEMINI.md                          # Gemini CLI auto-loads this
-├── CLAUDE.md                          # Claude Code auto-loads this
-├── .cursorrules                       # Cursor auto-loads this
-├── .windsurfrules                     # Windsurf auto-loads this
-├── .cursor/rules/skillsmith.mdc       # Cursor modern rule format
-├── .github/copilot-instructions.md    # GitHub Copilot auto-loads this
-└── .agent/
-    ├── skills/         # Modular expertise (SKILL.md files)
-    ├── guides/         # Project-specific style & architecture docs
-    ├── plans/          # Active implementation plans and RFCs
-    ├── workflows/      # Automated tasks and deployment templates
-    ├── PROJECT.md      # Vision, tech stack, architecture
-    ├── ROADMAP.md      # Strategic milestones and phases
-    ├── STATE.md        # Current task context (read FIRST every session)
-    └── prd.md          # Standard blueprint for new features
-```
-
----
-
-## 💻 CLI Commands
-
-### Initialize Project
-Scaffold the full structure including all 23 skills.
 ```bash
 skillsmith init
-```
-
-### Minimal Scaffolding
-Create the directory structure and templates without the pre-built skills.
-```bash
 skillsmith init --minimal
+skillsmith init --agents-md-only
+skillsmith init --all
+skillsmith init --category <category>
+skillsmith init --tag <tag>
 ```
 
-### Install by Category or Tag
-Install bundles of skills for specific domains.
-```bash
-# Install all Security skills
-skillsmith init --category security
+### Discover Skills
 
-# Install all Python skills
-skillsmith init --tag python
-```
-
-### List Available Skills
-View the library of portable expertise.
 ```bash
 skillsmith list
-
-# Filter by category
-skillsmith list --category data-ai
-
-# Filter by tag
-skillsmith list --tag react
+skillsmith list --list-categories
+skillsmith list --category <category>
+skillsmith list --tag <tag>
 ```
 
-### Update Skills
-Sync local project skills with the library and latest best practices.
+### Manage Skills
+
 ```bash
+skillsmith add <skill-name>
+skillsmith add <github-directory-url>
 skillsmith update
-```
-
-### Validate Skills
-Verify skill structure, metadata, and link integrity.
-```bash
-# Basic validation
+skillsmith update --force
+skillsmith lint
 skillsmith lint --local
-
-# AgentSkills.io standard compliance (adopted by Anthropic, Microsoft, OpenAI, Google)
 skillsmith lint --spec agentskills
 ```
 
-### Compose a Workflow
-Generate a workflow by composing relevant skills for a goal.
+### Workflow + Health
+
 ```bash
 skillsmith compose "build a saas mvp"
-skillsmith compose "fix a security vulnerability" --max-skills 5
-```
-Outputs a numbered workflow `.md` to `.agent/workflows/<goal-slug>.md`.
-
-### Health Check
-Verify your entire skillsmith setup across all AI platforms.
-```bash
 skillsmith doctor
-
-# Auto-fix missing platform files
 skillsmith doctor --fix
-```
-
-### Context Budget
-Analyze token usage across all platform files and skills.
-```bash
 skillsmith budget
 ```
 
----
+### MCP Server
 
-## 🗺️ Roadmap
+Install optional MCP dependency:
 
-### ✅ Released
-- **v0.1.0** — Core CLI, AGENTS.md standard, skill scaffolding.
-- **v0.2.0** — 600+ skills, GSD workflow integration, categories & tags.
-- **v0.3.0** — Universal Agent Platform: auto-generates config for Gemini, Claude, Cursor, Windsurf, Copilot. GSD state files (PROJECT.md, ROADMAP.md, STATE.md). Smart append (never overwrites existing config).
+```bash
+pip install skillsmith[mcp]
+```
 
-### 🔜 Planned
-- **v0.4.0** — Bundles (role-based curated skill sets: Web Wizard, Security Engineer, etc.).
-- **v0.5.0** — Workflows (ordered multi-step execution playbooks).
-- **Central Skill Registry**: A hosted platform to browse, search, and share community-verified skills.
-- **Agent Self-Installation**: APIs that allow agents to autonomously search for and install skills.
+Run server:
 
----
+```bash
+skillsmith serve
+skillsmith serve --transport http --host localhost --port 47731
+```
 
-## 📜 License
+Tools exposed by MCP server:
 
-Distributed under the MIT License. See `LICENSE` for more information.
+- `list_skills`
+- `get_skill(name)`
+- `search_skills(query)`
+- `compose_workflow(goal)`
 
----
+Claude Code integration (stdio):
 
-## 🤝 Contributing
+```bash
+claude mcp add skillsmith -- skillsmith serve
+```
 
-Contributions are welcome! If you have a portable skill that could benefit other developers, please open a Pull Request.
+Claude Code integration (HTTP):
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingSkill`)
-3. Commit your Changes (`git commit -m 'feat: add AmazingSkill'`)
-4. Push to the Branch (`git push origin feature/AmazingSkill`)
-5. Open a Pull Request
+```bash
+claude mcp add --transport http skillsmith http://localhost:47731/mcp
+```
 
----
+Cursor example (`.cursor/mcp.json`):
 
-Developed with ❤️ by **ApexIQ**
+```json
+{
+  "mcpServers": {
+    "skillsmith": {
+      "command": "skillsmith",
+      "args": ["serve"]
+    }
+  }
+}
+```
+
+## Project Status
+
+- Package version: `0.4.0`
+- Core CLI + MCP entrypoint are implemented.
+- Starter templates and lifecycle skills are included in the package.
+
+## Development
+
+```bash
+# run CLI from source
+PYTHONPATH=src python -m skillsmith.cli --help
+```
+
+## License
+
+MIT. See `LICENSE`.

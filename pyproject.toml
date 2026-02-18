@@ -1,6 +1,6 @@
 [project]
 name = "skillsmith"
-version = "0.3.1"
+version = "0.4.0"
 description = "The premier agentic skills library for professional AI engineering"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -22,6 +22,11 @@ dependencies = [
     "PyYAML>=6.0",
 ]
 
+[project.optional-dependencies]
+mcp = [
+    "mcp>=1.0.0",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=7.0",
@@ -31,6 +36,7 @@ dev = [
 
 [project.scripts]
 skillsmith = "skillsmith.cli:main"
+skillsmith-mcp = "skillsmith.mcp_server:run_server"
 
 [project.urls]
 Homepage = "https://github.com/ApexIQ/skillsmith"

@@ -24,15 +24,15 @@ Set-Location "test_zip_env"
 
 # Test 1: List Categories (Should read JSON, ignoring zip)
 Test-Command "List Categories" `
-    { uv run skills-agent list --list-categories } `
+    { uv run skillsmith list --list-categories } `
     { }
 
-# Test 2: Init Category (Should extract from zip)
-Test-Command "Init Category (Security)" `
-    { uv run skills-agent init --category security } `
+# Test 2: Init (Should extract at least one skill from zip)
+Test-Command "Init + Skill Extraction" `
+    { uv run skillsmith init } `
     {
-        if (!(Test-Path ".agents/skills/burp_suite_testing")) { throw "Extraction failed: burp_suite_testing missing" }
-        if (Test-Path ".agents/skills/react_best_practices") { throw "Extraction leaking: react_best_practices present" }
+        $skills = Get-ChildItem ".agent/skills" -Recurse -Filter "SKILL.md" -ErrorAction SilentlyContinue
+        if (-not $skills -or $skills.Count -lt 1) { throw "Extraction failed: no skills extracted to .agent/skills" }
     }
 
 Set-Location ..

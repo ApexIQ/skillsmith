@@ -38,6 +38,28 @@ CORE_SKILLS = [
     "ui_ux_design",
 ]
 
+
+def iter_skill_dirs(base_dir: Path):
+    """Yield skill directories containing SKILL.md, recursively."""
+    if not base_dir.exists():
+        return
+    for skill_md in sorted(base_dir.rglob("SKILL.md")):
+        if skill_md.is_file():
+            yield skill_md.parent
+
+
+def find_template_skill_dir(skill_name: str):
+    """Find a template skill directory by folder name, recursively."""
+    skills_root = TEMPLATE_DIR / ".agent" / "skills"
+    exact = skills_root / skill_name
+    if (exact / "SKILL.md").exists():
+        return exact
+
+    matches = [d for d in iter_skill_dirs(skills_root) if d.name == skill_name]
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
 def load_catalog():
     """Loads the skill catalog JSON if available."""
     catalog_path = TEMPLATE_DIR / ".agent" / "skill_catalog.json"
@@ -45,7 +67,10 @@ def load_catalog():
     if catalog_path.exists():
         try:
             with open(catalog_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                catalog = json.load(f)
+                if isinstance(catalog, dict) and "total_skills" not in catalog:
+                    catalog["total_skills"] = len(catalog.get("skills", {}))
+                return catalog
         except Exception:
             return None
     return None
@@ -297,40 +322,55 @@ def init(minimal, agents_md_only, all_skills, category, tag):
                 with zipfile.ZipFile(src_skills_zip, 'r') as z:
                     files_to_extract = []
                     extracted_skills = set()
-                    
-                    for file_path in z.namelist():
-                        parts = file_path.split("/")
-                        # Expecting: skills/skill_name/...
-                        if len(parts) > 2 and parts[0] == "skills":
-                            skill_name = parts[1]
-                            
-                            should_include = False
-                            
-                            # 1. Core Set (Default)
-                            if not all_skills and not category and not tag:
-                                should_include = skill_name in CORE_SKILLS
-                            # 2. --all flag
-                            elif all_skills:
-                                should_include = True
-                            # 3. --category flag
-                            elif category:
-                                skill_data = catalog_skills.get(skill_name)
-                                if skill_data and skill_data.get("category") == category:
-                                    should_include = True
-                            # 4. --tag flag
-                            elif tag:
-                                skill_data = catalog_skills.get(skill_name)
-                                if skill_data and tag.lower() in skill_data.get("tags", []):
-                                    should_include = True
+                    skill_files = []
 
-                            if should_include:
-                                files_to_extract.append(file_path)
-                                extracted_skills.add(skill_name)
+                    for file_path in z.namelist():
+                        normalized = file_path.replace("\\", "/")
+                        parts = [p for p in normalized.split("/") if p]
+                        if len(parts) < 3 or parts[0] != "skills":
+                            continue
+                        if parts[-1] != "SKILL.md":
+                            continue
+                        skill_name = parts[-2]
+                        skill_files.append((file_path, skill_name))
+
+                    default_mode = not all_skills and not category and not tag
+                    has_core_skills = any(name in CORE_SKILLS for _, name in skill_files)
+
+                    for file_path, skill_name in skill_files:
+                        should_include = False
+
+                        # 1. Core Set (Default)
+                        if default_mode:
+                            should_include = skill_name in CORE_SKILLS or not has_core_skills
+                        # 2. --all flag
+                        elif all_skills:
+                            should_include = True
+                        # 3. --category flag
+                        elif category:
+                            skill_data = catalog_skills.get(skill_name)
+                            if skill_data and skill_data.get("category") == category:
+                                should_include = True
+                        # 4. --tag flag
+                        elif tag:
+                            skill_data = catalog_skills.get(skill_name)
+                            if skill_data and tag.lower() in skill_data.get("tags", []):
+                                should_include = True
+
+                        if should_include:
+                            files_to_extract.append(file_path)
+                            extracted_skills.add(skill_name)
                     
                     if files_to_extract:
-                        z.extractall(agents_dir, members=files_to_extract)
+                        for member in files_to_extract:
+                            normalized = member.replace("\\", "/")
+                            parts = [p for p in normalized.split("/") if p]
+                            dest_path = agents_dir.joinpath(*parts)
+                            dest_path.parent.mkdir(parents=True, exist_ok=True)
+                            with z.open(member) as src, open(dest_path, "wb") as dst:
+                                dst.write(src.read())
                         for s in sorted(extracted_skills):
-                             console.print(f"[blue][INFO][/blue] Added skill: {s}")
+                            console.print(f"[blue][INFO][/blue] Added skill: {s}")
     
     console.print("\n[bold green]Successfully initialized .agent structure![/bold green]")
 
@@ -370,35 +410,30 @@ def list_skills(category, tag, list_categories):
     table.add_column("Skill", style="cyan")
     table.add_column("Description", style="white")
     
-    for skill_folder in sorted(skills_dir.iterdir()):
-        if skill_folder.is_dir():
-            skill_md = skill_folder / "SKILL.md"
-            
-            # Filter logic for list
-            if category or tag:
-                if not catalog:
-                    # If no catalog, can't filter effectively by metadata w/o reading every file
-                    pass 
-                else:
-                    skill_data = catalog["skills"].get(skill_folder.name)
-                    if not skill_data:
-                        continue
-                    
-                    if category and skill_data.get("category") != category:
-                        continue
-                    if tag and tag.lower() not in skill_data.get("tags", []):
-                        continue
+    for skill_folder in iter_skill_dirs(skills_dir):
+        skill_md = skill_folder / "SKILL.md"
 
-            description = "No description found"
-            if skill_md.exists():
-                with open(skill_md, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    if "description:" in content:
-                        for line in content.split("\n"):
-                            if "description:" in line:
-                                description = line.split("description:")[1].strip()
-                                break
-            table.add_row(skill_folder.name, description)
+        # Filter logic for list
+        if category or tag:
+            if catalog:
+                skill_data = catalog["skills"].get(skill_folder.name)
+                if not skill_data:
+                    continue
+                if category and skill_data.get("category") != category:
+                    continue
+                if tag and tag.lower() not in skill_data.get("tags", []):
+                    continue
+
+        description = "No description found"
+        if skill_md.exists():
+            with open(skill_md, "r", encoding="utf-8") as f:
+                content = f.read()
+                if "description:" in content:
+                    for line in content.split("\n"):
+                        if "description:" in line:
+                            description = line.split("description:")[1].strip()
+                            break
+        table.add_row(skill_folder.name, description)
             
     console.print(table)
 
@@ -423,9 +458,9 @@ def add(name_or_url):
     else:
         # Local Add
         skill_name = name_or_url
-        src_skill = TEMPLATE_DIR / ".agent" / "skills" / skill_name
+        src_skill = find_template_skill_dir(skill_name)
         
-        if not src_skill.exists():
+        if src_skill is None:
             console.print(f"[red]Error: Skill '{skill_name}' not found in local library.[/red]")
             return
             
@@ -459,10 +494,7 @@ def lint(local, spec):
     table.add_column("Details", style="white")
     
     all_passed = True
-    for skill_folder in sorted(skills_dir.iterdir()):
-        if not skill_folder.is_dir():
-            continue
-
+    for skill_folder in iter_skill_dirs(skills_dir):
         if spec == "agentskills":
             is_valid, messages = validate_skill_agentskills(skill_folder)
             status = "[green]PASS[/green]" if is_valid else "[red]FAIL[/red]"
@@ -501,12 +533,8 @@ def compose(goal, max_skills, output):
     goal_words = set(re.sub(r"[^a-z0-9 ]", "", goal.lower()).split())
 
     scored = []
-    for skill_folder in sorted(skills_dir.iterdir()):
-        if not skill_folder.is_dir():
-            continue
+    for skill_folder in iter_skill_dirs(skills_dir):
         skill_md = skill_folder / "SKILL.md"
-        if not skill_md.exists():
-            continue
 
         try:
             content = skill_md.read_text(encoding="utf-8")
@@ -675,9 +703,8 @@ def doctor(fix):
     console.print("\n[bold]Skills[/bold]")
     skills_dir = cwd / ".agent" / "skills"
     if skills_dir.exists():
-        skill_dirs = [d for d in skills_dir.iterdir() if d.is_dir()]
-        valid = sum(1 for d in skill_dirs if (d / "SKILL.md").exists())
-        invalid = len(skill_dirs) - valid
+        valid = sum(1 for _ in iter_skill_dirs(skills_dir))
+        invalid = 0
         console.print(f"  [green][OK][/green] {valid} skills installed", end="")
         if invalid:
             console.print(f"  [yellow]({invalid} missing SKILL.md)[/yellow]")
@@ -856,12 +883,14 @@ def update(force):
     table.add_column("Action", style="bold")
     table.add_column("Details", style="white")
     
-    for skill_folder in sorted(project_skills_dir.iterdir()):
-        if not skill_folder.is_dir():
-            continue
+    for skill_folder in iter_skill_dirs(project_skills_dir):
             
         skill_name = skill_folder.name
-        template_skill = template_skills_dir / skill_name
+        relative = skill_folder.relative_to(project_skills_dir)
+        template_skill = template_skills_dir / relative
+        if not template_skill.exists():
+            fallback = find_template_skill_dir(skill_name)
+            template_skill = fallback if fallback else template_skill
         
         if not template_skill.exists():
             table.add_row(skill_name, "[yellow]SKIP[/yellow]", "Not found in library")
@@ -909,6 +938,80 @@ def update(force):
             table.add_row(skill_name, "[red]FAIL[/red]", str(e))
             
     console.print(table)
+
+
+@main.command()
+@click.option(
+    "--transport",
+    default="stdio",
+    type=click.Choice(["stdio", "http"], case_sensitive=False),
+    show_default=True,
+    help="Transport: stdio (Claude Code/Cursor) or http (browser/HTTP clients)",
+)
+@click.option("--host", default="localhost", show_default=True, help="Host for HTTP transport")
+@click.option("--port", default=47731, show_default=True, help="Port for HTTP transport")
+def serve(transport, host, port):
+    """Start the skillsmith MCP server for AI tool integration.
+
+    Exposes your .agent/skills/ library as an MCP server so Claude Code,
+    Cursor, Windsurf, and Gemini CLI can query skills on-demand.
+
+    \b
+    Tools exposed:
+      list_skills      - list all installed skills
+      get_skill        - read full SKILL.md for a specific skill
+      search_skills    - keyword search across all skills
+      compose_workflow - generate a workflow for a goal
+
+    \b
+    Examples:
+      skillsmith serve                    # stdio (add to Claude Code / Cursor)
+      skillsmith serve --transport http   # HTTP on localhost:3333
+
+    \b
+    Claude Code integration:
+      claude mcp add skillsmith -- skillsmith serve
+
+    \b
+    Cursor integration (add to .cursor/mcp.json):
+      {
+        "mcpServers": {
+          "skillsmith": {
+            "command": "skillsmith",
+            "args": ["serve"]
+          }
+        }
+      }
+    """
+    try:
+        from skillsmith.mcp_server import run_server
+    except ImportError as e:
+        if "mcp" in str(e).lower():
+            console.print("[red]Error: MCP package not installed.[/red]")
+            console.print("Install it with: [bold]pip install skillsmith[mcp][/bold]")
+            console.print("Or: [bold]pip install mcp[/bold]")
+            return
+        raise
+
+    skills_dir = Path.cwd() / ".agent" / "skills"
+    if not skills_dir.exists():
+        console.print("[yellow]Warning: .agent/skills/ not found in current directory.[/yellow]")
+        console.print("Run [bold]skillsmith init[/bold] first, or cd to your project root.")
+
+    if transport == "http":
+        console.print(f"\n[bold cyan]skillsmith MCP Server[/bold cyan] (HTTP)")
+        console.print(f"Listening on: [bold]http://{host}:{port}/mcp[/bold]")
+        console.print(f"Skills dir:   [dim]{skills_dir}[/dim]")
+        console.print(f"\nAdd to Claude Code: [dim]claude mcp add --transport http skillsmith http://{host}:{port}/mcp[/dim]")
+        console.print("[dim]Press Ctrl+C to stop.[/dim]\n")
+    else:
+        # stdio — no console output, the protocol uses stdin/stdout
+        import sys
+        if sys.stderr.isatty():
+            import sys as _sys
+            print(f"[skillsmith MCP] Starting stdio server. Skills: {skills_dir}", file=_sys.stderr)
+
+    run_server(transport=transport, host=host, port=port)
 
 
 if __name__ == "__main__":

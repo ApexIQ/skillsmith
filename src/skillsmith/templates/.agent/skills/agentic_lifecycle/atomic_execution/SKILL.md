@@ -1,6 +1,7 @@
 ---
 name: atomic_execution
 description: Standardized "Plan -> Execute -> Verify" workflow for Agentic coding.
+version: 1.0.0
 role: Senior Engineer
 tags:
   - gsd
