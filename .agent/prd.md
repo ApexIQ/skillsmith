@@ -125,3 +125,20 @@ As the skills library Grows, projects will need a way to keep their local skills
 - `skillsmith budget` → developers know their context load before hitting limits
 - `skillsmith compose "build a saas mvp"` → generates 7-step workflow in <1s
 - All 23 skills pass AgentSkills.io compliance (errors=0, warnings=globs only)
+
+## 15. Advanced Agentic Patterns (v0.6.0)
+
+**Problem:** Basic agentic loops were fragile. Multi-step reasoning and model-specific optimizations (o1, o3, MCP) were missing.
+
+**Solution:**
+1. **Search-then-GSD Protocol:** Mandated skill discovery as the first step of the agentic loop.
+2. **Anthropic & OpenAI Patterns:** Orchestration, Parallelization, Critic Loops, and Reasoning optimization.
+3. **Automated Cataloging:** `skillsmith rebuild` command for real-time library synchronization.
+4. **Context Engineering:** Implemented "Just-in-Time" memory and compaction strategies.
+
+## 16. Revision History
+- [2026-01-20] Proposed Versioning & Update module.
+- [2026-02-18] Added v0.3.0 Universal Agent Platform.
+- [2026-02-18] Added v0.3.1 Developer Experience & Compliance.
+- [2026-02-19] Released v0.5.3: Restored full 24MB skill library (625+ skills).
+- [2026-02-21] Released v0.6.0: The Advanced Agentic Release (Anthropic/OpenAI/GSD Refinement).

@@ -142,3 +142,28 @@ cython_debug/
 
 # OS X
 .DS_Store
+
+# Skillsmith Diagnostics & Temp (Ignored)
+debug_cli.py
+fix_list_command.py
+insert_commands.py
+patch_doctor.py
+test_cli.py
+verify_zip.ps1
+zip_library.py
+my_Referce.md
+"# MCP Python SDK.txt"
+.agent/snapshots/
+.agent/temp/
+temp_skills/
+temp_full_skills/
+
+# Essential Library Assets (Explicitly allow for packaging)
+!AGENTS.md
+!GEMINI.md
+!CLAUDE.md
+!ROADMAP.md
+!.agent/
+!.github/
+!.cursor/
+!.windsurf/

@@ -1,19 +1,27 @@
-# AGENTS.md
+# 🤖 AGENTS.md - Context & Instructions for AI Agents
 
-> This file provides AI coding agents with context about this project.
-> See: https://agents.md
+> **Start Here:** This file is the primary entry point for AI Agents working on this project.
 
-## Project Overview
-<!-- Brief description of what this project does -->
+## 🧠 Prime Directives (The "Search-then-GSD" Protocol)
 
-## Setup Commands
-<!-- Commands to set up the development environment, e.g., uv sync, npm install -->
+1.  **Read `.agent/STATE.md` First:** Orient yourself by reading the current project state.
+2.  **Skill-First Discovery:** For any complex task, **SEARCH** `.agent/skills/` for the 2-3 most relevant instruction files. **READ** them before proposing a plan.
+3.  **GSD Loop (The Agentic Loop):** Once armed with relevant skills, follow the structured loop:
+    - **Discuss:** Clarify intent and edge cases.
+    - **Plan:** Create a step-by-step implementation plan.
+    - **Execute:** Write code and run tools.
+    - **Verify:** Run tests and validate results.
+4.  **Update State:** After every significant step, update `.agent/STATE.md`.
 
-## Testing Workflows
-<!-- How to run tests, e.g., pytest, npm test -->
+## 📂 Project Structure
 
-## Coding Style
-<!-- Project-specific conventions, e.g., Follow SOLID principles, use functional components -->
+- **`.agent/`**: Your brain. Stores skills, plans, and state.
+    - **`skills/`**: "How-to" guides for specific tasks.
+    - **`params/`**: Project-specific constraints.
+    - **`PROJECT.md`**: High-level vision and tech stack.
+    - **`ROADMAP.md`**: Strategic milestones.
+    - **`STATE.md`**: Current tactical status.
 
-## Architecture Notes
-<!-- Key architectural decisions, e.g., Using FastAPI for backend, React with Vite for frontend -->
+## 🛠 Active Skills
+
+Run `skillsmith list` to see available skills. specialized instructions are in `.agent/skills/`.

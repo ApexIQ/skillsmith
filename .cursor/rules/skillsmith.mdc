@@ -1,0 +1,25 @@
+<!-- Skillsmith -->
+---
+description: Skillsmith agentic skills and GSD protocol directives
+alwaysApply: true
+---
+
+# Skillsmith — Agentic Skills Platform
+
+## Core Directives
+
+- Read `AGENTS.md` in the project root for universal agent instructions.
+- Read `.agent/STATE.md` before doing anything — it has current task context.
+- Follow the GSD Protocol: Discuss → Plan → Execute → Verify.
+- Check `.agent/skills/` for specialized guides before starting any task.
+
+## Project Context
+
+- `AGENTS.md` — Universal agent instructions.
+- `.agent/PROJECT.md` — Tech stack and vision.
+- `.agent/STATE.md` — Current task and next steps.
+- `.agent/ROADMAP.md` — Strategic milestones.
+
+## Skills
+
+All skills live in `.agent/skills/`. Each has a `SKILL.md` with frontmatter.

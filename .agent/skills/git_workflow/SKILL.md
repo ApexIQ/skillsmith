@@ -2,7 +2,6 @@
 version: 0.1.0
 name: git-workflow
 description: Use this skill for version control best practices. It defines branching, commit messages, and PR conventions.
-tags: [git, version-control, branching, commits, pr]
 ---
 
 # 🌳 Git Workflow

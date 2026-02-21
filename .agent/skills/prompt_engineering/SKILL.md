@@ -1,117 +1,53 @@
 ---
-version: 0.1.0
-name: prompt-engineering
-description: Use this skill when crafting effective prompts for AI agents. Covers clarity, context, examples, and output formatting.
-tags: [prompts, ai, llm, instructions, context]
+version: 1.0.0
+name: prompt_engineering
+description: Expert guide on prompt engineering for 2024-2025 models (GPT-4o, Claude 3.5, o1, o3, Gemini 2.0). Covers reasoning models, delimiters, structured output, and context engineering.
+tags: [prompting, reasoning, llm, optimization, structured-output]
 ---
 
-# ✍️ Prompt Engineering
+# ✍️ Prompt Engineering (2025 Edition)
 
-> **Philosophy:** The quality of AI output is directly proportional to the quality of the prompt.
+> **Philosophy:** Direct models through clear constraints and structural cues. Modern LLMs prioritize well-formatted, context-rich instructions over simple keywords.
 
-## Core Principles
+## 🧠 Reasoning Model Strategy (o1, o3, DeepSeek-R1)
+For models with internal "Think" cycles:
+- **Quiet Mode:** Do NOT ask for "chain of thought" or "step by step" logic. These models do it internally and redundant prompting can degrade latency or follow-through.
+- **Focus:** Define the **Input**, **Constraints**, and **Expected Output Schema** with extreme precision.
+- **Evaluation:** Provide rubrics for how the model should verify its own work.
 
-### 1. Be Specific
-```
-❌ "Make this better"
-✅ "Refactor this function to reduce cyclomatic complexity below 5, 
-    extract helper functions for repeated logic, and add JSDoc comments"
-```
+## 1. Delimiters and XML Tagging
+Use standard delimiters (XML tags, backticks, or separators) to clearly distinguish instructions from data.
+- **Example:**
+  ```markdown
+  <instruction>Extract entities from the text below.</instruction>
+  <text>John Doe moved to Berlin in 2024.</text>
+  ```
+- **Benefit:** Prevents "prompt injection" where the data content overwrites the instructions.
 
-### 2. Provide Context
-```
-❌ "Fix the bug"
-✅ "The login endpoint returns 500 when email contains '+'. 
-    We use FastAPI with Pydantic validation. Error is in auth/router.py"
-```
+## 2. Few-Shot Structural Prompting
+Show example "Thought -> Action" sequences to steer complex agent behavior.
+- Use 2-3 high-quality examples of the *full reasoning process*.
 
-### 3. Specify Output Format
-```
-❌ "Explain this code"
-✅ "Explain this code in 3 bullet points:
-    1. What it does
-    2. Key dependencies
-    3. Potential issues"
-```
+## 3. Negative Constraints (Avoidance)
+Be explicit about what NOT to do.
+- **Bad:** "Don't use Python 2."
+- **Good:** "Use Python 3.12+ features. Avoid any legacy constructs from Python 2.x."
 
-## Prompt Structure
+## 4. Output Formatting (JSON/Markdown)
+Force specific formats for programmatic use.
+- Use **JSON Schema** in the prompt to ensure the keys and types are strictly followed.
 
-Use clear sections for complex prompts:
+## Advanced Patterns
+- **Meta-Prompting:** Use the model to help you refine your own prompt.
+- **Context Injection:** See `agentic_context_engineering` for managing long-term memory.
+- **Workflow Patterns:** See `anthropic_workflow_patterns` for orchestration logic.
 
-```markdown
-<context>
-We're building a FastAPI backend with SQLModel ORM.
-Current task: Add pagination to /users endpoint.
-</context>
-
-<instructions>
-1. Add `skip` and `limit` query parameters
-2. Default limit: 20, max limit: 100
-3. Return total count in response headers
-</instructions>
-
-<constraints>
-- Don't break existing tests
-- Follow existing code patterns in routers/
-</constraints>
-
-<output_format>
-Return only the modified code, no explanations.
-</output_format>
-```
-
-## Prompting Techniques
-
-| Technique | Use Case | Example |
-|-----------|----------|---------|
-| **Zero-shot** | Simple tasks | "Convert this to TypeScript" |
-| **Few-shot** | Pattern learning | "Here are 2 examples... now do this" |
-| **Chain-of-thought** | Complex reasoning | "Think step by step..." |
-| **Role/Persona** | Specialized output | "You are a security auditor..." |
-
-## Few-Shot Example
-
-```markdown
-Convert Python to SQL queries:
-
-Example 1:
-Python: `users.filter(age > 18)`
-SQL: `SELECT * FROM users WHERE age > 18`
-
-Example 2:
-Python: `orders.filter(status="pending").count()`
-SQL: `SELECT COUNT(*) FROM orders WHERE status = 'pending'`
-
-Now convert:
-Python: `products.filter(price < 100, in_stock=True).order_by("name")`
-```
-
-## Chain-of-Thought Example
-
-```markdown
-Analyze this code for security issues. Think step by step:
-
-1. First, identify all user inputs
-2. Then, trace how each input flows through the code
-3. Check if inputs are validated/sanitized
-4. Look for SQL injection, XSS, or auth bypass
-5. Finally, list vulnerabilities with severity
-```
-
-## Anti-Patterns
-
-| ❌ Don't | ✅ Do |
-|---------|------|
-| Vague instructions | Specific, measurable goals |
-| Assume agent knows context | Provide relevant background |
-| Ask "don't do X" | Ask "do Y instead" |
-| Dump entire codebase | Provide focused, relevant snippets |
-| Single mega-prompt | Break into focused sub-prompts |
+## Anti-Patterns (2025 Update)
+- **Prompt Dumping:** Adding irrelevant code snippets (use `skillsmith budget` to check token usage).
+- **Keyword Soup:** Relying on magic words like "Expert" (effective prompts now rely on specific instructions and role-play).
+- **Ignoring Failures:** Not providing instructions on what the model should do when it *cannot* complete the task.
 
 ## Guidelines
-
-*   **Iterate:** Start simple, refine based on output.
-*   **Test edge cases:** Include unusual inputs in examples.
-*   **Match input/output length:** Short prompts → brief outputs.
-*   **Use delimiters:** Triple backticks, XML tags for clarity.
-*   **Version your prompts:** Track what works in documentation.
+*   **Be Atomic:** One prompt per specific sub-task.
+*   **Verify Schema:** Always validate JSON outputs before final processing.
+*   **Iterate with Evaluation:** Use `Evaluator-Optimizer` patterns for production-grade output.

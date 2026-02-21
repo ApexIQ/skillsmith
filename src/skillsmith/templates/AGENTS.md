@@ -2,13 +2,16 @@
 
 > **Start Here:** This file is the primary entry point for AI Agents working on this project.
 
-## 🧠 Prime Directives (The "GSD" Protocol)
+## 🧠 Prime Directives (The "Search-then-GSD" Protocol)
 
-1.  **Read `.agent/STATE.md` First:** Before doing anything, orient yourself by reading the current project state.
-2.  **Atomic Execution:** Break complex tasks into small, verified steps.
-    - Discuss -> Plan -> Execute -> Verify.
-3.  **Update State:** After every significant step, update `.agent/STATE.md`.
-4.  **No Hallucinations:** If you are unsure, ask the user or check the code. Do not guess.
+1.  **Read `.agent/STATE.md` First:** Orient yourself by reading the current project state.
+2.  **Skill-First Discovery:** For any complex task, **SEARCH** `.agent/skills/` for the 2-3 most relevant instruction files. **READ** them before proposing a plan.
+3.  **GSD Loop (The Agentic Loop):** Once armed with relevant skills, follow the structured loop:
+    - **Discuss:** Clarify intent and edge cases.
+    - **Plan:** Create a step-by-step implementation plan.
+    - **Execute:** Write code and run tools.
+    - **Verify:** Run tests and validate results.
+4.  **Update State:** After every significant step, update `.agent/STATE.md`.
 
 ## 📂 Project Structure
 

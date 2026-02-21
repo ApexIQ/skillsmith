@@ -2,7 +2,6 @@
 version: 0.1.0
 name: software-lifecycle
 description: Use this skill at the start of any new feature or bug fix. It defines the standard operating procedure for shipping code.
-tags: [lifecycle, planning, process, engineering, sdlc]
 ---
 
 # ♾️ Software Lifecycle Strategy
@@ -11,12 +10,13 @@ tags: [lifecycle, planning, process, engineering, sdlc]
 
 ## The Cycle
 
-### 1. 🧠 Discovery & Planning
-*   **Input:** User Request / Bug Report / Feature Idea.
+### 1. 🔍 Discovery & Skill Search (Search-then-GSD)
+*   **Rule:** Before planning, **SEARCH** `.agent/skills/` for the 2-3 most relevant skills.
 *   **Action:**
+    *   Read the relevant skills to understand the "How-to".
     *   Research existing code and patterns.
     *   Check competitors and industry standards.
-*   **Deliverable:** Update the project's PRD or requirements document if scope changes.
+*   **Deliverable:** Orient yourself and update the project's PRD if scope changes.
 
 ### 2. 📝 Technical Design (RFC)
 *   **Rule:** **NEVER write code without a plan.**

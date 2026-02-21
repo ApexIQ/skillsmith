@@ -18,4 +18,4 @@
 ## Core Principles
 1. Atomic Commits — One logical change per commit.
 2. Test-Driven — Write tests before implementation.
-3. Skills-First — Check `.agent/skills/` before starting any task.
+3. Search-then-GSD — Always **SEARCH** for skills and **READ** them before initiating the GSD (Discuss/Plan/Execute/Verify) loop.

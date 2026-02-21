@@ -2,7 +2,6 @@
 version: 0.1.0
 name: how-to-create-implementation-plan
 description: Use this skill when creating technical design documents (RFCs) before implementing features.
-tags: [planning, rfc, design, architecture]
 ---
 
 # 📝 How to Create an Implementation Plan

@@ -2,7 +2,6 @@
 version: 0.1.0
 name: debugging
 description: Use this skill when diagnosing and fixing bugs. It provides a structured approach to identify root causes and verify fixes.
-tags: [debugging, bugs, troubleshooting, diagnosis]
 ---
 
 # 🐛 Debugging
