@@ -1,0 +1,22 @@
+{
+  "name": "library",
+  "description": "Benchmark pack for Python library maintenance and release workflows.",
+  "tasks": [
+    {
+      "id": "library_build",
+      "title": "Build the package"
+    },
+    {
+      "id": "library_test",
+      "title": "Run the library test suite"
+    },
+    {
+      "id": "library_package",
+      "title": "Prepare distributable artifacts"
+    },
+    {
+      "id": "library_publish",
+      "title": "Validate publish readiness"
+    }
+  ]
+}

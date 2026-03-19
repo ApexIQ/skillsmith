@@ -1,0 +1,18 @@
+{
+  "name": "smoke",
+  "description": "Fast smoke pack for local iteration and preflight checks.",
+  "tasks": [
+    {
+      "id": "smoke_prepare",
+      "title": "Prepare the smoke scenario"
+    },
+    {
+      "id": "smoke_execute",
+      "title": "Execute the smoke scenario"
+    },
+    {
+      "id": "smoke_verify",
+      "title": "Verify smoke outcomes"
+    }
+  ]
+}

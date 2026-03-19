@@ -1,27 +1,47 @@
-# 🤖 AGENTS.md - Context & Instructions for AI Agents
+# AGENTS.md - Context and Instructions for AI Agents
 
-> **Start Here:** This file is the primary entry point for AI Agents working on this project.
+> Start here. This is the primary entry point for agents working in this project.
 
-## 🧠 Prime Directives (The "Search-then-GSD" Protocol)
+## Prime Directives
 
-1.  **Read `.agent/STATE.md` First:** Orient yourself by reading the current project state.
-2.  **Skill-First Discovery:** For any complex task, **SEARCH** `.agent/skills/` for the 2-3 most relevant instruction files. **READ** them before proposing a plan.
-3.  **GSD Loop (The Agentic Loop):** Once armed with relevant skills, follow the structured loop:
-    - **Discuss:** Clarify intent and edge cases.
-    - **Plan:** Create a step-by-step implementation plan.
-    - **Execute:** Write code and run tools.
-    - **Verify:** Run tests and validate results.
-4.  **Update State:** After every significant step, update `.agent/STATE.md`.
+1. Read `.agent/STATE.md` first.
+2. Read `.agent/project_profile.yaml` and `.agent/context/project-context.md` before making assumptions.
+3. Search `.agent/skills/` and read the 2-3 most relevant `SKILL.md` files before planning.
+4. Follow the loop: Discuss -> Plan -> Execute -> Verify.
+5. Update `.agent/STATE.md` after significant steps.
 
-## 📂 Project Structure
+## Execution Standard
 
-- **`.agent/`**: Your brain. Stores skills, plans, and state.
-    - **`skills/`**: "How-to" guides for specific tasks.
-    - **`params/`**: Project-specific constraints.
-    - **`PROJECT.md`**: High-level vision and tech stack.
-    - **`ROADMAP.md`**: Strategic milestones.
-    - **`STATE.md`**: Current tactical status.
+- Plan first for non-trivial work (3+ steps, architecture changes, migrations, or risky edits).
+- Keep fixes minimal and focused; avoid broad refactors unless required.
+- Delegate to subagents only when specialization or parallel work clearly helps.
+- Keep one owner per subtask and avoid overlapping write scope.
+- Never mark done without evidence (tests, command output, or concrete behavior checks).
 
-## 🛠 Active Skills
+## Role Playbook
 
-Run `skillsmith list` to see available skills. specialized instructions are in `.agent/skills/`.
+- `orchestrator`: owns problem framing, execution sequencing, and delegation boundaries.
+- `researcher`: gathers repo context, constraints, and references before edits begin.
+- `implementer`: applies minimal, testable changes aligned with the agreed plan.
+- `reviewer`: validates correctness and regressions; reports findings before summaries.
+
+## Handoff Contract
+
+- Every handoff should include: goal, scope, changed files, risks, and verification evidence.
+- `researcher -> implementer`: concrete constraints, touched code areas, and edge cases.
+- `implementer -> reviewer`: diff summary, test output, and known limitations.
+- `reviewer -> orchestrator`: severity-ordered findings and release recommendation.
+
+## Project Structure
+
+- `.agent/skills/`: reusable task guides.
+- `.agent/params/`: project constraints.
+- `.agent/PROJECT.md`: product and architecture context.
+- `.agent/ROADMAP.md`: strategic milestones.
+- `.agent/STATE.md`: current tactical state.
+- `.agent/project_profile.yaml`: structured project source of truth.
+- `.agent/context/project-context.md`: generated repository context.
+
+## Active Skills
+
+Run `skillsmith list` to see available skills in `.agent/skills/`.

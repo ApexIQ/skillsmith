@@ -6,7 +6,7 @@ import click
 from . import console
 
 @click.command()
-@click.option("--note", help="Memo to save with the snapshot")
+@click.option("-n", "--note", help="Memo to save with the snapshot")
 @click.option("--list", "list_snapshots", is_flag=True, help="List all available snapshots")
 @click.option("--restore", help="Snapshot filename to restore")
 def snapshot_command(note, list_snapshots, restore):

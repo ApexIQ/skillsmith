@@ -1,23 +1,29 @@
-# 🗺️ Future Roadmap: skillsmith
+# Roadmap: skillsmith
 
-To evolve from a simple scaffolding tool into a central hub for agentic expertise, here are the proposed future enhancements:
+## Phase 1: Guided Onboarding
+- Add `skillsmith init --guided` to interview the user about idea, app type, stack, deployment, team preferences, quality bar, and constraints.
+- Infer defaults from the repo before prompting.
+- Save the result as `.agent/project_profile.yaml`.
 
-## 1. Dynamic Skill Registry 🌐
-- **Remote `add`**: `skillsmith add github:user/repo/skill` to pull community-made skills directly from GitHub.
-- **Central Registry**: A hosted API where developers can browse and search for skills.
+## Phase 2: Alignment Engine
+- Generate all rule files and `.agent/*.md` from the same profile.
+- Add `skillsmith align` to re-render aligned files when the profile changes.
+- Stop duplicating logic across `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, Cursor, Windsurf, and Copilot instructions.
 
-## 2. Framework-Specific Scaffolding 🔧
-- **Integrations**: `skillsmith init --agno` or `--langchain` to generate boilerplate code for specific agent frameworks.
-- **Python-Native Skills**: Exporting skills as Python modules that agents can import directly.
+## Phase 3: Registry Federation
+- Add a provider abstraction for local templates, `skills.sh`, curated registries, and MCP-backed discovery.
+- Score skills by relevance, trust, freshness, popularity, and compatibility.
+- Add lockfiles so teams can reproduce the exact skill set.
 
-## 3. Skill Versioning & Updates 🔄
-- **`skillsmith update`**: Intelligent merging of updates to local skills without overwriting project-specific customizations.
-- **Version Locking**: Pinning skills to specific versions in an `agents.toml` file.
+## Phase 4: Workflow Composer
+- Replace simple keyword composition with profile-aware workflow generation.
+- Generate workflows by project stage: discovery, implementation, debugging, review, release.
+- Add parameterized workflow templates and acceptance criteria.
 
-## 4. Advanced Tooling 🛠️
-- **Skill Linting**: `skillsmith lint` to verify skill formatting and link integrity.
-- **TUI (Terminal UI)**: An interactive selector for choosing skills during initialization.
+## Phase 5: Continuous Adaptation
+- Add `skillsmith doctor --fix`, `watch`, and recommendation loops that suggest missing skills when the stack changes.
+- Support branch-specific state, roadmap drift detection, and skill update suggestions.
 
-## 5. Agent-Centric Features 🤖
-- **Skill Discovery**: Allowing agents to search for and install missing skills autonomously.
-- **Prompt Templates**: Bundling specific prompt templates with each skill.
+## Phase 6: Ecosystem Quality
+- Add stronger validation, provenance tracking, and security policy enforcement for remote skills.
+- Publish a stable schema for project profiles, registry records, and workflow bundles.

@@ -1,195 +1,177 @@
-# skillsmith
+﻿# skillsmith Documentation
 
 [![PyPI version](https://img.shields.io/pypi/v/skillsmith.svg)](https://pypi.org/project/skillsmith/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**One command to make your repo agent-ready.**
+`skillsmith` helps you prepare a project so AI coding tools can understand your project better and work more reliably.
 
-`skillsmith` gives AI coding assistants the project context they need to work reliably: structure, rules, state files, and reusable skills. It bootstraps a portable `.agent/` workspace, wires platform-specific instruction files, and can expose skills over MCP for on-demand use.
+This guide is written for beginners. You can copy and run commands as shown.
 
-## Why skillsmith
-
-Without project structure, agents lose context, repeat mistakes, and drift.
-
-With `skillsmith`, every repo gets:
-
-- A standard agent workspace (`.agent/`)
-- Shared project memory (`PROJECT.md`, `ROADMAP.md`, `STATE.md`)
-- Platform-specific instruction files (Claude, Gemini, Cursor, Windsurf, Copilot)
-- A skill layer for repeatable workflows and better execution quality
-- Optional MCP server for dynamic skill retrieval
-
-## Install
+## 1) Install
 
 ```bash
 pip install skillsmith
 ```
 
-For MCP support:
+Optional MCP support:
 
 ```bash
-pip install skillsmith[mcp]
+pip install "skillsmith[mcp]"
 ```
 
-## 60-Second Quick Start
+If `skillsmith` is not found, use module mode:
 
 ```bash
-skillsmith init
+python -m skillsmith --help
 ```
 
-This scaffolds:
+## 2) 60-Second Start
 
-- `AGENTS.md`
-- `CLAUDE.md`, `GEMINI.md`
-- `.cursorrules`, `.cursor/rules/skillsmith.mdc`
-- `.windsurfrules`
-- `.github/copilot-instructions.md`
-- `.agent/` with state files, guides/plans/workflows, and starter skills
-
-## Core Capabilities
-
-### 1) Project Bootstrapping
+Run this inside your project folder:
 
 ```bash
-skillsmith init
-skillsmith init --minimal
-skillsmith init --agents-md-only
-skillsmith init --all
-skillsmith init --category <category>
-skillsmith init --tag <tag>
+skillsmith init --guided
 ```
 
-### 2) Skill Discovery and Management
+Then do:
 
 ```bash
-skillsmith list
-skillsmith list --list-categories
-skillsmith list --category <category>
-skillsmith list --tag <tag>
-
+skillsmith recommend
 skillsmith add <skill-name>
-skillsmith add <github-directory-url>
-
-skillsmith update
-skillsmith update --force
-
-skillsmith lint
-skillsmith lint --local
-skillsmith lint --spec agentskills
+skillsmith sync
+skillsmith align
+skillsmith audit --strict
 ```
 
-### 3) Workflow and Health Tooling
+## 3) What You Get
+
+After setup, skillsmith creates and manages:
+
+- `.agent/` project context and memory files
+- AI-tool instruction files (for supported tools)
+- skill installation and tracking (`skills.lock.json`)
+- workflow/evaluation/trust utilities
+
+## 4) Command Reference (Simple)
+
+### Project Setup
+
+- `skillsmith init`: Create the skillsmith workspace in your project.
+- `skillsmith sync`: Re-scan your project and refresh generated files.
+- `skillsmith align`: Re-render managed files from your saved profile.
+- `skillsmith doctor`: Health check for setup and environment.
+- `skillsmith audit`: Full quality/trust/drift audit.
+- `skillsmith report`: Human-readable project status summary.
+- `skillsmith profile`: View or change project profile settings.
+
+### Skills
+
+- `skillsmith list`: Show available skills.
+- `skillsmith discover <query>`: Search for skills by keyword.
+- `skillsmith recommend`: Suggest skills based on your project.
+- `skillsmith add <skill-name-or-url>`: Install one skill.
+- `skillsmith update`: Update installed local skills.
+- `skillsmith lint`: Validate skill metadata and structure.
+- `skillsmith rebuild`: Rebuild local catalog from skill files.
+
+### Workflow and Evaluation
+
+- `skillsmith compose "<goal>"`: Generate a step-by-step workflow for a goal.
+- `skillsmith eval`: Run evaluation and save metrics artifact.
+- `skillsmith budget`: Show context/token budget usage.
+- `skillsmith context-index build`: Build searchable project context index.
+- `skillsmith context-index query "<query>"`: Search ranked project context.
+- `skillsmith context ...`: Alias for `context-index`.
+
+### Registry and Trust (Advanced / Team Use)
+
+- `skillsmith registry`: Manage team registry entries/lifecycle.
+- `skillsmith registry-service`: Run/sync local registry service API.
+- `skillsmith trust-service`: Run/sync local trust service API.
+
+### MCP Server and Context Snapshots
+
+- `skillsmith serve`: Start MCP server for tool integrations.
+- `skillsmith snapshot`: Save/restore `.agent` context snapshots.
+- `skillsmith watch`: Monitor context drift and staleness.
+
+### Maintenance
+
+- `skillsmith update`: Update installed skills.
+
+## 5) Beginner-Friendly Workflows
+
+### A) First time in a project
 
 ```bash
-skillsmith compose "build a saas mvp"
-skillsmith doctor
-skillsmith doctor --fix
-skillsmith budget
+skillsmith init --guided
+skillsmith recommend
+skillsmith add <skill-name>
+skillsmith audit
 ```
 
-### 5) Context Management
-
-Save a snapshot of your `.agent/` before big changes or long breaks:
+### B) Before starting a new task
 
 ```bash
-skillsmith snapshot                          # save current state
-skillsmith snapshot -n "before refactor"    # save with a note
-skillsmith snapshot --list                   # list all snapshots
-skillsmith snapshot --restore 2026-02-19_10-30-00.zip
+skillsmith sync
+skillsmith align
+skillsmith compose "build <your-goal>"
 ```
 
-Watch for context drift in the background:
+### C) Before merge/release
 
 ```bash
-skillsmith watch                  # poll every 30s
-skillsmith watch --interval 60    # poll every 60s
-skillsmith watch --stale-hours 8  # warn after 8h instead of 24h
+skillsmith eval
+skillsmith audit --strict
+skillsmith report
 ```
 
-`watch` detects:
-- Git branch switches → prompts you to update `STATE.md`
-- `STATE.md` staleness → warns when context is older than N hours
-- New or removed skills in `.agent/skills/`
+## 6) Most Useful Help Commands
 
-### 4) MCP Server
-
-Run via stdio (default):
+Show global help:
 
 ```bash
-skillsmith serve
+skillsmith --help
 ```
 
-Run via HTTP:
+Show help for one command:
 
 ```bash
-skillsmith serve --transport http --host localhost --port 47731
+skillsmith <command> --help
 ```
 
-MCP tools exposed:
-
-- `list_skills`
-- `get_skill(name)`
-- `search_skills(query)`
-- `compose_workflow(goal)`
-
-## Platform Integration
-
-### Claude Code
+Examples:
 
 ```bash
-claude mcp add skillsmith -- skillsmith serve
+skillsmith init --help
+skillsmith audit --help
+skillsmith registry-service --help
 ```
 
-HTTP mode:
+## 7) Library vs CLI
 
-```bash
-claude mcp add --transport http skillsmith http://localhost:47731/mcp
-```
+`skillsmith` is a Python package, but the supported public interface is the CLI.
 
-### Cursor (`.cursor/mcp.json`)
+- Stable: `skillsmith <command>` and `python -m skillsmith <command>`
+- Not guaranteed stable: importing internal modules like `skillsmith.commands.*`
 
-```json
-{
-  "mcpServers": {
-    "skillsmith": {
-      "command": "skillsmith",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-### 6) Troubleshooting & PATH Help
-
-If the `skillsmith` command is not found after installation, you can always use the universal python module execution:
-
-```bash
-python -m skillsmith init
-```
-
-Use the `doctor` command to check for PATH issues and get automatic fix suggestions:
-
-```bash
-python -m skillsmith doctor
-```
-
-## Current Status
-
-- Package version: `0.5.2`
-- CLI scaffolding and management commands are implemented
-- Universal OS compatibility with `python -m skillsmith` and `doctor` PATH detection
-- CLI scaffolding and management commands are implemented
-- Starter lifecycle skills are bundled
-- MCP server is available with optional dependency install
-- Context management: `snapshot` and `watch` commands
-
-## Development
+## 8) Development
 
 Run from source:
 
 ```bash
-PYTHONPATH=src python -m skillsmith.cli --help
+PYTHONPATH=src python -m skillsmith --help
 ```
+
+Build package artifacts:
+
+```bash
+uv run --group dev python -m build
+```
+
+## 9) Current Version
+
+- Package version: `0.6.1`
 
 ## License
 

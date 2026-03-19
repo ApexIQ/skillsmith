@@ -11,7 +11,7 @@ from . import (
 @click.command(name="list")
 @click.option("--category", help="Filter by category")
 @click.option("--tag", help="Filter by tag")
-@click.option("--categories", "list_categories", is_flag=True, help="List all categories and skill counts")
+@click.option("--categories", "--list-categories", "list_categories", is_flag=True, help="List all categories and skill counts")
 def list_command(category, tag, list_categories):
     """List available skills from the catalog (650+ skills)."""
     catalog = load_catalog()
@@ -55,10 +55,10 @@ def list_command(category, tag, list_categories):
             continue
             
         table.add_row(
-            s.get("name", "unknown"),
-            s.get("version", "0.0.0"),
-            s.get("category", "general"),
-            s.get("description", "")[:80] + "..." if len(s.get("description", "")) > 80 else s.get("description", "")
+            str(s.get("name", "unknown")),
+            str(s.get("version", "0.0.0")),
+            str(s.get("category", "general")),
+            (str(s.get("description", ""))[:80] + "...") if len(str(s.get("description", ""))) > 80 else str(s.get("description", ""))
         )
         count += 1
 

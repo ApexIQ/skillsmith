@@ -1,0 +1,74 @@
+{
+  "pack": "ci",
+  "thresholds": {
+    "min_tacr_delta": 0,
+    "max_latency_increase_ms": 0,
+    "max_cost_increase_usd": 0
+  },
+  "slo_budgets": {
+    "default": {
+      "thresholds": {
+        "tacr_floor": 75,
+        "delta_tacr_floor": 0,
+        "interventions_threshold": 3,
+        "latency_increase_threshold_ms": 0,
+        "cost_increase_threshold_usd": 0
+      },
+      "caps": {
+        "verification_pass_floor": 1,
+        "verification_pass_cap": 4,
+        "reflection_retry_cap": 3,
+        "allow_mode_switch": true
+      }
+    },
+    "library": {
+      "thresholds": {
+        "tacr_floor": 75,
+        "delta_tacr_floor": 0,
+        "interventions_threshold": 3,
+        "latency_increase_threshold_ms": 0,
+        "cost_increase_threshold_usd": 0
+      },
+      "caps": {
+        "verification_pass_floor": 1,
+        "verification_pass_cap": 4,
+        "reflection_retry_cap": 3,
+        "allow_mode_switch": true
+      }
+    },
+    "release": {
+      "thresholds": {
+        "tacr_floor": 80,
+        "delta_tacr_floor": 0,
+        "interventions_threshold": 2,
+        "latency_increase_threshold_ms": 0,
+        "cost_increase_threshold_usd": 0
+      },
+      "caps": {
+        "verification_pass_floor": 1,
+        "verification_pass_cap": 3,
+        "reflection_retry_cap": 2,
+        "allow_mode_switch": false
+      }
+    }
+  },
+  "compose": {
+    "feedback_window": 3,
+    "minimum_artifacts": 3,
+    "reflection_retry_cap": 3,
+    "verification_pass_floor": 1,
+    "verification_pass_cap": 4,
+    "tacr_floor": 75,
+    "delta_tacr_floor": 0,
+    "interventions_threshold": 3,
+    "latency_increase_threshold_ms": 0,
+    "cost_increase_threshold_usd": 0,
+    "planner_editor": {
+      "enabled": true,
+      "risk_threshold": 2,
+      "tacr_floor": 70,
+      "delta_tacr_floor": 0,
+      "interventions_threshold": 2
+    }
+  }
+}

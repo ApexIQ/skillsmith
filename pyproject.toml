@@ -3,7 +3,8 @@ name = "skillsmith"
 version = "0.6.1"
 description = "The premier agentic skills library for professional AI engineering"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+license = { text = "MIT" }
 authors = [
     { name = "ApexIQ", email = "contact@apexiq.ai" },
 ]
@@ -29,6 +30,7 @@ mcp = [
 
 [dependency-groups]
 dev = [
+    "build>=1.2",
     "pytest>=7.0",
     "pytest-mock>=3.6",
     "PyYAML>=6.0",

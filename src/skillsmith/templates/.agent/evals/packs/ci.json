@@ -1,0 +1,22 @@
+{
+  "name": "ci",
+  "description": "Default CI regression pack for fast, always-on gates.",
+  "tasks": [
+    {
+      "id": "ci_lint",
+      "title": "Lint the workspace"
+    },
+    {
+      "id": "ci_tests",
+      "title": "Run unit tests"
+    },
+    {
+      "id": "ci_policy",
+      "title": "Validate policy drift"
+    },
+    {
+      "id": "ci_release",
+      "title": "Check release readiness"
+    }
+  ]
+}

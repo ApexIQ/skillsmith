@@ -1,22 +1,113 @@
 import shutil
 import sys
 import time
+from collections import defaultdict
 from pathlib import Path
+
 import click
-from . import (
-    console, 
-    iter_skill_dirs, 
-    PLATFORM_FILES
+
+from . import console, iter_skill_dirs
+from .lockfile import (
+    LOCKFILE_NAME,
+    _checksum_for_path,
+    load_lockfile,
+    lockfile_signing_enabled,
+    refresh_local_lockfile_verification_timestamps,
+    verify_lockfile_signature,
+    write_lockfile,
 )
+from .providers import install_policy_for_profile
+from .rendering import load_project_profile, managed_file_map, selected_tools
+
+
+def _check_path_status(path: Path, label: str) -> tuple[bool, str]:
+    if path.exists():
+        return True, f"  [green][OK][/green] {label}"
+    return False, f"  [red][!!][/red] {label} missing"
+
+
+def _check_rendered_file(path: Path, expected: str, cwd: Path) -> tuple[bool, str]:
+    rel = path.relative_to(cwd)
+    if not path.exists():
+        return False, f"  [red][!!][/red] {rel} missing"
+    actual = path.read_text(encoding="utf-8", errors="ignore").strip()
+    if actual != expected.strip():
+        return False, f"  [yellow][!!][/yellow] {rel} is out of sync with .agent/project_profile.yaml"
+    return True, f"  [green][OK][/green] {rel}"
+
+
+def _workflow_surface_label(path: Path) -> str:
+    parts = path.parts
+    if ".agent" in parts and "workflows" in parts:
+        return "internal"
+    if ".claude" in parts and "commands" in parts:
+        return "claude"
+    if ".windsurf" in parts and "workflows" in parts:
+        return "windsurf"
+    if ".cursor" in parts and "workflows" in parts:
+        return "cursor"
+    if ".zencoder" in parts and "workflows" in parts:
+        return "zencoder"
+    return "other"
+
+
+def _report_render_group(title: str, files: dict[Path, str], cwd: Path) -> bool:
+    section_ok = True
+    console.print(f"\n[bold]{title}[/bold]")
+    if not files:
+        console.print("  [dim]-[/dim] none expected for current profile")
+        return True
+    for path in sorted(files):
+        ok, message = _check_rendered_file(path, files[path], cwd)
+        console.print(message)
+        section_ok &= ok
+    return section_ok
+
+
+def _report_workflow_surfaces(files: dict[Path, str], cwd: Path) -> bool:
+    console.print("\n[bold]Workflow Surfaces[/bold]")
+    workflow_files = {path: expected for path, expected in files.items() if "workflows" in path.parts or ".claude" in path.parts and "commands" in path.parts}
+    if not workflow_files:
+        console.print("  [dim]-[/dim] none expected for current profile")
+        return True
+
+    grouped: dict[str, list[Path]] = defaultdict(list)
+    for path in workflow_files:
+        grouped[_workflow_surface_label(path)].append(path)
+
+    section_ok = True
+    for label in sorted(grouped):
+        console.print(f"  [bold]{label}[/bold]")
+        for path in sorted(grouped[label]):
+            ok, message = _check_rendered_file(path, files[path], cwd)
+            console.print(message)
+            section_ok &= ok
+    return section_ok
+
+
+def _format_recommendation_summary(recommendation: dict) -> str:
+    if not isinstance(recommendation, dict):
+        return "no recorded rationale"
+
+    starter_pack = recommendation.get("starter_pack") or recommendation.get("starter_pack_label")
+    reasons = recommendation.get("reasons", [])
+
+    parts = []
+    if starter_pack:
+        parts.append(f"starter pack: {starter_pack}")
+    if reasons:
+        parts.append("reasons: " + ", ".join(str(reason) for reason in reasons[:3]))
+    return " | ".join(parts) if parts else "no recorded rationale"
+
 
 @click.command()
 @click.option("--fix", is_flag=True, help="Auto-fix missing platform files by running init")
-def doctor_command(fix):
+@click.option("--strict", is_flag=True, help="Exit non-zero when any warning or error is detected")
+def doctor_command(fix, strict):
     """Check your skillsmith setup health across all AI platforms."""
     cwd = Path.cwd()
-    SKILLSMITH_MARKER = "<!-- Skillsmith -->"
     all_ok = True
-    # ── 0. PATH Detection ─────────────────────────────────────────────────────
+
     console.print("[bold]Executable PATH[/bold]")
     is_on_path = shutil.which("skillsmith") is not None
     if is_on_path:
@@ -24,123 +115,199 @@ def doctor_command(fix):
     else:
         all_ok = False
         console.print("  [red][!!][/red] 'skillsmith' is NOT on your PATH")
-        
-        # Try to find where it is
         import sysconfig
-        scripts_dir = sysconfig.get_path("scripts")
-        if not scripts_dir:
-            # Fallback for some systems
-            scripts_dir = str(Path(sys.executable).parent / "Scripts")
-            
+
+        scripts_dir = sysconfig.get_path("scripts") or str(Path(sys.executable).parent / "Scripts")
         console.print(f"  [dim]Expected location: {scripts_dir}[/dim]")
-        
         if sys.platform == "win32":
             console.print(f"  [yellow]Tip:[/yellow] Run this to fix permanently: [bold]setx PATH \"%PATH%;{scripts_dir}\"[/bold]")
         else:
             console.print(f"  [yellow]Tip:[/yellow] Add this to your shell profile: [bold]export PATH=\"$PATH:{scripts_dir}\"[/bold]")
-            
-        console.print("  [blue][INFO][/blue] [bold]Alternative:[/bold] You can always use [bold]python -m skillsmith[/bold] to run the tool.")
-
+        console.print("  [blue][INFO][/blue] [bold]Alternative:[/bold] You can always use [bold]python -m skillsmith[/bold]")
 
     console.print("\n[bold cyan][ DOCTOR ] Skillsmith Doctor[/bold cyan]\n")
 
-    # ── 1. Core files ────────────────────────────────────────────────────────
     console.print("[bold]Core Files[/bold]")
     agents_md = cwd / "AGENTS.md"
-    if agents_md.exists():
-        content = agents_md.read_text(encoding="utf-8", errors="ignore")
-        if "Search-then-GSD" in content:
-            console.print("  [green][OK][/green] AGENTS.md found (Protocol: Search-then-GSD)")
-        else:
-            console.print("  [yellow][!!][/yellow] AGENTS.md exists but has legacy GSD protocol  ->  run: [bold]skillsmith init[/bold]")
-            all_ok = False
-    else:
-        console.print("  [red][!!][/red] AGENTS.md missing  ->  run: [bold]skillsmith init[/bold]")
-        all_ok = False
+    ok, message = _check_path_status(agents_md, "AGENTS.md")
+    console.print(message)
+    all_ok &= ok
 
-    # ── 2. Platform rule files ────────────────────────────────────────────────
-    console.print("\n[bold]Platform Rule Files[/bold]")
-    platform_labels = {
-        "gemini":     ("GEMINI.md",                         "Gemini CLI"),
-        "claude":     ("CLAUDE.md",                         "Claude Code"),
-        "cursor":     (".cursorrules",                      "Cursor (legacy)"),
-        "cursor_mdc": (".cursor/rules/skillsmith.mdc",      "Cursor (modern .mdc)"),
-        "windsurf":   (".windsurfrules",                    "Windsurf"),
-        "copilot":    (".github/copilot-instructions.md",   "GitHub Copilot"),
-    }
-    for key, (dest, label) in platform_labels.items():
-        dest_path = cwd / dest
-        if dest_path.exists():
-            content = dest_path.read_text(encoding="utf-8", errors="ignore")
-            if SKILLSMITH_MARKER in content:
-                console.print(f"  [green][OK][/green] {dest} ({label})")
-            else:
-                console.print(f"  [yellow][!!][/yellow] {dest} exists but missing Skillsmith config  ->  run: [bold]skillsmith init[/bold]")
-                all_ok = False
-        else:
-            console.print(f"  [red][!!][/red] {dest} missing ({label})  ->  run: [bold]skillsmith init[/bold]")
-            all_ok = False
+    console.print("\n[bold]Profile & Context[/bold]")
+    profile_path = cwd / ".agent" / "project_profile.yaml"
+    context_path = cwd / ".agent" / "context" / "project-context.md"
+    for path, label in [
+        (profile_path, ".agent/project_profile.yaml"),
+        (context_path, ".agent/context/project-context.md"),
+    ]:
+        ok, message = _check_path_status(path, label)
+        console.print(message)
+        all_ok &= ok
 
-    # ── 3. GSD State files ────────────────────────────────────────────────────
+    profile = {}
+    expected_files: dict[Path, str] = {}
+    if profile_path.exists():
+        try:
+            profile = load_project_profile(cwd)
+            expected_files = managed_file_map(cwd, profile)
+        except Exception as exc:
+            all_ok = False
+            console.print(f"  [red][!!][/red] Failed to load project profile: {exc}")
+
     console.print("\n[bold]State Files (.agent/)[/bold]")
-    state_files = {
+    for fname, desc in {
         "PROJECT.md": "Tech stack & vision",
         "ROADMAP.md": "Strategic milestones",
-        "STATE.md":   "Current task context (read FIRST each session)",
-    }
-    for fname, desc in state_files.items():
+        "STATE.md": "Current task context",
+    }.items():
         fpath = cwd / ".agent" / fname
         if fpath.exists():
             age_hours = (time.time() - fpath.stat().st_mtime) / 3600
             if fname == "STATE.md" and age_hours > 24:
-                console.print(f"  [yellow][!!][/yellow] .agent/{fname} is stale ({age_hours:.0f}h old) -- update it to prevent context rot")
+                console.print(f"  [yellow][!!][/yellow] .agent/{fname} is stale ({age_hours:.0f}h old)")
                 all_ok = False
             else:
-                console.print(f"  [green][OK][/green] .agent/{fname}  [dim]({desc})[/dim]")
+                console.print(f"  [green][OK][/green] .agent/{fname} [dim]({desc})[/dim]")
         else:
-            console.print(f"  [red][!!][/red] .agent/{fname} missing  ->  run: [bold]skillsmith init[/bold]")
+            console.print(f"  [red][!!][/red] .agent/{fname} missing")
             all_ok = False
 
-    # ── 4. Skills ─────────────────────────────────────────────────────────────
+    if expected_files:
+        non_workflow_files = {
+            path: expected
+            for path, expected in expected_files.items()
+            if "workflows" not in path.parts and not (".claude" in path.parts and "commands" in path.parts)
+        }
+        all_ok &= _report_render_group("Tool-Native Outputs", non_workflow_files, cwd)
+        all_ok &= _report_workflow_surfaces(expected_files, cwd)
+    else:
+        console.print("\n[bold]Tool-Native Outputs[/bold]")
+        console.print("  [yellow][!!][/yellow] No expected outputs available; run [bold]skillsmith init[/bold] first")
+        all_ok = False
+
+    console.print("\n[bold]Selected Tools[/bold]")
+    if profile:
+        console.print(f"  [green][OK][/green] {_tool_list(selected_tools(profile))}")
+    else:
+        console.print("  [dim]-[/dim] unknown (project profile missing)")
+
     console.print("\n[bold]Skills[/bold]")
     skills_dir = cwd / ".agent" / "skills"
     if skills_dir.exists():
         valid = sum(1 for _ in iter_skill_dirs(skills_dir))
-        invalid = 0
-        console.print(f"  [green][OK][/green] {valid} skills installed", end="")
-        if invalid:
-            console.print(f"  [yellow]({invalid} missing SKILL.md)[/yellow]")
-        else:
-            console.print()
+        console.print(f"  [green][OK][/green] {valid} skills installed")
     else:
-        console.print("  [red][!!][/red] .agent/skills/ not found  ->  run: [bold]skillsmith init[/bold]")
-        all_ok = False
+        console.print("  [yellow][!!][/yellow] .agent/skills/ not found")
 
-    # ── 5. Platform detection ─────────────────────────────────────────────────
-    console.print("\n[bold]Platform Detection[/bold]")
-    detections = {
-        "Gemini CLI":      (cwd / "GEMINI.md").exists() or (Path.home() / ".gemini").exists(),
-        "Claude Code":     (cwd / "CLAUDE.md").exists() or (Path.home() / ".claude").exists(),
-        "Cursor":          (cwd / ".cursorrules").exists() or (cwd / ".cursor").exists(),
-        "Windsurf":        (cwd / ".windsurfrules").exists() or (cwd / ".windsurf").exists(),
-        "GitHub Copilot":  (cwd / ".github" / "copilot-instructions.md").exists(),
-    }
-    for platform, detected in detections.items():
-        icon = "[green][OK][/green]" if detected else "[dim] - [/dim]"
-        console.print(f"  {icon} {platform}")
+    console.print("\n[bold]Lockfile[/bold]")
+    lockfile_path = cwd / LOCKFILE_NAME
+    if lockfile_path.exists():
+        try:
+            payload = load_lockfile(cwd)
+            signature_status = verify_lockfile_signature(payload)
+            if signature_status["state"] != "skipped":
+                marker = "[green][OK][/green]" if signature_status["valid"] else "[yellow][!!][/yellow]"
+                console.print(f"  {marker} {signature_status['message']}")
+                if not signature_status["valid"]:
+                    all_ok = False
+            elif lockfile_signing_enabled():
+                all_ok = False
+                console.print("  [yellow][!!][/yellow] lockfile signature verification could not run")
+            refreshed_payload, verification_findings, lockfile_changed = refresh_local_lockfile_verification_timestamps(cwd, payload)
+            if lockfile_changed:
+                write_lockfile(cwd, refreshed_payload)
+            skills = refreshed_payload.get("skills", [])
+            console.print(f"  [green][OK][/green] {LOCKFILE_NAME} with {len(skills)} recorded installs")
+            policy = install_policy_for_profile(profile)
+            rationale_present = False
+            rationale_lines = []
+            for index, item in enumerate(skills):
+                finding = verification_findings[index] if index < len(verification_findings) else {}
+                source = item.get("source", "unknown")
+                install_ref = item.get("install_ref", "")
+                path_value = item.get("path", "")
+                checksum = item.get("checksum", "")
+                trust_score = int(item.get("trust_score", 0))
+                install_path = cwd / path_value if path_value else None
+                if source != "local" and not install_ref:
+                    all_ok = False
+                    console.print(f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} is missing provenance")
+                if not path_value or install_path is None or not install_path.exists():
+                    all_ok = False
+                    console.print(f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} has a missing install path")
+                    continue
+                if not checksum:
+                    all_ok = False
+                    console.print(f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} is missing a checksum")
+                elif source == "local":
+                    actual_checksum = _checksum_for_path(install_path)
+                    if not actual_checksum:
+                        all_ok = False
+                        console.print(f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} is missing SKILL.md and cannot be checksum-verified")
+                    elif actual_checksum != checksum:
+                        all_ok = False
+                        console.print(
+                            f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} checksum mismatch; installed local skill may be tampered with"
+                        )
+                if source == "local":
+                    state = finding.get("state")
+                    if state == "unverified":
+                        all_ok = False
+                        console.print(
+                            f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} checksum verified but verification timestamp was missing; refreshed to {item.get('verification_timestamp')}"
+                        )
+                    elif state == "stale":
+                        all_ok = False
+                        previous_timestamp = finding.get("previous_verification_timestamp", "unknown")
+                        console.print(
+                            f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} verification timestamp was stale ({previous_timestamp}); refreshed to {item.get('verification_timestamp')}"
+                        )
+                if source != "local":
+                    if not policy["allow_remote_skills"]:
+                        all_ok = False
+                        console.print(f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} is remote but allow_remote_skills is disabled")
+                    elif source.lower() not in policy["allowed_sources"]:
+                        all_ok = False
+                        console.print(f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} source '{source}' is not trusted by the current profile")
+                    elif trust_score < policy["min_remote_trust_score"]:
+                        all_ok = False
+                        console.print(
+                            f"  [yellow][!!][/yellow] {item.get('name', 'unknown')} trust score {trust_score} is below min_remote_trust_score {policy['min_remote_trust_score']}"
+                        )
+                recommendation = item.get("recommendation")
+                if isinstance(recommendation, dict) and recommendation.get("reasons"):
+                    rationale_present = True
+                    rationale_lines.append(
+                        f"  [cyan][INFO][/cyan] {item.get('name', 'unknown')}: {_format_recommendation_summary(recommendation)}"
+                    )
+            if rationale_present:
+                console.print("  [bold]Recommendation Rationale[/bold]")
+                for line in rationale_lines:
+                    console.print(line, soft_wrap=True)
+                console.print("  [dim]Recommendation rationale is recorded in skills.lock.json[/dim]")
+        except Exception as exc:
+            all_ok = False
+            console.print(f"  [red][!!][/red] Failed to read {LOCKFILE_NAME}: {exc}")
+    else:
+        console.print(f"  [dim]-[/dim] {LOCKFILE_NAME} not found")
 
-    # ── Summary ───────────────────────────────────────────────────────────────
     console.print()
     if all_ok:
         console.print("[bold green][OK] All checks passed! Your skillsmith setup is healthy.[/bold green]")
     else:
-        console.print("[bold yellow][!!] Some issues found. Run [bold]skillsmith init[/bold] to fix missing files.[/bold yellow]")
+        console.print("[bold yellow][!!] Some issues found. Run [bold]skillsmith align[/bold] or [bold]skillsmith init[/bold] to repair generated files.[/bold yellow]")
         if fix:
-            console.print("\n[cyan]Running skillsmith init to fix issues...[/cyan]")
-            # Import local to avoid circular deps
-            from .init import init_command
+            console.print("\n[cyan]Running skillsmith align to repair generated files...[/cyan]")
+            from .align import align_command
             from click.testing import CliRunner
+
             runner = CliRunner()
-            result = runner.invoke(init_command, [])
+            result = runner.invoke(align_command, [])
             console.print(result.output)
     console.print()
+    if strict and not all_ok:
+        raise click.exceptions.Exit(1)
+
+
+def _tool_list(tools: set[str]) -> str:
+    return ", ".join(sorted(tools)) if tools else "none"

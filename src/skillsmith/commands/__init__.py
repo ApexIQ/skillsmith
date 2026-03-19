@@ -21,9 +21,18 @@ PLATFORM_DIR = TEMPLATE_DIR / "platforms"
 PLATFORM_FILES = {
     "gemini": {"src": "GEMINI.md", "dest": "GEMINI.md"},
     "claude": {"src": "CLAUDE.md", "dest": "CLAUDE.md"},
+    "claude_orchestrator": {"src": ".claude/agents/orchestrator.md", "dest": ".claude/agents/orchestrator.md"},
+    "claude_researcher": {"src": ".claude/agents/researcher.md", "dest": ".claude/agents/researcher.md"},
+    "claude_implementer": {"src": ".claude/agents/implementer.md", "dest": ".claude/agents/implementer.md"},
+    "claude_reviewer": {"src": ".claude/agents/reviewer.md", "dest": ".claude/agents/reviewer.md"},
+    "claude_plan_feature": {"src": ".claude/commands/plan-feature.md", "dest": ".claude/commands/plan-feature.md"},
+    "claude_implement_feature": {"src": ".claude/commands/implement-feature.md", "dest": ".claude/commands/implement-feature.md"},
+    "claude_review_changes": {"src": ".claude/commands/review-changes.md", "dest": ".claude/commands/review-changes.md"},
     "cursor": {"src": ".cursorrules", "dest": ".cursorrules"},
     "cursor_mdc": {"src": ".cursor/rules/skillsmith.mdc", "dest": ".cursor/rules/skillsmith.mdc"},
     "windsurf": {"src": ".windsurfrules", "dest": ".windsurfrules"},
+    "windsurf_rules": {"src": ".windsurf/rules/skillsmith.md", "dest": ".windsurf/rules/skillsmith.md"},
+    "zencoder_rules": {"src": ".zencoder/rules/skillsmith.md", "dest": ".zencoder/rules/skillsmith.md"},
     "copilot": {"src": ".github/copilot-instructions.md", "dest": ".github/copilot-instructions.md"},
 }
 
@@ -198,14 +207,26 @@ def download_github_dir(repo_url, dest_dir):
 
 # Import commands to expose them
 from .init import init_command
+from .align import align_command
+from .sync import sync_command
+from .recommend import recommend_command
+from .report import report_command
+from .profile import profile_command
+from .discover import discover_command
 from .list_cmd import list_command
 from .add import add_command
 from .lint import lint_command
 from .compose import compose_command
+from .audit import audit_command
 from .doctor import doctor_command
+from .eval_cmd import eval_command
 from .budget import budget_command
 from .update import update_command
 from .rebuild import rebuild_command
 from .serve import serve_command
 from .snapshot import snapshot_command
 from .watch import watch_command
+from .context_index import context_index_command
+from .registry import registry_command
+from .registry_service import registry_service_command
+from .trust_service import trust_service_command
