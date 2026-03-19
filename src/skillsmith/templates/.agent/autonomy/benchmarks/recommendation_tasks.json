@@ -1,0 +1,47 @@
+﻿{
+  "name": "recommendation_tasks",
+  "description": "Small autonomy benchmark pack for skill recommendation quality across common project scenarios.",
+  "tasks": [
+    {
+      "id": "recommend_library_release",
+      "title": "Recommend skills for a Python library release",
+      "goal": "Ship a Python library release with packaging, testing, and publish readiness.",
+      "expected_skills": [
+        "test-driven-development",
+        "git-workflow",
+        "ci-cd-best-practices"
+      ]
+    },
+    {
+      "id": "recommend_cli_fix",
+      "title": "Recommend skills for a CLI bug fix",
+      "goal": "Trace and fix a regression in a command-line tool while preserving behavior.",
+      "expected_skills": [
+        "debugging",
+        "software-architecture",
+        "backend-testing"
+      ]
+    },
+    {
+      "id": "recommend_fullstack_change",
+      "title": "Recommend skills for a fullstack feature change",
+      "goal": "Add a user-facing feature that touches both frontend and backend code.",
+      "expected_skills": [
+        "integration-backend-frontend-best-practices",
+        "frontend-best-practices",
+        "software-architecture"
+      ]
+    },
+    {
+      "id": "recommend_agent_workflow",
+      "title": "Recommend skills for an agent workflow task",
+      "goal": "Plan, execute, and verify a multi-step autonomous workflow with clear handoffs.",
+      "expected_skills": [
+        "agentic-workflow",
+        "context-engineering",
+        "agent-collaboration"
+      ]
+    }
+  ]
+}
+

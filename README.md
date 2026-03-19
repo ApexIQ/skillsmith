@@ -79,6 +79,9 @@ After setup, skillsmith creates and manages:
 ### Workflow and Evaluation
 
 - `skillsmith compose "<goal>"`: Generate a step-by-step workflow for a goal.
+- `skillsmith autonomous run`: Start the autonomous workflow loop.
+- `skillsmith autonomous status`: Show the current autonomous workflow state.
+- `skillsmith autonomous report`: Generate an autonomous workflow summary.
 - `skillsmith eval`: Run evaluation and save metrics artifact.
 - `skillsmith budget`: Show context/token budget usage.
 - `skillsmith context-index build`: Build searchable project context index.
@@ -173,7 +176,7 @@ uv run --group dev python -m build
 
 ## 9) Current Version
 
-- Package version: `0.6.4`
+- Package version: `0.6.5`
 
 ## License
 

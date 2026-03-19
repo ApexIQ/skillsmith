@@ -14,12 +14,15 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Immediate priority is architecture definition and implementation planning.
 
 ## Recent Changes
+- Added a new autonomy runtime module plus `tests/test_autonomy_runtime.py` covering stop conditions, crash handling, `results.tsv` row fields, and resume safety from the latest state snapshot.
 - Executed v0.7 packaging-architecture migration: introduced runtime asset resolution/bootstrap surfaces (`skillsmith assets status|bootstrap`) so heavy skill payloads can live outside the default wheel.
 - Hardened build boundaries in `pyproject.toml` by constraining sdist includes to package + core metadata files and excluding heavyweight template zip/bytecode artifacts.
 - Added `V0_7_MIGRATION_PLAN.md` with exact file moves, new command surface, rollout sequence, and backward-compat strategy.
 - Verified migration with `uv run python -m unittest tests.test_assets_runtime -v` and `uv run --group dev python scripts/check_package_quality.py`; resulting artifacts are now ~`0.19 MB` wheel and ~`0.17 MB` sdist.
 - Ran an external black-box validation from a fresh Desktop uv install of `skillsmith==0.6.2` (`C:\Users\vanam\Desktop\skillsmith-e2e-lab`) across 24 happy-path and adversarial scenarios; captured outcomes in `noted_down.md` for remediation planning.
 - Added role-specific operating guidance across AGENTS/CLAUDE/GEMINI (orchestrator, researcher, implementer, reviewer), including explicit handoff contracts; mirrored the same policy into templates and renderer output generation.
+- Added a new `tests/test_autonomy_command.py` spec for the upcoming autonomy CLI surface, covering run/status/report happy paths, artifact persistence, and strict keep/discard handling with mocked subprocess/scoring internals.
+- Verified the autonomy slice with `uv run python -m unittest tests.test_autonomy_runtime tests.test_autonomy_command -v` after aligning the command tests to the existing `autonomous` CLI group and runtime artifacts.
 - Compared instruction quality between existing AGENTS/CLAUDE/GEMINI files and a richer workflow-orchestration draft; replaced generic guidance with a balanced execution policy (plan-for-non-trivial, bounded delegation, verification-before-done) and mirrored the update into source templates plus renderer functions.
 - Reviewed the CLI command surface and identified defects around `serve`, `add`, `list`, `budget`, and `update`.
 - Researched adjacent products and standards including `skills.sh`, Skyll, Continue, Aider, Claude Code MCP, Goose recipes, and OpenHands skills.
@@ -120,6 +123,7 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Closed the core basic-readiness gaps: README command-surface drift fixed, module invocation corrected (`python -m skillsmith`), version/status updated, explicit CLI-vs-library contract added, and `pyproject.toml` now declares license metadata plus dev build tooling.
 - Verified remediation commands: `uv run python -m skillsmith --help` and `uv run --group dev python -m build` both pass.
 - Rewrote `README.md` into beginner-first documentation format with clearer command explanations, copy/paste workflows, and non-technical guidance.
+- Added the `skillsmith autonomous` command surface with `run`, `status`, and `report` subcommands wired through a runtime helper shim.
 
 ## Next Steps
 1. Close basic-readiness gaps from `docs/basic_readiness_audit.md` (README command surface, module invocation, version drift, CLI-vs-library contract, packaging metadata/tooling).
