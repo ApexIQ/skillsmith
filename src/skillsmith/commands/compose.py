@@ -8,7 +8,8 @@ from .workflow_engine import build_workflow, load_rolling_eval_feedback
 
 
 @click.command()
-@click.argument("goal")
+@click.argument("goal", required=False)
+@click.option("--goal", "goal_option", help="Workflow goal (backward-compatible alias for positional GOAL).")
 @click.option("--max-skills", default=5, show_default=True, help="Maximum skills to include")
 @click.option("--mode", type=click.Choice(["standard", "planner-editor"]), default="standard", show_default=True, help="Workflow execution mode")
 @click.option("--reflection-retries", default=0, type=click.IntRange(0, 10), show_default=True, help="How many reflection retries to allow after failed verification")
@@ -25,11 +26,17 @@ from .workflow_engine import build_workflow, load_rolling_eval_feedback
     help="Number of recent eval artifacts to consider when feedback is enabled.",
 )
 @click.option("--output", type=click.Path(), help="Output file (default: stdout)")
-def compose_command(goal, max_skills, mode, reflection_retries, feedback, feedback_window, output):
+def compose_command(goal, goal_option, max_skills, mode, reflection_retries, feedback, feedback_window, output):
     """Generate a workflow using the saved profile, context, and available skills."""
+    if goal and goal_option:
+        raise click.UsageError("Provide the goal either as positional GOAL or with --goal, not both.")
+    resolved_goal = goal_option or goal
+    if not resolved_goal:
+        raise click.UsageError("Missing goal. Provide GOAL or use --goal <text>.")
+
     feedback_artifact = load_rolling_eval_feedback(Path.cwd(), feedback_window=feedback_window) if feedback else None
     workflow = build_workflow(
-        goal,
+        resolved_goal,
         Path.cwd(),
         max_skills=max_skills,
         execution_mode=mode,

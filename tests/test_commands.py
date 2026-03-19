@@ -734,7 +734,7 @@ class SkillsmithCommandTests(unittest.TestCase):
         with self.project_dir(), mock.patch("skillsmith.commands.add.discover_skills", return_value=candidates):
             result = self.runner.invoke(add_command, ["missing-skill"])
 
-        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(result.exit_code, 1, result.output)
         self.assertIn("not found locally", result.output)
         self.assertIn("python-packaging", result.output)
 
@@ -822,7 +822,7 @@ class SkillsmithCommandTests(unittest.TestCase):
             download.side_effect = fake_download
             result = self.runner.invoke(add_command, ["https://github.com/example/repo/tree/0123456789abcdef0123456789abcdef01234567/direct-skill"])
 
-            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertEqual(result.exit_code, 1, result.output)
             self.assertIn("publisher signature mismatch", result.output)
             self.assertFalse((cwd / ".agent" / "skills" / "direct-skill").exists())
             self.assertFalse((cwd / "skills.lock.json").exists())
@@ -853,7 +853,7 @@ class SkillsmithCommandTests(unittest.TestCase):
                 ["https://github.com/example/repo/tree/0123456789abcdef0123456789abcdef01234567/direct-skill"],
             )
 
-            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertEqual(result.exit_code, 1, result.output)
             self.assertIn("revoked", result.output)
             self.assertFalse((cwd / ".agent" / "skills" / "direct-skill").exists())
             self.assertFalse((cwd / "skills.lock.json").exists())
@@ -905,7 +905,7 @@ class SkillsmithCommandTests(unittest.TestCase):
 
             result = self.runner.invoke(add_command, ["low trust", "--discover"])
 
-            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertEqual(result.exit_code, 1, result.output)
             self.assertIn("blocked", result.output)
             self.assertIn("min_remote_trust_score 65", result.output)
             download.assert_not_called()
@@ -972,7 +972,7 @@ class SkillsmithCommandTests(unittest.TestCase):
 
             result = self.runner.invoke(add_command, ["https://github.com/example/repo/tree/main/direct-skill"])
 
-            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertEqual(result.exit_code, 1, result.output)
             self.assertIn("require_pinned_github_refs", result.output)
             download.assert_not_called()
             self.assertFalse((cwd / "skills.lock.json").exists())
@@ -1625,6 +1625,34 @@ class SkillsmithCommandTests(unittest.TestCase):
             self.assertIn("profile:", workflow)
             self.assertNotIn("Feedback loop:", workflow)
             self.assertIn("reflection_max_retries: 0", workflow)
+
+    def test_compose_supports_goal_option_alias(self):
+        catalog = [
+            {"name": "backend-testing", "description": "testing python backend", "tags": ["testing", "python"]},
+        ]
+        with self.project_dir() as cwd, mock.patch("skillsmith.commands.workflow_engine.load_catalog", return_value=catalog):
+            self.runner.invoke(main, ["init", "--minimal"])
+            output_path = cwd / "workflow.yml"
+            result = self.runner.invoke(
+                compose_command,
+                ["--goal", "test python backend", "--output", str(output_path)],
+            )
+
+            self.assertEqual(result.exit_code, 0, result.output)
+            workflow = output_path.read_text(encoding="utf-8")
+            self.assertIn("goal: test python backend", workflow)
+            self.assertIn("backend-testing", workflow)
+
+    def test_compose_rejects_positional_goal_and_goal_option_together(self):
+        with self.project_dir() as cwd:
+            self.runner.invoke(main, ["init", "--minimal"])
+            result = self.runner.invoke(
+                compose_command,
+                ["test python backend", "--goal", "duplicate"],
+            )
+
+            self.assertNotEqual(result.exit_code, 0, result.output)
+            self.assertIn("either as positional GOAL or with --goal", result.output)
 
     def test_compose_supports_planner_editor_mode_with_reflection_retries(self):
         catalog = [{"name": "planner-skill", "description": "plan then implement", "tags": ["plan", "implement"]}]

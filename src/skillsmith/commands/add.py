@@ -284,9 +284,10 @@ def add_command(name_or_url, use_discovery, source):
         try:
             installed = _install_from_url(cwd, name_or_url, dest_dir, profile=profile)
             if not installed:
-                return
+                raise click.exceptions.Exit(1)
         except Exception as exc:
             console.print(f"[red]Error downloading skill: {exc}[/red]")
+            raise click.exceptions.Exit(1)
         return
 
     if _install_local_skill(cwd, name_or_url, dest_dir):
@@ -354,3 +355,4 @@ def add_command(name_or_url, use_discovery, source):
         console.print("[dim]Use `skillsmith add <query> --discover` to install the top supported match.[/dim]")
     else:
         console.print("[dim]Use `skillsmith discover <query>` to search local and remote providers.[/dim]")
+    raise click.exceptions.Exit(1)

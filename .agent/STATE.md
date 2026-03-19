@@ -14,6 +14,7 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Immediate priority is architecture definition and implementation planning.
 
 ## Recent Changes
+- Ran an external black-box validation from a fresh Desktop uv install of `skillsmith==0.6.2` (`C:\Users\vanam\Desktop\skillsmith-e2e-lab`) across 24 happy-path and adversarial scenarios; captured outcomes in `noted_down.md` for remediation planning.
 - Added role-specific operating guidance across AGENTS/CLAUDE/GEMINI (orchestrator, researcher, implementer, reviewer), including explicit handoff contracts; mirrored the same policy into templates and renderer output generation.
 - Compared instruction quality between existing AGENTS/CLAUDE/GEMINI files and a richer workflow-orchestration draft; replaced generic guidance with a balanced execution policy (plan-for-non-trivial, bounded delegation, verification-before-done) and mirrored the update into source templates plus renderer functions.
 - Reviewed the CLI command surface and identified defects around `serve`, `add`, `list`, `budget`, and `update`.

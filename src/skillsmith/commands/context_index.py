@@ -528,8 +528,10 @@ def context_index_command(ctx):
     """Build a retrieval-friendly context index for the current project."""
     if ctx.invoked_subcommand is not None:
         return
+    _run_context_index_build(Path.cwd())
 
-    cwd = Path.cwd()
+
+def _run_context_index_build(cwd: Path) -> dict:
     payload = build_context_index(cwd)
     path = _write_context_index(cwd, payload)
 
@@ -537,6 +539,13 @@ def context_index_command(ctx):
     console.print(f"[green][OK][/green] Wrote {path.relative_to(cwd).as_posix()}")
     console.print(f"[dim]Indexed {payload['file_count']} key project files[/dim]")
     _print_context_index_table(payload["files"])
+    return payload
+
+
+@context_index_command.command("build")
+def context_index_build_command():
+    """Build the retrieval-friendly context index."""
+    _run_context_index_build(Path.cwd())
 
 
 @context_index_command.command("query")

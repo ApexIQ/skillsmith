@@ -149,6 +149,29 @@ class ContextIndexCommandTests(unittest.TestCase):
             self.assertLess(result.output.index("path=.agent/project_profile.yaml"), result.output.index("path=README.md"))
             self.assertLess(result.output.index("path=.agent/project_profile.yaml"), result.output.index("path=AGENTS.md"))
 
+    def test_context_index_build_subcommand_matches_default_behavior(self):
+        with self.project_dir() as cwd, mock.patch(
+            "skillsmith.commands.context_index._timestamp_to_string",
+            side_effect=self.fixed_timestamp,
+        ):
+            (cwd / ".agent" / "context").mkdir(parents=True)
+            (cwd / "AGENTS.md").write_text("hello", encoding="utf-8")
+            with mock.patch(
+                "skillsmith.commands.context_index.KEY_PROJECT_FILES",
+                ["AGENTS.md"],
+            ):
+                default_result = self.runner.invoke(main, ["context-index"])
+                default_payload = json.loads((cwd / ".agent" / "context" / "index.json").read_text(encoding="utf-8"))
+                build_result = self.runner.invoke(main, ["context-index", "build"])
+                build_payload = json.loads((cwd / ".agent" / "context" / "index.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(default_result.exit_code, 0, default_result.output)
+        self.assertEqual(build_result.exit_code, 0, build_result.output)
+        self.assertEqual(default_payload["file_count"], build_payload["file_count"])
+        self.assertEqual(default_payload["files"][0]["path"], build_payload["files"][0]["path"])
+        self.assertIn("Context Index", build_result.output)
+        self.assertIn(".agent/context/index.json", build_result.output)
+
     def test_context_index_query_weights_override_changes_ranking(self):
         with self.project_dir() as cwd:
             self.write_index_payload(

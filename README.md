@@ -171,7 +171,7 @@ uv run --group dev python -m build
 
 ## 9) Current Version
 
-- Package version: `0.6.2`
+- Package version: `0.6.3`
 
 ## License
 

@@ -107,6 +107,7 @@ def doctor_command(fix, strict):
     """Check your skillsmith setup health across all AI platforms."""
     cwd = Path.cwd()
     all_ok = True
+    fatal_error = False
 
     console.print("[bold]Executable PATH[/bold]")
     is_on_path = shutil.which("skillsmith") is not None
@@ -152,6 +153,7 @@ def doctor_command(fix, strict):
             expected_files = managed_file_map(cwd, profile)
         except Exception as exc:
             all_ok = False
+            fatal_error = True
             console.print(f"  [red][!!][/red] Failed to load project profile: {exc}")
 
     console.print("\n[bold]State Files (.agent/)[/bold]")
@@ -306,6 +308,8 @@ def doctor_command(fix, strict):
             console.print(result.output)
     console.print()
     if strict and not all_ok:
+        raise click.exceptions.Exit(1)
+    if fatal_error:
         raise click.exceptions.Exit(1)
 
 
