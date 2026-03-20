@@ -1,6 +1,6 @@
 [project]
 name = "skillsmith"
-version = "0.6.7"
+version = "0.6.8"
 description = "The premier agentic skills library for professional AI engineering"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -67,4 +67,5 @@ include = [
     "LICENSE",
     "pyproject.toml",
 ]
+
 
