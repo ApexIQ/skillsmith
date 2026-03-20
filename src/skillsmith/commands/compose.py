@@ -4,6 +4,7 @@ import click
 import yaml
 
 from . import console
+from .context_index import build_context_retrieval_trace, persist_context_retrieval_trace, retrieve_context_candidates
 from .workflow_engine import build_workflow, load_rolling_eval_feedback
 
 
@@ -34,15 +35,37 @@ def compose_command(goal, goal_option, max_skills, mode, reflection_retries, fee
     if not resolved_goal:
         raise click.UsageError("Missing goal. Provide GOAL or use --goal <text>.")
 
-    feedback_artifact = load_rolling_eval_feedback(Path.cwd(), feedback_window=feedback_window) if feedback else None
+    cwd = Path.cwd()
+    feedback_artifact = load_rolling_eval_feedback(cwd, feedback_window=feedback_window) if feedback else None
     workflow = build_workflow(
         resolved_goal,
-        Path.cwd(),
+        cwd,
         max_skills=max_skills,
         execution_mode=mode,
         reflection_max_retries=reflection_retries,
         feedback=feedback_artifact,
     )
+    trace_path = None
+    try:
+        candidates = retrieve_context_candidates(cwd, resolved_goal, limit=max_skills, tier="l1")
+        trace = build_context_retrieval_trace(
+            cwd,
+            source="compose",
+            query=resolved_goal,
+            goal=resolved_goal,
+            tier="l1",
+            limit=max_skills,
+            candidates=candidates,
+            selection={
+                "selected_skills": [skill.get("name", "") for skill in workflow.get("skills", []) if isinstance(skill, dict)],
+                "workflow_steps": len(workflow.get("steps", [])),
+            },
+            metadata={"mode": mode, "feedback_enabled": bool(feedback)},
+        )
+        trace_path = persist_context_retrieval_trace(cwd, trace)
+        workflow["context_trace"] = trace_path.relative_to(cwd).as_posix()
+    except Exception:
+        trace_path = None
 
     if not workflow["skills"]:
         console.print("[yellow]No relevant skills found for that goal.[/yellow]")
@@ -52,6 +75,8 @@ def compose_command(goal, goal_option, max_skills, mode, reflection_retries, fee
     if output:
         Path(output).write_text(yaml_out, encoding="utf-8")
         console.print(f"[green][OK][/green] Workflow written to {output}")
+        if trace_path is not None:
+            console.print(f"[dim]Retrieval trace: {trace_path.relative_to(cwd).as_posix()}[/dim]")
     else:
         console.print("\n[bold]--- Generated Workflow ---[/bold]")
         console.print(yaml_out)

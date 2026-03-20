@@ -15,6 +15,7 @@ if str(SRC) not in os.sys.path:
     os.sys.path.insert(0, str(SRC))
 
 from skillsmith.cli import main
+from skillsmith.commands.context_index import retrieve_context_candidates
 
 
 class ContextIndexCommandTests(unittest.TestCase):
@@ -57,6 +58,15 @@ class ContextIndexCommandTests(unittest.TestCase):
         context_dir = cwd / ".agent" / "context"
         context_dir.mkdir(parents=True, exist_ok=True)
         (context_dir / "query_policy.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    def snapshot_json_files(self, cwd: Path) -> dict[str, str]:
+        snapshot: dict[str, str] = {}
+        agent_dir = cwd / ".agent"
+        if not agent_dir.exists():
+            return snapshot
+        for path in sorted(agent_dir.rglob("*.json")):
+            snapshot[path.relative_to(cwd).as_posix()] = path.read_text(encoding="utf-8")
+        return snapshot
 
     def test_context_index_writes_freshness_stamps_and_compressed_snippets(self):
         with self.project_dir() as cwd, mock.patch(
@@ -149,6 +159,54 @@ class ContextIndexCommandTests(unittest.TestCase):
             self.assertLess(result.output.index("path=.agent/project_profile.yaml"), result.output.index("path=README.md"))
             self.assertLess(result.output.index("path=.agent/project_profile.yaml"), result.output.index("path=AGENTS.md"))
 
+    def test_context_index_query_writes_retrieval_trace_artifact(self):
+        with self.project_dir() as cwd, mock.patch(
+            "skillsmith.commands.context_index._timestamp_to_string",
+            side_effect=self.fixed_timestamp,
+        ):
+            (cwd / ".agent" / "context").mkdir(parents=True)
+            (cwd / "AGENTS.md").write_text("Read the profile before anything else.\n", encoding="utf-8")
+            (cwd / ".agent" / "project_profile.yaml").write_text(
+                "project: retrieval demo\nprofile: true\ncontext: project profile retrieval\n",
+                encoding="utf-8",
+            )
+            with mock.patch(
+                "skillsmith.commands.context_index.KEY_PROJECT_FILES",
+                ["AGENTS.md", ".agent/project_profile.yaml"],
+            ):
+                self.assertEqual(self.runner.invoke(main, ["context-index"]).exit_code, 0)
+                before = self.snapshot_json_files(cwd)
+                result = self.runner.invoke(main, ["context-index", "query", "project profile", "--limit", "2"])
+
+            self.assertEqual(result.exit_code, 0, result.output)
+            after = self.snapshot_json_files(cwd)
+            changed = {path: text for path, text in after.items() if before.get(path) != text}
+            trace_paths = [
+                path
+                for path in changed
+                if "trace" in Path(path).stem.lower() or "retrieval" in Path(path).stem.lower() or "/traces/" in path
+            ]
+            if not trace_paths and ".agent/context/index.json" in changed:
+                index_payload = json.loads((cwd / ".agent" / "context" / "index.json").read_text(encoding="utf-8"))
+                trace_payload = (
+                    index_payload.get("retrieval_trace")
+                    or index_payload.get("query_trace")
+                    or index_payload.get("trace")
+                    or index_payload.get("queries")
+                )
+                self.assertIsInstance(trace_payload, dict, index_payload)
+                self.assertEqual(trace_payload.get("query"), "project profile")
+                self.assertIn(trace_payload.get("tier"), {"l0", "l1", "l2"})
+                candidates = trace_payload.get("candidates") or trace_payload.get("results") or []
+                self.assertTrue(candidates, trace_payload)
+            else:
+                self.assertTrue(trace_paths, changed)
+                trace_payload = json.loads((cwd / trace_paths[0]).read_text(encoding="utf-8"))
+                self.assertEqual(trace_payload.get("query"), "project profile")
+                self.assertIn(trace_payload.get("tier"), {"l0", "l1", "l2"})
+                candidates = trace_payload.get("candidates") or trace_payload.get("results") or []
+                self.assertTrue(candidates, trace_payload)
+
     def test_context_index_build_subcommand_matches_default_behavior(self):
         with self.project_dir() as cwd, mock.patch(
             "skillsmith.commands.context_index._timestamp_to_string",
@@ -171,6 +229,57 @@ class ContextIndexCommandTests(unittest.TestCase):
         self.assertEqual(default_payload["files"][0]["path"], build_payload["files"][0]["path"])
         self.assertIn("Context Index", build_result.output)
         self.assertIn(".agent/context/index.json", build_result.output)
+
+    def test_context_index_query_preserves_legacy_ranking_with_optional_metadata_and_budgeted_tiers(self):
+        with self.project_dir() as cwd:
+            self.write_index_payload(
+                cwd,
+                [
+                    {
+                        "path": "docs/guide.md",
+                        "freshness_score": 95,
+                        "path_priority_score": 100,
+                        "compressed_snippet": "project profile retrieval alpha beta",
+                        "tier_snippets": {
+                            "l0": "project profile retrieval alpha beta",
+                            "l1": "project profile retrieval alpha beta with more context",
+                            "l2": "project profile retrieval alpha beta with more context and detail",
+                        },
+                        "path_group": {"name": "docs", "type": "longform"},
+                        "compaction": {
+                            "strategy": "summary",
+                            "source_paths": ["docs/guide.md", "docs/reference.md"],
+                        },
+                    },
+                    {
+                        "path": "docs/reference.md",
+                        "freshness_score": 80,
+                        "path_priority_score": 92,
+                        "compressed_snippet": "project profile retrieval beta gamma",
+                    },
+                ],
+            )
+
+            l0_results = retrieve_context_candidates(cwd, "project profile", limit=2, tier="l0")
+            l2_results = retrieve_context_candidates(cwd, "project profile", limit=2, tier="l2")
+            result = self.runner.invoke(main, ["context-index", "query", "project profile", "--limit", "2", "--tier", "l2"])
+
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual([item["path"] for item in l0_results], ["docs/guide.md", "docs/reference.md"])
+        self.assertEqual([item["path"] for item in l2_results], ["docs/guide.md", "docs/reference.md"])
+        self.assertEqual(l0_results[0]["retrieval_tier"], "l0")
+        self.assertEqual(l2_results[0]["retrieval_tier"], "l2")
+        self.assertLess(len(l0_results[0]["selected_snippet"]), len(l2_results[0]["selected_snippet"]))
+        path_group = l2_results[0].get("path_group")
+        if isinstance(path_group, dict):
+            self.assertEqual(path_group.get("name"), "docs")
+        else:
+            self.assertEqual(path_group, "docs")
+        compaction = l2_results[0].get("compaction", l2_results[0].get("compaction_hint", {}))
+        self.assertEqual(compaction.get("strategy", compaction.get("compaction_mode")), "summary" if "strategy" in compaction else "compact")
+        self.assertIn("Tier: l2", result.output)
+        self.assertIn("path=docs/guide.md", result.output)
+        self.assertIn("path=docs/reference.md", result.output)
 
     def test_context_index_query_weights_override_changes_ranking(self):
         with self.project_dir() as cwd:

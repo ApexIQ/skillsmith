@@ -14,6 +14,9 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Immediate priority is architecture definition and implementation planning.
 
 ## Recent Changes
+- Documented the 8-pillar autonomy contract in `README.md`, including bounded recommendation-only runs, benchmark packs under `.agent/autonomy/benchmarks/`, session persistence, and safety behavior.
+- Added the autonomy release artifact map to `README.md` and recorded the session outputs (`session.json`, `state.json`, `latest.json`, `results.tsv`) used by `skillsmith autonomous run|status|report`.
+- Documented the context-tier model, retrieval trace location (`.agent/context/index.json`), and snapshot note/memory-lesson output paths in `README.md`, with expected `context-index` and `snapshot` behavior.
 - Added a new autonomy runtime module plus `tests/test_autonomy_runtime.py` covering stop conditions, crash handling, `results.tsv` row fields, and resume safety from the latest state snapshot.
 - Executed v0.7 packaging-architecture migration: introduced runtime asset resolution/bootstrap surfaces (`skillsmith assets status|bootstrap`) so heavy skill payloads can live outside the default wheel.
 - Hardened build boundaries in `pyproject.toml` by constraining sdist includes to package + core metadata files and excluding heavyweight template zip/bytecode artifacts.
@@ -23,6 +26,7 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Added role-specific operating guidance across AGENTS/CLAUDE/GEMINI (orchestrator, researcher, implementer, reviewer), including explicit handoff contracts; mirrored the same policy into templates and renderer output generation.
 - Added a new `tests/test_autonomy_command.py` spec for the upcoming autonomy CLI surface, covering run/status/report happy paths, artifact persistence, and strict keep/discard handling with mocked subprocess/scoring internals.
 - Verified the autonomy slice with `uv run python -m unittest tests.test_autonomy_runtime tests.test_autonomy_command -v` after aligning the command tests to the existing `autonomous` CLI group and runtime artifacts.
+- Expanded autonomy contract coverage to include structured session metadata round-trips for typed intent/task graph state, mutation safety snapshots and rollback policy, run manifest consistency, structured lessons persistence, and trust summary/report fields.
 - Compared instruction quality between existing AGENTS/CLAUDE/GEMINI files and a richer workflow-orchestration draft; replaced generic guidance with a balanced execution policy (plan-for-non-trivial, bounded delegation, verification-before-done) and mirrored the update into source templates plus renderer functions.
 - Reviewed the CLI command surface and identified defects around `serve`, `add`, `list`, `budget`, and `update`.
 - Researched adjacent products and standards including `skills.sh`, Skyll, Continue, Aider, Claude Code MCP, Goose recipes, and OpenHands skills.

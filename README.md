@@ -52,6 +52,17 @@ After setup, skillsmith creates and manages:
 - skill installation and tracking (`skills.lock.json`)
 - workflow/evaluation/trust utilities
 
+### Context Tiers
+
+skillsmith keeps context in simple layers:
+
+- Tier 1: the active task and recent instructions
+- Tier 2: project state in `.agent/project_profile.yaml` and `.agent/context/project-context.md`
+- Tier 3: retrieval and memory artifacts in `.agent/context/index.json`, `.agent/context/query_policy.json`, and `.agent/snapshots/`
+
+`skillsmith context-index build` writes the retrieval index, `skillsmith context-index query` returns ranked matches with score breakdowns, and `skillsmith snapshot` saves or restores the `.agent/` folder.
+Snapshot notes, when provided, are stored beside the archive in `.agent/snapshots/` as `.note.txt` files and are the place to keep short memory lessons or handoff notes.
+
 ## 4) Command Reference (Simple)
 
 ### Project Setup
@@ -87,6 +98,34 @@ After setup, skillsmith creates and manages:
 - `skillsmith context-index build`: Build searchable project context index.
 - `skillsmith context-index query "<query>"`: Search ranked project context.
 - `skillsmith context ...`: Alias for `context-index`.
+
+### Autonomous Contract
+
+The 8-pillar autonomy contract in this release is:
+
+1. Bounded domain: autonomous runs currently support recommendation workflows only.
+2. Benchmark-driven: runs load a benchmark pack from `.agent/autonomy/benchmarks/`.
+3. Preflight safety: runs stop early if git is missing, the repo is not clean, or preflight fails.
+4. Bounded execution: `--max-hours`, `--max-iterations`, and `--early-stop-fails` cap loop length.
+5. Score gating: `--score-gate` and `--strict-gate` control keep/discard/crash behavior.
+6. Session persistence: each run writes session JSON, state JSON, and a latest pointer.
+7. Audit trail: `results.tsv` records preflight, iteration, and summary rows for each session.
+8. Status/report access: `status` and `report` resolve the latest session from `.agent/autonomy/latest.json`.
+
+Artifacts and paths:
+
+- `.agent/autonomy/runs/<session-id>/session.json`
+- `.agent/autonomy/runs/<session-id>/state.json`
+- `.agent/autonomy/runs/<session-id>/iterations/`
+- `.agent/autonomy/latest.json`
+- `.agent/autonomy/results.tsv`
+- `.agent/autonomy/benchmarks/`
+
+Safety behavior:
+
+- Dirty git trees are blocked before execution starts.
+- Strict gate failures end the run with a crash result.
+- Missing or invalid latest-session data falls back to "no autonomy session found" instead of raising.
 
 ### Registry and Trust (Advanced / Team Use)
 

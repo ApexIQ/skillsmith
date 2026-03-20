@@ -356,6 +356,16 @@ def write_eval_policy_fixture(target: Path) -> None:
     )
 
 
+def snapshot_json_files(target: Path) -> dict[str, str]:
+    snapshot: dict[str, str] = {}
+    agent_dir = target / ".agent"
+    if not agent_dir.exists():
+        return snapshot
+    for path in sorted(agent_dir.rglob("*.json")):
+        snapshot[path.relative_to(target).as_posix()] = path.read_text(encoding="utf-8")
+    return snapshot
+
+
 class SkillsmithCommandTests(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
@@ -1958,6 +1968,50 @@ class SkillsmithCommandTests(unittest.TestCase):
             self.assertNotIn("mode_suggestion:", workflow)
             self.assertIn("reflection_max_retries: 0", workflow)
             self.assertIn("verification_passes: 1", workflow)
+
+    def test_compose_writes_retrieval_trace_artifact_for_goal(self):
+        fake_workflow = {
+            "goal": "implement a feature",
+            "skills": [{"name": "implementation"}],
+            "steps": [{"name": "plan"}, {"name": "implement"}],
+        }
+        with self.project_dir() as cwd, mock.patch(
+            "skillsmith.commands.compose.build_workflow",
+            return_value=fake_workflow,
+        ):
+            self.runner.invoke(main, ["init", "--minimal"])
+            output_path = cwd / "workflow.yml"
+            before = snapshot_json_files(cwd)
+            result = self.runner.invoke(
+                compose_command,
+                ["implement a feature", "--output", str(output_path)],
+            )
+            after = snapshot_json_files(cwd)
+            self.assertEqual(result.exit_code, 0, result.output)
+            self.assertTrue(output_path.exists())
+            workflow_text = output_path.read_text(encoding="utf-8")
+            changed_json = {
+                path: text
+                for path, text in after.items()
+                if before.get(path) != text and path.endswith(".json")
+            }
+            trace_paths = [
+                path
+                for path in changed_json
+                if "trace" in Path(path).stem.lower() or "retrieval" in Path(path).stem.lower() or "/traces/" in path
+            ]
+            if trace_paths:
+                trace_payload = json.loads((cwd / trace_paths[0]).read_text(encoding="utf-8"))
+                self.assertEqual(trace_payload.get("goal"), "implement a feature")
+                retrieval_tier = trace_payload.get("retrieval_tier", trace_payload.get("tier"))
+                self.assertIn(retrieval_tier, {"l0", "l1", "l2"})
+                candidates = trace_payload.get("candidates") or trace_payload.get("results") or []
+                self.assertTrue(candidates, trace_payload)
+            else:
+                self.assertTrue(
+                    "retrieval_trace:" in workflow_text or "context_trace:" in workflow_text,
+                    workflow_text,
+                )
 
     def test_build_workflow_prefers_installed_skills(self):
         with self.project_dir() as cwd, mock.patch("skillsmith.commands.workflow_engine.load_catalog", return_value=[]):

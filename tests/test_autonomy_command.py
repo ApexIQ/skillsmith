@@ -39,8 +39,25 @@ class AutonomyCommandTests(unittest.TestCase):
             "stop_reason": "max_iterations",
             "iterations": [{"iteration": 1, "decision": "keep", "score": 88.2}],
             "best_score": 88.2,
-            "summary": {"score": 88.2},
+            "summary": {"score": 88.2, "trust_summary": {"state": "trusted", "score": 0.95}},
             "benchmark": {"name": "recommendation_tasks"},
+            "intent": {
+                "kind": "typed-intent",
+                "type": "mutation-safe-refine",
+                "goal": "Preserve runtime metadata across persistence",
+            },
+            "task_graph": {
+                "kind": "task-graph",
+                "root_task_id": "task-1",
+                "nodes": [{"id": "task-1", "type": "plan"}],
+            },
+            "mutation_safety": {
+                "snapshot": {"path": ".agent/snapshots/run-1", "exists": True},
+                "rollback_policy": {"mode": "restore-on-failure"},
+            },
+            "run_manifest": {"session_id": "run-1", "iteration_count": 1, "status": "completed"},
+            "lessons": [{"id": "lesson-1", "summary": "Restore the snapshot before retrying."}],
+            "trust_summary": {"state": "trusted", "score": 0.95},
         }
         fake_summary = {
             "session_id": "run-1",
@@ -54,6 +71,8 @@ class AutonomyCommandTests(unittest.TestCase):
             "best_score": 88.2,
             "final_score": 88.2,
             "benchmark_pack": "recommendation_tasks",
+            "trust_summary": {"state": "trusted", "score": 0.95},
+            "run_manifest": {"session_id": "run-1", "iteration_count": 1, "status": "completed"},
         }
         with self.project_dir(), mock.patch(
             "skillsmith.commands.autonomy.run_autonomy_session",
@@ -72,9 +91,16 @@ class AutonomyCommandTests(unittest.TestCase):
         self.assertEqual(run_result.exit_code, 0, run_result.output)
         self.assertEqual(status_result.exit_code, 0, status_result.output)
         self.assertEqual(report_result.exit_code, 0, report_result.output)
-        self.assertEqual(json.loads(run_result.output)["summary"]["best_score"], 88.2)
-        self.assertTrue(json.loads(status_result.output)["available"])
-        self.assertEqual(json.loads(report_result.output)["summary"]["status"], "completed")
+        run_payload = json.loads(run_result.output)
+        status_payload = json.loads(status_result.output)
+        report_payload = json.loads(report_result.output)
+        self.assertEqual(run_payload["summary"]["best_score"], 88.2)
+        self.assertEqual(run_payload["session"]["intent"]["type"], "mutation-safe-refine")
+        self.assertEqual(run_payload["session"]["run_manifest"]["status"], "completed")
+        self.assertEqual(run_payload["session"]["lessons"][0]["id"], "lesson-1")
+        self.assertEqual(status_payload["session"]["trust_summary"]["state"], "trusted")
+        self.assertEqual(report_payload["summary"]["trust_summary"]["score"], 0.95)
+        self.assertEqual(report_payload["summary"]["run_manifest"]["iteration_count"], 1)
 
     def test_autonomous_status_and_report_when_missing(self):
         with self.project_dir(), mock.patch(
