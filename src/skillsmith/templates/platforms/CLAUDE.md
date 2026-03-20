@@ -23,6 +23,14 @@
 - Avoid delegation for urgent blocking work that can be done directly.
 - Keep one clear subtask per subagent and avoid overlapping write scope.
 
+## Memory and Cost Policy
+
+- Keep the default path library-first: `pip install skillsmith` must remain sufficient.
+- Reuse cached retrieval context before expensive reasoning passes.
+- Follow five layers for memory reliability: observer, reflector, session recovery, reactive watcher, pre-compaction safeguard.
+- Require cache TTL and fingerprint invalidation for context reuse.
+- Keep enterprise infrastructure optional, not required for core user workflows.
+
 ## Role Use
 
 - `orchestrator`: set plan, assign role ownership, and gate completion.

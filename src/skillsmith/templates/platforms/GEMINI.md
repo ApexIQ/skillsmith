@@ -18,6 +18,18 @@
 - Use subagents only when parallelism or specialization is clearly beneficial.
 - Verify with tests/checks before marking done.
 
+## Memory and Cost Policy
+
+- Preserve a library-first default path; no mandatory hosted infra for core usage.
+- Prefer retrieval reuse and cheap context operations before model-heavy loops.
+- Use the five-layer memory reliability pattern:
+  1. observer capture
+  2. reflector compaction
+  3. session recovery
+  4. reactive watcher refresh
+  5. pre-compaction safeguard
+- Cache reuse must be guarded by TTL and context/policy fingerprints.
+
 ## Role Use
 
 - `orchestrator`: own task framing, delegation decisions, and final readiness.

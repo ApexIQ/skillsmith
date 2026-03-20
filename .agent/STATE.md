@@ -3,7 +3,7 @@
 > **CRITICAL**: AI agents MUST read this file at the start of every session.
 > Update this file after every significant step to prevent context rot.
 
-**Last Updated:** 2026-03-20
+**Last Updated:** 2026-03-21
 
 ## Current Objective
 Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-context platform with dynamic skill discovery, profile-driven file alignment, and workflow composition.
@@ -14,6 +14,31 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Immediate priority is architecture definition and implementation planning.
 
 ## Recent Changes
+- Cleared the final release-gate regression blocker in this Windows sandbox by introducing an early unittest bootstrap (`tests/test_000_tempdir_compat.py`) that routes `tempfile.TemporaryDirectory` to a workspace-safe temp root, eliminating environment ACL failures; verified full regression with `uv run python -m unittest discover tests -v` (`223` tests passed).
+- Implemented deterministic machine-output surfaces for core commands by adding `compose --json` and `doctor --json` (with stable key ordering) and validated `recommend --json` alongside them via schema and 3-run determinism coverage in `tests/test_machine_output_contract.py`; verification evidence: `python -m unittest tests.test_machine_output_contract -v` plus 3 repeated runs of `tests.test_quickstart_smoke tests.test_public_api tests.test_stability_contract tests.test_docs_recipes tests.test_machine_output_contract -v` (all green across runs).
+- Completed the docs-as-product execution slice for library-first onboarding: added 3 production recipe docs (`docs/recipes/local-bootstrap.md`, `docs/recipes/ci-gate-flow.md`, `docs/recipes/team-onboarding.md`), added a concrete failure-recovery section in `README.md` with 6 command-level failure modes/fixes, and added docs validation coverage in `tests/test_docs_recipes.py`; verified with `python -m unittest tests.test_docs_recipes tests.test_quickstart_smoke -v`.
+- Added the minimal Python SDK surface and import-first docs for `init_project`, `compose_workflow`, and `doctor_summary`; verification is still pending the orchestrator run, so this entry only records the docs/state change and the expected follow-up checks.
+- Documented the new `skillsmith context-index recover` and `skillsmith context-index refresh-changed` commands in `README.md`, including plain-language usage in the context-index reference and recall-cache troubleshooting flow; verification of the implementation itself remains with the orchestrator, so this state note only records the documentation change and expected follow-up checks.
+- Implemented a Total-Recall-inspired local retrieval cache for `context-index`/`compose` (`.agent/context/recall_cache.json`) with TTL-based reuse (`900s`), cache-key fingerprinting (query + tier/depth/limit + context-index fingerprint + query-policy fingerprint), and cache hit/miss observability in CLI output and retrieval traces.
+- Added deterministic recall-cache regression coverage in `tests/test_context_index.py` for miss->hit behavior, invalidation on context-index/policy changes, TTL expiry, and CLI cache indicators.
+- Verified recall-cache rollout with `uv run python -m unittest tests.test_context_index -v` (`14` tests passed) and full regression `uv run python -m unittest discover tests -v` (`203` tests passed).
+- Documented the recall-cache rollout in `README.md` as a library-first cost/speed improvement for `context-index query` and `compose`, including TTL, invalidation rules, and recovery commands; no code/test claims were added.
+- Updated `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md` (plus template and renderer variants) with a shared library-first memory/cost policy based on the five-layer recall pattern: observer, reflector, session recovery, reactive watcher, and pre-compaction safeguards, with explicit cache TTL/fingerprint invalidation requirements.
+- Rewrote `UPCOMING_FEATURES.md` into a strict library-first 30-day roadmap centered on the install-to-agent-ready promise (`pip install skillsmith` -> usable project), with explicit de-prioritization of non-core enterprise expansion in this cycle.
+- Completed the remaining service hardening slice with a swarm implementation:
+  - Added optional OIDC JWT auth mode for `skillsmith registry-service` (`--oidc-config`) with issuer/audience/HS256 signature/exp checks, claim-to-role+scope mapping, and `whoami` mode visibility.
+  - Added optional OIDC JWT auth mode for `skillsmith trust-service` (`--oidc-config`) with role+scope enforcement on read/write trust endpoints.
+  - Added trust authority signer-provider abstraction for `trust-service` (`--signer-provider local-hmac|external`), routing authority bundle/revocation signing through provider interface; `external` is a deterministic stub contract for future KMS/HSM integration.
+- Fixed a POST authz stability issue in `trust-service` by consuming request bodies before forbidden returns, eliminating intermittent connection aborts under denied-write tests.
+- Verified the slice with `uv run python -m unittest tests.test_registry_service tests.test_trust_service -v` and full regression `uv run python -m unittest discover tests -v` (`197` tests passed).
+- Implemented durable local service storage via optional SQLite backends for both `skillsmith registry-service` and `skillsmith trust-service` (with one-time legacy JSON import on empty DB), including new serve flags (`--backend sqlite`, `--db-file`, and trust `--authority-db-file`) and restart-persistence/import regression coverage in `tests/test_registry_service.py` and `tests/test_trust_service.py`.
+- Verified this durability slice with `uv run python -m unittest tests.test_registry_service tests.test_trust_service -v` and full regression `uv run python -m unittest discover tests -v` (`190` tests passed).
+- Added `UPCOMING_FEATURES.md` as a decision-complete 30-day execution roadmap (baseline, top 5 features, week-by-week sequencing, explicit deprioritization, and release gates) grounded in current state + v0.7 migration context.
+- Verified the integrated swarm implementation (`compose` stages + `suggest` + `safety`) with `uv run python -m unittest discover tests -v` (`179` tests passed).
+- Implemented a local safety mode command surface: `skillsmith safety` with `status`, `careful`, `freeze`, `guard`, and `unfreeze`, persisted under `.agent/safety/policy.json`.
+- Added `skillsmith suggest` as a deterministic next-action recommender that inspects profile, context drift, git status, lockfile health, and workflow availability.
+- Implemented stage-based workflow generation for `compose` with explicit `discover`, `plan`, `build`, `review`, `test`, `ship`, and `reflect` stages, while preserving the legacy `steps` list.
+- Added `tests/test_workflow_stages.py` to verify structured stage output, backward-compatible step emission, and goal-specific tailoring for debug/deploy behavior.
 - Documented the 8-pillar autonomy contract in `README.md`, including bounded recommendation-only runs, benchmark packs under `.agent/autonomy/benchmarks/`, session persistence, and safety behavior.
 - Added the autonomy release artifact map to `README.md` and recorded the session outputs (`session.json`, `state.json`, `latest.json`, `results.tsv`) used by `skillsmith autonomous run|status|report`.
 - Documented the context-tier model, retrieval trace location (`.agent/context/index.json`), and snapshot note/memory-lesson output paths in `README.md`, with expected `context-index` and `snapshot` behavior.

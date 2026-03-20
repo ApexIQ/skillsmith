@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import re
+import sqlite3
 import threading
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -19,7 +23,9 @@ console = Console()
 
 SERVICE_DIR_NAME = ".agent/service"
 SERVICE_FILE_NAME = "registry.json"
+SQLITE_DB_FILE_NAME = "registry.sqlite3"
 DEFAULT_AUTHZ_FILE_NAME = ".agent/service/registry-authz.json"
+DEFAULT_OIDC_CONFIG_NAME = ".agent/service/registry-oidc.json"
 SERVICE_NAME = "registry"
 SERVICE_VERSION = 1
 AUTHZ_ROLES = ("viewer", "editor", "approver", "admin")
@@ -44,6 +50,22 @@ class _AuthContext:
     token: str
     claims: _AuthClaims
     mode: str
+
+
+@dataclass(frozen=True)
+class _OidcConfig:
+    issuer: str
+    audience: str
+    shared_secret: str
+    algorithms: tuple[str, ...]
+    subject_claim: str
+    name_claim: str
+    roles_claim: str
+    groups_claim: str
+    tenants_claim: str
+    teams_claim: str
+    group_role_map: dict[str, tuple[str, ...]]
+    default_roles: tuple[str, ...]
 
 
 def _timestamp_to_string(value: Any | None = None) -> str:
@@ -185,6 +207,153 @@ def _load_authz_policy(path: Path | None) -> dict[str, _AuthClaims]:
     return policy
 
 
+def _claim_name(mapping: dict[str, Any], key: str, default: str) -> str:
+    value = mapping.get(key, default)
+    text = str(value).strip()
+    return text or default
+
+
+def _normalize_group_role_map(raw: Any) -> dict[str, tuple[str, ...]]:
+    if not isinstance(raw, dict):
+        return {}
+    normalized: dict[str, tuple[str, ...]] = {}
+    for group, roles in raw.items():
+        key = str(group).strip()
+        if not key:
+            continue
+        role_values = tuple(_normalize_role_values(roles))
+        if role_values:
+            normalized[key] = role_values
+    return normalized
+
+
+def _load_oidc_config(path: Path | None) -> _OidcConfig | None:
+    if path is None or not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(payload, dict):
+        return None
+    claims = payload.get("claims", {})
+    if not isinstance(claims, dict):
+        claims = {}
+    issuer = str(payload.get("issuer", "")).strip()
+    audience = str(payload.get("audience", "")).strip()
+    shared_secret = str(payload.get("shared_secret", "")).strip()
+    algorithms = tuple(str(value).strip().upper() for value in _split_values(payload.get("algorithms", ["HS256"])) if str(value).strip())
+    if not issuer or not audience or not shared_secret:
+        return None
+    return _OidcConfig(
+        issuer=issuer,
+        audience=audience,
+        shared_secret=shared_secret,
+        algorithms=algorithms or ("HS256",),
+        subject_claim=_claim_name(claims, "subject", "sub"),
+        name_claim=_claim_name(claims, "name", "name"),
+        roles_claim=_claim_name(claims, "roles", "roles"),
+        groups_claim=_claim_name(claims, "groups", "groups"),
+        tenants_claim=_claim_name(claims, "tenants", "tenants"),
+        teams_claim=_claim_name(claims, "teams", "teams"),
+        group_role_map=_normalize_group_role_map(payload.get("group_role_map", {})),
+        default_roles=tuple(_normalize_role_values(payload.get("default_roles", []))),
+    )
+
+
+def _base64url_decode(value: str) -> bytes:
+    padding = "=" * (-len(value) % 4)
+    return base64.urlsafe_b64decode((value + padding).encode("ascii"))
+
+
+def _decode_jwt(token: str) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    parts = token.split(".")
+    if len(parts) != 3:
+        return None
+    try:
+        header = json.loads(_base64url_decode(parts[0]).decode("utf-8"))
+        payload = json.loads(_base64url_decode(parts[1]).decode("utf-8"))
+    except Exception:
+        return None
+    if not isinstance(header, dict) or not isinstance(payload, dict):
+        return None
+    return header, payload
+
+
+def _jwt_signature_valid(token: str, shared_secret: str) -> bool:
+    parts = token.split(".")
+    if len(parts) != 3:
+        return False
+    signing_input = f"{parts[0]}.{parts[1]}".encode("ascii")
+    expected = hmac.new(shared_secret.encode("utf-8"), signing_input, hashlib.sha256).digest()
+    encoded = base64.urlsafe_b64encode(expected).decode("ascii").rstrip("=")
+    return hmac.compare_digest(encoded, parts[2])
+
+
+def _audience_matches(expected: str, actual: Any) -> bool:
+    if isinstance(actual, str):
+        return actual.strip() == expected
+    if isinstance(actual, list):
+        return any(str(item).strip() == expected for item in actual)
+    return False
+
+
+def _exp_valid(value: Any) -> bool:
+    if value in (None, ""):
+        return True
+    try:
+        expiry = int(value)
+    except Exception:
+        return False
+    from datetime import datetime, timezone
+
+    now = int(datetime.now(timezone.utc).timestamp())
+    return expiry >= now
+
+
+def _oidc_claims(token: str, payload: dict[str, Any], config: _OidcConfig) -> _AuthClaims:
+    subject = str(payload.get(config.subject_claim, "")).strip()
+    name = str(payload.get(config.name_claim, subject)).strip() or subject or "oidc-user"
+    roles = list(config.default_roles)
+    roles.extend(_normalize_role_values(payload.get(config.roles_claim, [])))
+    for group in _split_values(payload.get(config.groups_claim, [])):
+        roles.extend(config.group_role_map.get(group, ()))
+    normalized_roles = tuple(_unique_values(_normalize_role_values(roles)))
+    tenants = tuple(_normalize_scope_values(payload.get(config.tenants_claim, [])))
+    team_scopes = _normalize_team_scopes(payload.get(config.teams_claim, []))
+    if not team_scopes and tenants:
+        team_scopes = tuple((tenant, ("*",)) for tenant in tenants)
+    return _AuthClaims(
+        token=token,
+        roles=normalized_roles or tuple(config.default_roles) or ("viewer",),
+        tenants=tenants or ("*",),
+        team_scopes=team_scopes or (("*", ("*",)),),
+        name=name,
+        mode="oidc",
+    )
+
+
+def _authenticate_oidc_token(token: str, config: _OidcConfig | None) -> _AuthClaims | None:
+    if not token or config is None:
+        return None
+    decoded = _decode_jwt(token)
+    if decoded is None:
+        return None
+    header, payload = decoded
+    algorithm = str(header.get("alg", "")).strip().upper()
+    if algorithm not in config.algorithms or algorithm != "HS256":
+        return None
+    if str(payload.get("iss", "")).strip() != config.issuer:
+        return None
+    if not _audience_matches(config.audience, payload.get("aud")):
+        return None
+    if not _exp_valid(payload.get("exp")):
+        return None
+    if not _jwt_signature_valid(token, config.shared_secret):
+        return None
+    return _oidc_claims(token, payload, config)
+
+
 def _resolve_project_path(cwd: Path, path: Path | None, default_name: str) -> Path:
     if path is None:
         return cwd / default_name
@@ -211,6 +380,69 @@ def _write_json(path: Path, payload: dict) -> Path:
     temp_path.write_text(json.dumps(normalized, indent=2, sort_keys=True), encoding="utf-8")
     temp_path.replace(path)
     return path
+
+
+def _default_sqlite_db_path(cwd: Path) -> Path:
+    return _service_root(cwd) / SQLITE_DB_FILE_NAME
+
+
+def _sqlite_db_path(cwd: Path, db_file: Path | None) -> Path:
+    if db_file is None:
+        return _default_sqlite_db_path(cwd)
+    candidate = Path(db_file)
+    if candidate.is_absolute():
+        return candidate
+    return cwd / candidate
+
+
+def _ensure_sqlite_schema(connection: sqlite3.Connection) -> None:
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS service_state (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            payload TEXT NOT NULL,
+            generated_at TEXT NOT NULL
+        )
+        """
+    )
+
+
+def _sqlite_store_state(connection: sqlite3.Connection, payload: dict) -> dict:
+    normalized = _normalize_state(payload)
+    normalized["generated_at"] = _timestamp_to_string()
+    connection.execute(
+        """
+        INSERT OR REPLACE INTO service_state (id, payload, generated_at)
+        VALUES (1, ?, ?)
+        """,
+        (json.dumps(normalized, sort_keys=True), normalized["generated_at"]),
+    )
+    return normalized
+
+
+def _load_sqlite_json(db_path: Path, legacy_path: Path | None = None) -> dict:
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(str(db_path)) as connection:
+        _ensure_sqlite_schema(connection)
+        row = connection.execute("SELECT payload FROM service_state WHERE id = 1").fetchone()
+        if row is None:
+            payload = _load_json(legacy_path) if legacy_path is not None and legacy_path.exists() else _empty_state()
+            normalized = _sqlite_store_state(connection, payload)
+            return normalized
+        try:
+            payload = json.loads(str(row[0]))
+        except Exception:
+            payload = _empty_state()
+            normalized = _sqlite_store_state(connection, payload)
+            return normalized
+        return _normalize_state(payload)
+
+
+def _save_sqlite_json(db_path: Path, payload: dict) -> dict:
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(str(db_path)) as connection:
+        _ensure_sqlite_schema(connection)
+        return _sqlite_store_state(connection, payload)
 
 
 def _empty_state() -> dict:
@@ -384,10 +616,19 @@ def _authenticate(handler: BaseHTTPRequestHandler) -> _AuthContext | None:
         return _AuthContext(authenticated=False, token="", claims=_public_claims(), mode="public")
 
     server = handler.server
+    oidc_enabled = bool(getattr(server, "oidc_enabled", False))
+    oidc_config: _OidcConfig | None = getattr(server, "oidc_config", None)
     authz_enabled = bool(getattr(server, "authz_enabled", False))
     authz_policy: dict[str, _AuthClaims] = getattr(server, "authz_policy", {})
     expected = str(getattr(server, "bearer_token", "")).strip()
     token = _token_from_header(handler)
+
+    if oidc_enabled:
+        claims = _authenticate_oidc_token(token, oidc_config)
+        if claims is None:
+            _unauthorized(handler)
+            return None
+        return _AuthContext(authenticated=True, token=token, claims=claims, mode="oidc")
 
     if authz_enabled:
         if not token:
@@ -648,15 +889,23 @@ def _split_path(path: str) -> list[str]:
 
 def _load_state_from_server(handler: BaseHTTPRequestHandler) -> dict:
     state_path = Path(getattr(handler.server, "state_path"))
+    backend = str(getattr(handler.server, "state_backend", "json")).strip().lower() or "json"
+    db_path = Path(getattr(handler.server, "db_path")) if getattr(handler.server, "db_path", None) else None
     lock = getattr(handler.server, "state_lock")
     with lock:
+        if backend == "sqlite" and db_path is not None:
+            return _load_sqlite_json(db_path, legacy_path=state_path)
         return _load_json(state_path)
 
 
 def _save_state(handler: BaseHTTPRequestHandler, payload: dict) -> dict:
     state_path = Path(getattr(handler.server, "state_path"))
+    backend = str(getattr(handler.server, "state_backend", "json")).strip().lower() or "json"
+    db_path = Path(getattr(handler.server, "db_path")) if getattr(handler.server, "db_path", None) else None
     lock = getattr(handler.server, "state_lock")
     with lock:
+        if backend == "sqlite" and db_path is not None:
+            return _save_sqlite_json(db_path, payload)
         normalized = _normalize_state(payload)
         normalized["generated_at"] = _timestamp_to_string()
         _write_json(state_path, normalized)
@@ -862,23 +1111,37 @@ def create_registry_service_server(
     host: str = "127.0.0.1",
     port: int = 0,
     authz_file: Path | None = None,
+    oidc_config: Path | None = None,
     token: str | None = None,
     bearer_token: str | None = None,
+    backend: str = "json",
+    db_file: Path | None = None,
 ) -> ThreadingHTTPServer:
     project_root = Path.cwd() if cwd is None else Path(cwd)
     state_path = _state_path(project_root)
     authz_path = _resolve_project_path(project_root, authz_file, DEFAULT_AUTHZ_FILE_NAME)
+    oidc_path = _resolve_project_path(project_root, oidc_config, DEFAULT_OIDC_CONFIG_NAME) if oidc_config is not None else None
+    db_path = _sqlite_db_path(project_root, db_file)
+    normalized_backend = str(backend).strip().lower() or "json"
     state_path.parent.mkdir(parents=True, exist_ok=True)
-    if not state_path.exists():
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    if normalized_backend != "sqlite" and not state_path.exists():
         _write_json(state_path, _empty_state())
     server = ThreadingHTTPServer((host, port), _RegistryServiceHandler)
     server.state_path = str(state_path)  # type: ignore[attr-defined]
+    server.db_path = str(db_path)  # type: ignore[attr-defined]
     server.state_lock = threading.Lock()  # type: ignore[attr-defined]
+    server.state_backend = normalized_backend  # type: ignore[attr-defined]
     auth_token = str(bearer_token if bearer_token is not None else token if token is not None else "skillsmith-local-token").strip()
     server.bearer_token = auth_token  # type: ignore[attr-defined]
     server.authz_file = str(authz_path)  # type: ignore[attr-defined]
     server.authz_enabled = authz_path.exists()  # type: ignore[attr-defined]
     server.authz_policy = _load_authz_policy(authz_path)  # type: ignore[attr-defined]
+    server.oidc_config_file = str(oidc_path) if oidc_path is not None else ""  # type: ignore[attr-defined]
+    server.oidc_config = _load_oidc_config(oidc_path)  # type: ignore[attr-defined]
+    server.oidc_enabled = server.oidc_config is not None  # type: ignore[attr-defined]
+    if normalized_backend == "sqlite":
+        _load_sqlite_json(db_path, legacy_path=state_path)
     return server
 
 
@@ -888,16 +1151,22 @@ def start_registry_service(
     host: str = "127.0.0.1",
     port: int = 0,
     authz_file: Path | None = None,
+    oidc_config: Path | None = None,
     token: str | None = None,
     bearer_token: str | None = None,
+    backend: str = "json",
+    db_file: Path | None = None,
 ) -> tuple[ThreadingHTTPServer, threading.Thread, str]:
     server = create_registry_service_server(
         cwd,
         host=host,
         port=port,
         authz_file=authz_file,
+        oidc_config=oidc_config,
         token=token,
         bearer_token=bearer_token,
+        backend=backend,
+        db_file=db_file,
     )
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -910,16 +1179,22 @@ def run_registry_service(
     host: str = "127.0.0.1",
     port: int = 8000,
     authz_file: Path | None = None,
+    oidc_config: Path | None = None,
     token: str | None = None,
     bearer_token: str | None = None,
+    backend: str = "json",
+    db_file: Path | None = None,
 ) -> None:
     server = create_registry_service_server(
         cwd,
         host=host,
         port=port,
         authz_file=authz_file,
+        oidc_config=oidc_config,
         token=token,
         bearer_token=bearer_token,
+        backend=backend,
+        db_file=db_file,
     )
     console.print(f"[bold cyan]Registry service[/bold cyan] listening on http://{host}:{port}")
     try:
@@ -988,15 +1263,52 @@ def registry_service_command(ctx: click.Context) -> None:
 @click.option("--host", default="127.0.0.1", show_default=True)
 @click.option("--port", default=8000, show_default=True, type=int)
 @click.option(
+    "--backend",
+    type=click.Choice(["json", "sqlite"], case_sensitive=False),
+    default="json",
+    show_default=True,
+    help="State backend used by the service.",
+)
+@click.option(
+    "--db-file",
+    type=click.Path(path_type=Path, dir_okay=False),
+    default=None,
+    help="Optional SQLite database file used when --backend=sqlite.",
+)
+@click.option(
     "--authz-file",
     type=click.Path(path_type=Path, dir_okay=False),
     default=DEFAULT_AUTHZ_FILE_NAME,
     show_default=True,
     help="Optional JSON authz policy file",
 )
+@click.option(
+    "--oidc-config",
+    type=click.Path(path_type=Path, dir_okay=False),
+    default=None,
+    help="Optional OIDC JWT validation config file.",
+)
 @click.option("--token", "bearer_token", default="skillsmith-local-token", show_default=True)
-def registry_service_serve_command(cwd: Path, host: str, port: int, authz_file: Path, bearer_token: str) -> None:
-    run_registry_service(cwd, host=host, port=port, authz_file=authz_file, bearer_token=bearer_token)
+def registry_service_serve_command(
+    cwd: Path,
+    host: str,
+    port: int,
+    backend: str,
+    db_file: Path | None,
+    authz_file: Path,
+    oidc_config: Path | None,
+    bearer_token: str,
+) -> None:
+    run_registry_service(
+        cwd,
+        host=host,
+        port=port,
+        authz_file=authz_file,
+        oidc_config=oidc_config,
+        bearer_token=bearer_token,
+        backend=backend,
+        db_file=db_file,
+    )
 
 
 @registry_service_command.command("sync")

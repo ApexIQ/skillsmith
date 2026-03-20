@@ -21,12 +21,14 @@ from .commands import (
     serve_command,
     snapshot_command,
     watch_command,
+    suggest_command,
     assets_command,
     autonomous_command,
     context_index_command,
     registry_command,
     registry_service_command,
     trust_service_command,
+    safety_command,
 )
 
 @click.group()
@@ -55,6 +57,7 @@ main.add_command(rebuild_command, name="rebuild")
 main.add_command(serve_command, name="serve")
 main.add_command(snapshot_command, name="snapshot")
 main.add_command(watch_command, name="watch")
+main.add_command(suggest_command, name="suggest")
 main.add_command(assets_command, name="assets")
 main.add_command(autonomous_command, name="autonomous")
 main.add_command(context_index_command, name="context-index")
@@ -62,6 +65,7 @@ main.add_command(context_index_command, name="context")
 main.add_command(registry_command, name="registry")
 main.add_command(registry_service_command, name="registry-service")
 main.add_command(trust_service_command, name="trust-service")
+main.add_command(safety_command, name="safety")
 
 if __name__ == "__main__":
     main()

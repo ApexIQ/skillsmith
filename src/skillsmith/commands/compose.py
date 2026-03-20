@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import click
 import yaml
@@ -13,6 +14,7 @@ from .workflow_engine import build_workflow, load_rolling_eval_feedback
 @click.option("--goal", "goal_option", help="Workflow goal (backward-compatible alias for positional GOAL).")
 @click.option("--max-skills", default=5, show_default=True, help="Maximum skills to include")
 @click.option("--mode", type=click.Choice(["standard", "planner-editor"]), default="standard", show_default=True, help="Workflow execution mode")
+@click.option("--planner-editor", is_flag=True, hidden=True, help="DEPRECATED: use --mode planner-editor")
 @click.option("--reflection-retries", default=0, type=click.IntRange(0, 10), show_default=True, help="How many reflection retries to allow after failed verification")
 @click.option(
     "--feedback/--no-feedback",
@@ -26,14 +28,19 @@ from .workflow_engine import build_workflow, load_rolling_eval_feedback
     type=click.IntRange(1, 20),
     help="Number of recent eval artifacts to consider when feedback is enabled.",
 )
+@click.option("--json", "as_json", is_flag=True, help="Emit machine-readable JSON output")
 @click.option("--output", type=click.Path(), help="Output file (default: stdout)")
-def compose_command(goal, goal_option, max_skills, mode, reflection_retries, feedback, feedback_window, output):
+def compose_command(goal, goal_option, max_skills, mode, planner_editor, reflection_retries, feedback, feedback_window, as_json, output):
     """Generate a workflow using the saved profile, context, and available skills."""
     if goal and goal_option:
         raise click.UsageError("Provide the goal either as positional GOAL or with --goal, not both.")
     resolved_goal = goal_option or goal
     if not resolved_goal:
         raise click.UsageError("Missing goal. Provide GOAL or use --goal <text>.")
+    if planner_editor:
+        console.print("[yellow][DEPRECATED][/yellow] --planner-editor is deprecated; use --mode planner-editor.")
+        if mode == "standard":
+            mode = "planner-editor"
 
     cwd = Path.cwd()
     feedback_artifact = load_rolling_eval_feedback(cwd, feedback_window=feedback_window) if feedback else None
@@ -48,6 +55,9 @@ def compose_command(goal, goal_option, max_skills, mode, reflection_retries, fee
     trace_path = None
     try:
         candidates = retrieve_context_candidates(cwd, resolved_goal, limit=max_skills, tier="l1")
+        cache_hit = bool(candidates and candidates[0].get("cache_hit", False))
+        cache_age_seconds = candidates[0].get("cache_age_seconds") if candidates else None
+        cache_key = candidates[0].get("cache_key") if candidates else None
         trace = build_context_retrieval_trace(
             cwd,
             source="compose",
@@ -57,17 +67,48 @@ def compose_command(goal, goal_option, max_skills, mode, reflection_retries, fee
             limit=max_skills,
             candidates=candidates,
             selection={
-                "selected_skills": [skill.get("name", "") for skill in workflow.get("skills", []) if isinstance(skill, dict)],
+                "selected_skills": list(workflow.get("skills", [])),
                 "workflow_steps": len(workflow.get("steps", [])),
+                "cache": {
+                    "hit": cache_hit,
+                    "age_seconds": cache_age_seconds,
+                    "key": cache_key,
+                },
             },
-            metadata={"mode": mode, "feedback_enabled": bool(feedback)},
+            metadata={
+                "mode": mode,
+                "feedback_enabled": bool(feedback),
+                "cache": {
+                    "hit": cache_hit,
+                    "age_seconds": cache_age_seconds,
+                    "key": cache_key,
+                },
+            },
         )
         trace_path = persist_context_retrieval_trace(cwd, trace)
         workflow["context_trace"] = trace_path.relative_to(cwd).as_posix()
     except Exception:
         trace_path = None
 
-    if not workflow["skills"]:
+    payload = {
+        "ok": bool(workflow.get("skills")),
+        "goal": resolved_goal,
+        "cwd": str(cwd),
+        "workflow": workflow,
+        "trace_path": trace_path.relative_to(cwd).as_posix() if trace_path is not None else None,
+    }
+
+    if as_json:
+        json_out = json.dumps(payload, indent=2, sort_keys=True)
+        if output:
+            Path(output).write_text(json_out, encoding="utf-8")
+        else:
+            click.echo(json_out)
+        if not payload["ok"]:
+            raise click.exceptions.Exit(1)
+        return
+
+    if not payload["ok"]:
         console.print("[yellow]No relevant skills found for that goal.[/yellow]")
         return
 

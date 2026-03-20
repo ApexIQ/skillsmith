@@ -1,6 +1,7 @@
 import shutil
 import sys
 import time
+import json
 from collections import defaultdict
 from pathlib import Path
 
@@ -100,12 +101,61 @@ def _format_recommendation_summary(recommendation: dict) -> str:
     return " | ".join(parts) if parts else "no recorded rationale"
 
 
+def _doctor_machine_summary(cwd: Path, *, strict: bool) -> dict:
+    missing: list[str] = []
+    stale: list[str] = []
+    checks: list[dict] = []
+
+    def add_check(name: str, ok: bool, details: str) -> None:
+        checks.append({"name": name, "ok": ok, "details": details})
+        if not ok and details == "missing":
+            missing.append(name)
+        if not ok and details == "stale":
+            stale.append(name)
+
+    agents_md = cwd / "AGENTS.md"
+    profile_path = cwd / ".agent" / "project_profile.yaml"
+    context_path = cwd / ".agent" / "context" / "project-context.md"
+    state_path = cwd / ".agent" / "STATE.md"
+
+    add_check("AGENTS.md", agents_md.exists(), "present" if agents_md.exists() else "missing")
+    add_check(".agent/project_profile.yaml", profile_path.exists(), "present" if profile_path.exists() else "missing")
+    add_check(
+        ".agent/context/project-context.md",
+        context_path.exists(),
+        "present" if context_path.exists() else "missing",
+    )
+    if not state_path.exists():
+        add_check(".agent/STATE.md age <=24h", False, "missing")
+    else:
+        age_hours = (time.time() - state_path.stat().st_mtime) / 3600
+        add_check(".agent/STATE.md age <=24h", age_hours <= 24, "present" if age_hours <= 24 else "stale")
+
+    ok = all(item["ok"] for item in checks)
+    return {
+        "ok": ok,
+        "cwd": str(cwd),
+        "checks": checks,
+        "missing": missing,
+        "stale": stale,
+        "strict_failed": bool(strict and not ok),
+    }
+
+
 @click.command()
 @click.option("--fix", is_flag=True, help="Auto-fix missing platform files by running init")
 @click.option("--strict", is_flag=True, help="Exit non-zero when any warning or error is detected")
-def doctor_command(fix, strict):
+@click.option("--json", "as_json", is_flag=True, help="Emit machine-readable JSON summary output")
+def doctor_command(fix, strict, as_json):
     """Check your skillsmith setup health across all AI platforms."""
     cwd = Path.cwd()
+    if as_json:
+        payload = _doctor_machine_summary(cwd, strict=strict)
+        click.echo(json.dumps(payload, indent=2, sort_keys=True))
+        if payload["strict_failed"]:
+            raise click.exceptions.Exit(1)
+        return
+
     all_ok = True
     fatal_error = False
 

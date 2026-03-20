@@ -81,6 +81,19 @@ def render_agents_md(profile: dict) -> str:
 - One owner per subtask; merge results only after verification.
 - Never mark done without evidence (tests, command output, or concrete behavioral checks).
 
+## Memory and Cost Policy (Library-First)
+
+- Optimize for `pip install skillsmith` local workflows first; external services remain optional.
+- Prefer retrieval reuse and cheap context operations before model-heavy loops.
+- Apply the five-layer memory pattern in order:
+  1. observer capture
+  2. reflector compaction
+  3. session recovery
+  4. reactive watcher refresh
+  5. pre-compaction safeguard
+- Require TTL + fingerprint invalidation for recall-cache reuse.
+- Do not introduce mandatory hosted infra for core success paths.
+
 ## Role Playbook
 
 - `orchestrator`: owns problem framing, execution sequencing, and delegation boundaries.
@@ -262,6 +275,14 @@ def render_claude_md(profile: dict) -> str:
 - Do not delegate urgent blocking work that can be completed directly.
 - Keep one clear subtask per subagent and avoid overlapping write scope.
 
+## Memory and Cost Policy
+
+- Keep the default path library-first: `pip install skillsmith` is sufficient.
+- Reuse cached retrieval context before expensive reasoning passes.
+- Follow five layers: observer, reflector, session recovery, reactive watcher, pre-compaction safeguard.
+- Use TTL + fingerprint invalidation for cache reuse.
+- Keep enterprise infrastructure optional for non-enterprise users.
+
 ## Role Use
 
 - `orchestrator`: set plan, assign role ownership, and gate completion.
@@ -296,6 +317,17 @@ def render_gemini_md(profile: dict) -> str:
 - Keep changes minimal, explicit, and easy to verify.
 - Use subagents only when parallelism or specialization is clearly beneficial.
 - Verify with tests/checks before marking done.
+
+## Memory and Cost Policy
+- Preserve a library-first default path with no mandatory hosted infra.
+- Prefer retrieval reuse and cheap context operations before model-heavy loops.
+- Use the five-layer memory reliability pattern:
+  1. observer capture
+  2. reflector compaction
+  3. session recovery
+  4. reactive watcher refresh
+  5. pre-compaction safeguard
+- Cache reuse must be guarded by TTL and context/policy fingerprints.
 
 ## Role Use
 - `orchestrator`: own task framing, delegation decisions, and final readiness.

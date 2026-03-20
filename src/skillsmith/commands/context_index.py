@@ -16,9 +16,16 @@ from .lockfile import _timestamp_to_string
 CONTEXT_INDEX_NAME = "index.json"
 QUERY_POLICY_NAME = "query_policy.json"
 TRACE_DIR_NAME = "traces"
+RECALL_CACHE_NAME = "recall_cache.json"
 DEFAULT_QUERY_TIER = "l0"
 TIER_ORDER = ("l0", "l1", "l2")
 TIER_DEPTHS = {"l0": 1, "l1": 2, "l2": 3}
+DEFAULT_RECALL_CACHE_TTL_SECONDS = 900
+FRESHNESS_MAX_AGE_HOURS = 24.0
+FRESHNESS_INDEX_REMEDIATION = "skillsmith context-index build"
+FRESHNESS_SYNC_REMEDIATION = "skillsmith sync"
+FRESHNESS_INIT_REMEDIATION = "skillsmith init --guided"
+FRESHNESS_SYNC_AUTO_INSTALL_REMEDIATION = "skillsmith sync --auto-install"
 KEY_PROJECT_FILES = [
     "AGENTS.md",
     ".agent/PROJECT.md",
@@ -104,6 +111,10 @@ def _context_trace_dir(cwd: Path) -> Path:
     return cwd / ".agent" / "context" / TRACE_DIR_NAME
 
 
+def _recall_cache_path(cwd: Path) -> Path:
+    return cwd / ".agent" / "context" / RECALL_CACHE_NAME
+
+
 def _query_policy_path(cwd: Path) -> Path:
     return cwd / ".agent" / "context" / QUERY_POLICY_NAME
 
@@ -115,6 +126,195 @@ def _load_json(path: Path) -> dict | list | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return None
+
+
+def _load_recall_cache(cwd: Path) -> dict[str, Any]:
+    payload = _load_json(_recall_cache_path(cwd))
+    if not isinstance(payload, dict):
+        return {"version": 1, "entries": {}}
+    entries = payload.get("entries")
+    if not isinstance(entries, dict):
+        entries = {}
+    return {"version": int(payload.get("version", 1) or 1), "entries": entries}
+
+
+def _write_recall_cache(cwd: Path, payload: dict[str, Any]) -> None:
+    path = _recall_cache_path(cwd)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def _parse_timestamp(value: Any) -> datetime.datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        dt = datetime.datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except Exception:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt.astimezone(datetime.timezone.utc)
+
+
+def _cache_now() -> datetime.datetime:
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+def _cache_timestamp_string() -> str:
+    return _cache_now().replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _context_index_fingerprint(payload: dict) -> str:
+    file_entries: list[dict] = []
+    for item in payload.get("files", []):
+        if not isinstance(item, dict):
+            continue
+        file_entries.append(
+            {
+                "path": str(item.get("path", "")),
+                "freshness_stamp": str(item.get("freshness_stamp", "")),
+                "freshness_score": int(item.get("freshness_score", 0) or 0),
+            }
+        )
+    basis = {
+        "freshness_stamp": payload.get("freshness_stamp", ""),
+        "generated_at": payload.get("generated_at", ""),
+        "file_count": int(payload.get("file_count", len(file_entries)) or 0),
+        "files": file_entries,
+    }
+    return hashlib.sha256(json.dumps(basis, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
+
+
+def _query_policy_fingerprint(policy: dict | None) -> str:
+    payload = {
+        "weights": _extract_weight_map(policy if isinstance(policy, dict) else {}),
+        "semantic": _extract_semantic_policy(policy if isinstance(policy, dict) else {}),
+        "rerank": _extract_rerank_policy(policy if isinstance(policy, dict) else {}),
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
+
+
+def _recall_cache_key(
+    *,
+    query: str,
+    tier: str,
+    limit: int,
+    depth: int,
+    index_fingerprint: str,
+    policy_fingerprint: str,
+) -> str:
+    basis = {
+        "query": str(query).strip().lower(),
+        "tier": tier,
+        "limit": int(limit),
+        "depth": int(depth),
+        "index": index_fingerprint,
+        "policy": policy_fingerprint,
+    }
+    digest = hashlib.sha256(json.dumps(basis, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")).hexdigest()
+    return digest
+
+
+def _cache_entry_valid(entry: dict, *, ttl_seconds: int) -> bool:
+    created = _parse_timestamp(entry.get("created_at"))
+    if created is None:
+        return False
+    age_seconds = (_cache_now() - created).total_seconds()
+    return age_seconds <= max(0, int(ttl_seconds))
+
+
+def _cache_entry_age_seconds(entry: dict) -> float | None:
+    created = _parse_timestamp(entry.get("created_at"))
+    if created is None:
+        return None
+    age_seconds = (_cache_now() - created).total_seconds()
+    return round(max(0.0, age_seconds), 2)
+
+
+def _prune_recall_cache_entries(entries: dict[str, Any], *, ttl_seconds: int) -> dict[str, Any]:
+    pruned: dict[str, Any] = {}
+    for key, entry in entries.items():
+        if not isinstance(entry, dict):
+            continue
+        if _cache_entry_valid(entry, ttl_seconds=ttl_seconds):
+            pruned[str(key)] = entry
+    return pruned
+
+
+def _lookup_recall_cache_entry(
+    cwd: Path,
+    *,
+    cache_key: str,
+    ttl_seconds: int = DEFAULT_RECALL_CACHE_TTL_SECONDS,
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    payload = _load_recall_cache(cwd)
+    entries = payload.get("entries", {})
+    if not isinstance(entries, dict):
+        entries = {}
+    entry = entries.get(cache_key)
+    if not isinstance(entry, dict):
+        return None, {"cache_hit": False, "cache_key": cache_key, "cache_ttl_seconds": ttl_seconds, "cache_age_seconds": None}
+    if not _cache_entry_valid(entry, ttl_seconds=ttl_seconds):
+        entries.pop(cache_key, None)
+        payload["entries"] = _prune_recall_cache_entries(entries, ttl_seconds=ttl_seconds)
+        _write_recall_cache(cwd, payload)
+        return None, {"cache_hit": False, "cache_key": cache_key, "cache_ttl_seconds": ttl_seconds, "cache_age_seconds": None}
+    age_seconds = _cache_entry_age_seconds(entry)
+    return entry, {
+        "cache_hit": True,
+        "cache_key": cache_key,
+        "cache_ttl_seconds": ttl_seconds,
+        "cache_age_seconds": age_seconds,
+    }
+
+
+def _store_recall_cache_entry(
+    cwd: Path,
+    *,
+    cache_key: str,
+    query: str,
+    tier: str,
+    depth: int,
+    limit: int,
+    index_fingerprint: str,
+    policy_fingerprint: str,
+    results: list[dict],
+    ttl_seconds: int = DEFAULT_RECALL_CACHE_TTL_SECONDS,
+) -> dict[str, Any]:
+    payload = _load_recall_cache(cwd)
+    entries = payload.get("entries", {})
+    if not isinstance(entries, dict):
+        entries = {}
+    stored_results: list[dict] = []
+    for item in results:
+        if not isinstance(item, dict):
+            continue
+        stored = dict(item)
+        stored.pop("retrieval_plan", None)
+        stored.pop("cache_hit", None)
+        stored.pop("cache_age_seconds", None)
+        stored.pop("cache_key", None)
+        stored.pop("cache_ttl_seconds", None)
+        stored_results.append(stored)
+    entries[str(cache_key)] = {
+        "created_at": _cache_timestamp_string(),
+        "query": str(query),
+        "tier": str(tier),
+        "depth": int(depth),
+        "limit": int(limit),
+        "index_fingerprint": str(index_fingerprint),
+        "policy_fingerprint": str(policy_fingerprint),
+        "results": stored_results,
+    }
+    payload["entries"] = _prune_recall_cache_entries(entries, ttl_seconds=ttl_seconds)
+    _write_recall_cache(cwd, payload)
+    return {
+        "cache_hit": False,
+        "cache_key": cache_key,
+        "cache_ttl_seconds": ttl_seconds,
+        "cache_age_seconds": 0.0,
+    }
 
 
 def _merge_dicts(base: dict | None, override: dict | None) -> dict:
@@ -646,6 +846,137 @@ def _project_file_entries(cwd: Path) -> list[dict]:
     return entries
 
 
+def _file_age_hours(path: Path) -> float:
+    modified = datetime.datetime.fromtimestamp(path.stat().st_mtime, tz=datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    return max(0.0, (now - modified).total_seconds() / 3600.0)
+
+
+def _remediation_for_critical_file(cwd: Path, relative_path: str) -> str:
+    if relative_path == "AGENTS.md":
+        return FRESHNESS_INIT_REMEDIATION
+    if relative_path in {".agent/project_profile.yaml", ".agent/context/project-context.md"}:
+        if not (cwd / "AGENTS.md").exists():
+            return FRESHNESS_INIT_REMEDIATION
+        return FRESHNESS_SYNC_REMEDIATION
+    if relative_path == "skills.lock.json":
+        return FRESHNESS_SYNC_AUTO_INSTALL_REMEDIATION
+    return FRESHNESS_SYNC_REMEDIATION
+
+
+def _freshness_check_entry(
+    cwd: Path,
+    *,
+    label: str,
+    path: Path,
+    remediation: str,
+    max_age_hours: float,
+) -> dict[str, Any]:
+    relative_path = path.relative_to(cwd).as_posix()
+    if not path.exists() or not path.is_file():
+        return {
+            "label": label,
+            "path": relative_path,
+            "state": "missing",
+            "age_hours": None,
+            "max_age_hours": max_age_hours,
+            "remediation": remediation,
+        }
+
+    age_hours = round(_file_age_hours(path), 2)
+    state = "ok" if age_hours <= max_age_hours else "stale"
+    return {
+        "label": label,
+        "path": relative_path,
+        "state": state,
+        "age_hours": age_hours,
+        "max_age_hours": max_age_hours,
+        "remediation": remediation if state != "ok" else "",
+    }
+
+
+def _build_freshness_report(cwd: Path, max_age_hours: float = FRESHNESS_MAX_AGE_HOURS) -> dict[str, Any]:
+    checks: list[dict[str, Any]] = []
+    checks.append(
+        _freshness_check_entry(
+            cwd,
+            label="Context index",
+            path=_context_index_path(cwd),
+            remediation=FRESHNESS_INDEX_REMEDIATION,
+            max_age_hours=max_age_hours,
+        )
+    )
+
+    for relative_path in (
+        "AGENTS.md",
+        ".agent/project_profile.yaml",
+        ".agent/context/project-context.md",
+        "skills.lock.json",
+    ):
+        checks.append(
+            _freshness_check_entry(
+                cwd,
+                label=relative_path,
+                path=cwd / relative_path,
+                remediation=_remediation_for_critical_file(cwd, relative_path),
+                max_age_hours=max_age_hours,
+            )
+        )
+
+    missing = [item for item in checks if item["state"] == "missing"]
+    stale = [item for item in checks if item["state"] == "stale"]
+    ok = [item for item in checks if item["state"] == "ok"]
+    remediations: list[str] = []
+    for item in checks:
+        remediation = str(item.get("remediation", "")).strip()
+        if remediation and remediation not in remediations and item["state"] != "ok":
+            remediations.append(remediation)
+
+    return {
+        "ok": not missing and not stale,
+        "max_age_hours": max_age_hours,
+        "summary": {
+            "checked": len(checks),
+            "ok": len(ok),
+            "missing": len(missing),
+            "stale": len(stale),
+        },
+        "checks": checks,
+        "remediations": remediations,
+    }
+
+
+def _print_freshness_report(report: dict[str, Any]) -> None:
+    summary = report["summary"]
+    table = Table(title="Context Freshness", box=None)
+    table.add_column("File", style="cyan")
+    table.add_column("State", style="yellow")
+    table.add_column("Age (h)", style="green", justify="right")
+    table.add_column("Max Age (h)", style="magenta", justify="right")
+    table.add_column("Remediation", style="white")
+    for item in report["checks"]:
+        age = "-" if item["age_hours"] is None else f"{item['age_hours']:.2f}"
+        state_style = "green" if item["state"] == "ok" else "red"
+        table.add_row(
+            item["path"],
+            f"[{state_style}]{item['state']}[/{state_style}]",
+            age,
+            f"{item['max_age_hours']:.2f}",
+            item["remediation"] or "-",
+        )
+    console.print(table)
+    console.print(
+        "[dim]Summary: "
+        f"{summary['ok']} fresh, {summary['stale']} stale, {summary['missing']} missing "
+        f"(checked {summary['checked']} files)[/dim]"
+    )
+    if report["remediations"]:
+        console.print("[bold]Remediation Commands[/bold]")
+        for command in report["remediations"]:
+            console.print(f"- `{command}`")
+
+
+
 def build_context_index(cwd: Path) -> dict:
     generated_at = _timestamp_to_string()
     files = _project_file_entries(cwd)
@@ -682,6 +1013,68 @@ def _load_context_index(cwd: Path) -> dict:
     if normalized != payload:
         _write_context_index(cwd, normalized)
     return normalized
+
+
+def _load_existing_context_index_payload(cwd: Path) -> dict | None:
+    payload = _load_json(_context_index_path(cwd))
+    return payload if isinstance(payload, dict) else None
+
+
+def _context_index_entry_by_path(payload: dict) -> dict[str, dict]:
+    entries: dict[str, dict] = {}
+    for item in payload.get("files", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "") or "").strip()
+        if path:
+            entries[path] = item
+    return entries
+
+
+def _refresh_context_index_payload(cwd: Path, payload: dict) -> tuple[dict, dict[str, int]]:
+    existing_entries = _context_index_entry_by_path(payload)
+    refreshed_entries: list[dict] = []
+    updated = 0
+    removed = 0
+    unchanged = 0
+
+    for priority_index, relative in enumerate(KEY_PROJECT_FILES):
+        path = cwd / relative
+        existing_entry = existing_entries.pop(relative, None)
+        if not path.exists() or not path.is_file():
+            if existing_entry is not None:
+                removed += 1
+            continue
+
+        current_stamp, _ = _freshness_stamp(path)
+        if isinstance(existing_entry, dict) and str(existing_entry.get("freshness_stamp", "")).strip() == current_stamp:
+            refreshed_entry = dict(existing_entry)
+            unchanged += 1
+        else:
+            refreshed_entry = _build_project_file_entry(cwd, path, priority_index=priority_index)
+            updated += 1
+
+        refreshed_entry["path"] = relative
+        refreshed_entry["exists"] = True
+        refreshed_entry["path_priority_rank"] = priority_index + 1
+        refreshed_entry["path_priority_score"] = _path_priority_score(priority_index)
+        refreshed_entries.append(refreshed_entry)
+
+    removed += sum(1 for entry in existing_entries.values() if isinstance(entry, dict) and not (cwd / str(entry.get("path", ""))).exists())
+
+    generated_at = _timestamp_to_string()
+    refreshed_payload = {
+        "version": int(payload.get("version", 1) or 1),
+        "generated_at": generated_at,
+        "freshness_stamp": generated_at,
+        "root": str(payload.get("root", ".")),
+        "files": refreshed_entries,
+    }
+    return _enrich_context_index_payload(cwd, refreshed_payload), {
+        "updated": updated,
+        "removed": removed,
+        "unchanged": unchanged,
+    }
 
 
 def _query_lexical_score(query: str, candidate_text: str) -> tuple[int, list[str]]:
@@ -816,7 +1209,10 @@ def _trace_candidate_summary(candidate: dict) -> dict:
         "retrieval_tier": candidate.get("retrieval_tier", DEFAULT_QUERY_TIER),
         "path_group": candidate.get("path_group", "other"),
         "matched_terms": candidate.get("matched_terms", []),
+        "cache_hit": bool(candidate.get("cache_hit", False)),
     }
+    if candidate.get("cache_age_seconds") is not None:
+        summary["cache_age_seconds"] = candidate.get("cache_age_seconds")
     if candidate.get("rerank_score") is not None:
         summary["rerank_score"] = candidate.get("rerank_score")
     return summary
@@ -1096,22 +1492,54 @@ def retrieve_context_candidates(
     depth: int | None = None,
 ) -> list[dict]:
     """Return ranked context candidates for reuse by other modules."""
+    payload = _load_context_index(cwd)
     plan = resolve_context_retrieval_plan(cwd, tier=tier, depth=depth, budget=budget, limit=limit)
     normalized_tier = plan["resolved"]["tier"]
-    payload = _load_context_index(cwd)
     policy = _load_query_policy(cwd)
     override = _coerce_weights_override(weights_override)
     if override is not None:
         policy = _merge_dicts(policy, {"weights": override})
-    results = _rank_context_entries(payload.get("files", []), query, policy=policy, tier=normalized_tier)
     resolved_limit = plan["budget"]["limit"] or limit
-    clipped = results[: max(0, int(resolved_limit))]
+    resolved_limit = max(0, int(resolved_limit))
+    retrieval_depth = int(plan["resolved"]["depth"])
+    index_fingerprint = _context_index_fingerprint(payload)
+    policy_fingerprint = _query_policy_fingerprint(policy)
+    cache_key = _recall_cache_key(
+        query=query,
+        tier=normalized_tier,
+        limit=resolved_limit,
+        depth=retrieval_depth,
+        index_fingerprint=index_fingerprint,
+        policy_fingerprint=policy_fingerprint,
+    )
+    cache_entry, cache_metadata = _lookup_recall_cache_entry(cwd, cache_key=cache_key)
+    if cache_entry is not None:
+        cached_results = cache_entry.get("results", [])
+        clipped = [dict(item) for item in cached_results if isinstance(item, dict)]
+    else:
+        ranked_results = _rank_context_entries(payload.get("files", []), query, policy=policy, tier=normalized_tier)
+        clipped = [dict(item) for item in ranked_results[:resolved_limit]]
+        cache_metadata = _store_recall_cache_entry(
+            cwd,
+            cache_key=cache_key,
+            query=query,
+            tier=normalized_tier,
+            depth=retrieval_depth,
+            limit=resolved_limit,
+            index_fingerprint=index_fingerprint,
+            policy_fingerprint=policy_fingerprint,
+            results=clipped,
+        )
     for item in clipped:
         item["retrieval_plan"] = plan
         item["retrieval_tier"] = normalized_tier
-        item["retrieval_depth"] = plan["resolved"]["depth"]
+        item["retrieval_depth"] = retrieval_depth
         item["retrieval_budget_tokens"] = plan["budget"]["tokens"]
         item["retrieval_fallbacks"] = list(plan["fallbacks"])
+        item["cache_hit"] = bool(cache_metadata.get("cache_hit", False))
+        item["cache_age_seconds"] = cache_metadata.get("cache_age_seconds")
+        item["cache_key"] = cache_metadata.get("cache_key", cache_key)
+        item["cache_ttl_seconds"] = cache_metadata.get("cache_ttl_seconds", DEFAULT_RECALL_CACHE_TTL_SECONDS)
     return clipped[: max(0, int(limit))]
 
 
@@ -1169,6 +1597,8 @@ def context_index_query_command(query, limit, tier, weights):
         policy = _merge_dicts(policy, {"weights": weights_override})
 
     results = retrieve_context_candidates(cwd, query, limit=limit, tier=normalized_tier, weights_override=weights_override)
+    cache_hit = bool(results and results[0].get("cache_hit", False))
+    cache_age_seconds = results[0].get("cache_age_seconds") if results else None
     trace = build_context_retrieval_trace(
         cwd,
         source="context-index-query",
@@ -1176,7 +1606,19 @@ def context_index_query_command(query, limit, tier, weights):
         tier=normalized_tier,
         limit=limit,
         candidates=results,
-        selection={"result_paths": [item.get("path", "") for item in results]},
+        selection={
+            "result_paths": [item.get("path", "") for item in results],
+            "cache": {
+                "hit": cache_hit,
+                "age_seconds": cache_age_seconds,
+            },
+        },
+        metadata={
+            "cache": {
+                "hit": cache_hit,
+                "age_seconds": cache_age_seconds,
+            }
+        },
     )
     trace_path = persist_context_retrieval_trace(cwd, trace)
 
@@ -1184,6 +1626,11 @@ def context_index_query_command(query, limit, tier, weights):
     console.print(f"[dim]Query: {query}[/dim]")
     console.print(f"[dim]Tier: {normalized_tier}[/dim]")
     console.print(f"[dim]Trace: {trace_path.relative_to(cwd).as_posix()}[/dim]")
+    cache_state = "hit" if cache_hit else "miss"
+    if cache_age_seconds is None:
+        console.print(f"[dim]Recall cache: {cache_state}[/dim]")
+    else:
+        console.print(f"[dim]Recall cache: {cache_state} age={cache_age_seconds}s[/dim]")
     console.print(
         "[dim]Weights: "
         f"freshness={policy['weights']['freshness']} "
@@ -1208,3 +1655,90 @@ def context_index_query_command(query, limit, tier, weights):
             "[/dim]"
         )
     _print_query_table(results, query)
+
+
+@context_index_command.command("freshness")
+@click.option(
+    "--max-age-hours",
+    default=FRESHNESS_MAX_AGE_HOURS,
+    show_default=True,
+    type=click.FloatRange(min=0.0),
+    help="Maximum allowed age for the context index and core project files.",
+)
+@click.option("--json", "json_output", is_flag=True, help="Emit machine-readable JSON output.")
+def context_index_freshness_command(max_age_hours, json_output):
+    """Check whether the context index and core project files are fresh enough."""
+    cwd = Path.cwd()
+    report = _build_freshness_report(cwd, max_age_hours=max_age_hours)
+
+    if json_output:
+        console.print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        console.print("[bold cyan]Context Freshness[/bold cyan]")
+        _print_freshness_report(report)
+        if not report["ok"]:
+            console.print("[red]Freshness check failed.[/red]")
+
+    if not report["ok"]:
+        raise click.exceptions.Exit(1)
+
+
+@context_index_command.command("recover")
+@click.option(
+    "--max-age-hours",
+    default=FRESHNESS_MAX_AGE_HOURS,
+    show_default=True,
+    type=click.FloatRange(min=0.0),
+    help="Maximum allowed age for the context index and core project files.",
+)
+@click.option("--force", is_flag=True, help="Rebuild the context index even if it is fresh.")
+def context_index_recover_command(max_age_hours, force):
+    """Recover a missing or stale context index by rebuilding when needed."""
+    cwd = Path.cwd()
+    report = _build_freshness_report(cwd, max_age_hours=max_age_hours)
+    index_path = _context_index_path(cwd)
+    index_payload = _load_json(index_path)
+    missing_or_unreadable = not isinstance(index_payload, dict)
+    index_check = next((item for item in report["checks"] if item.get("label") == "Context index"), None)
+    index_state = str(index_check.get("state", "")).strip().lower() if isinstance(index_check, dict) else "missing"
+    should_rebuild = force or missing_or_unreadable or index_state != "ok"
+
+    console.print("[bold cyan]Context Index Recovery[/bold cyan]")
+    console.print(
+        "[dim]Freshness: "
+        f"ok={report['summary']['ok']} stale={report['summary']['stale']} "
+        f"missing={report['summary']['missing']} checked={report['summary']['checked']} "
+        f"max_age_hours={report['max_age_hours']:.2f}[/dim]"
+    )
+    if should_rebuild:
+        if force:
+            reason = "force requested"
+        elif missing_or_unreadable:
+            reason = "context index missing or unreadable"
+        else:
+            reason = f"context index is {index_state or 'missing'}"
+        console.print(f"[yellow]Recovery: rebuilt[/yellow] ({reason})")
+        _run_context_index_build(cwd)
+    else:
+        console.print("[green]Recovery: skipped[/green] (context index is fresh)")
+
+
+@context_index_command.command("refresh-changed")
+def context_index_refresh_changed_command():
+    """Refresh only changed key files in the context index."""
+    cwd = Path.cwd()
+    existing_payload = _load_existing_context_index_payload(cwd)
+    if not isinstance(existing_payload, dict):
+        console.print("[bold cyan]Context Index Refresh[/bold cyan]")
+        console.print("[dim]Existing index missing or invalid JSON; rebuilding the full index.[/dim]")
+        _run_context_index_build(cwd)
+        return
+
+    refreshed_payload, counts = _refresh_context_index_payload(cwd, existing_payload)
+    path = _write_context_index(cwd, refreshed_payload)
+    console.print("[bold cyan]Context Index Refresh[/bold cyan]")
+    console.print(
+        "[dim]Updated "
+        f"{counts['updated']} entries, removed {counts['removed']}, unchanged {counts['unchanged']}[/dim]"
+    )
+    console.print(f"[green][OK][/green] Wrote {path.relative_to(cwd).as_posix()}")

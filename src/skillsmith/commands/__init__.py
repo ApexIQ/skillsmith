@@ -227,9 +227,11 @@ from .rebuild import rebuild_command
 from .serve import serve_command
 from .snapshot import snapshot_command
 from .watch import watch_command
+from .suggest import suggest_command
 from .assets import assets_command
 from .autonomy import autonomous_command
 from .context_index import context_index_command
 from .registry import registry_command
 from .registry_service import registry_service_command
 from .trust_service import trust_service_command
+from .safety import safety_command

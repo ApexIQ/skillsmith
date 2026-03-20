@@ -18,6 +18,19 @@
 - Keep one owner per subtask and avoid overlapping write scope.
 - Never mark done without evidence (tests, command output, or concrete behavior checks).
 
+## Memory and Cost Policy (Library-First)
+
+- Optimize for `pip install skillsmith` local workflows first; external services must stay optional.
+- Prefer low-cost retrieval paths before expensive model loops.
+- Apply the five-layer memory approach in this order:
+  1. observer capture,
+  2. reflector compaction,
+  3. session recovery,
+  4. reactive watcher refresh,
+  5. pre-compaction safeguard.
+- Use TTL + fingerprint invalidation for recall caches to prevent stale context reuse.
+- Do not introduce mandatory infra (OIDC/KMS/hosted services) for core library success paths.
+
 ## Role Playbook
 
 - `orchestrator`: owns problem framing, execution sequencing, and delegation boundaries.

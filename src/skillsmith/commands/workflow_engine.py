@@ -12,6 +12,7 @@ from .providers import SkillCandidate, rank_candidates
 EVAL_POLICY_RELATIVE_PATH = ".agent/evals/policy.json"
 EVAL_RESULTS_RELATIVE_DIR = ".agent/evals/results"
 TEMPLATE_EVAL_POLICY_PATH = TEMPLATE_DIR / EVAL_POLICY_RELATIVE_PATH
+WORKFLOW_STAGE_ORDER = ("discover", "plan", "build", "review", "test", "ship", "reflect")
 
 
 def _tokenize(text: str) -> set[str]:
@@ -328,6 +329,259 @@ def select_skills_for_goal(goal: str, cwd: Path, max_skills: int = 5) -> list[Sk
     return rank_candidates(catalog_skill_candidates(), goal, profile)[:max_skills]
 
 
+def _goal_kind(goal_tokens: set[str]) -> str:
+    if {"brainstorm", "explore", "ideas", "design"} & goal_tokens:
+        return "brainstorm"
+    if {"debug", "fix", "bug"} & goal_tokens:
+        return "debug"
+    if {"test", "verify", "validation"} & goal_tokens:
+        return "test"
+    if {"deploy", "release", "ship"} & goal_tokens:
+        return "deploy"
+    if {"review", "audit", "pr"} & goal_tokens:
+        return "review"
+    return "default"
+
+
+def _build_stage_plan(
+    *,
+    goal: str,
+    goal_tokens: set[str],
+    profile: dict,
+    selected_skills: list[SkillCandidate],
+    execution_mode: str,
+    reflection_max_retries: int,
+    verification_passes: int,
+    feedback_adjustments: dict | None,
+) -> tuple[list[dict], list[str]]:
+    skill_names = [skill.name for skill in selected_skills]
+    skill_sources = [skill.source for skill in selected_skills]
+    stage_focus = _goal_kind(goal_tokens)
+    stage_prefix = {
+        "discover": "Discover",
+        "plan": "Plan",
+        "build": "Build",
+        "review": "Review",
+        "test": "Test",
+        "ship": "Ship",
+        "reflect": "Reflect",
+    }
+
+    if skill_names:
+        skill_line = f"Top relevant skills: {', '.join(skill_names)}."
+    else:
+        skill_line = "Top relevant skills: none selected."
+
+    stage_details: dict[str, dict[str, list[str]]] = {
+        "discover": {
+            "objectives": [
+                "Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.",
+                f"Confirm the project stage, app type, frameworks, and priorities for goal: {goal}.",
+                skill_line,
+            ],
+            "acceptance_checks": [
+                "Project profile and generated context are present or inferred without error.",
+                "The ranked skill list is deterministic for the current goal and profile.",
+                "Target tools and project shape are visible in the workflow output.",
+            ],
+            "evidence": [
+                ".agent/project_profile.yaml",
+                ".agent/context/project-context.md",
+                ".agent/context/index.json",
+            ],
+        },
+        "plan": {
+            "objectives": [
+                "Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+                "Name the touched files or subsystems before any edit is made.",
+                "Record the chosen execution mode and retry budget for the run.",
+            ],
+            "acceptance_checks": [
+                "The plan names concrete files, commands, or subsystems.",
+                "Every planned step has at least one verification check.",
+                "Planner-editor mode, when selected, is reflected in the workflow text.",
+            ],
+            "evidence": [
+                "selected skill names",
+                "execution mode",
+                "reflection retry budget",
+            ],
+        },
+        "build": {
+            "objectives": [
+                "Implement the smallest coherent change needed for the goal.",
+                "Keep edits scoped to the selected files and avoid unrelated refactors.",
+                "For debug goals, reproduce the issue and capture the failing behavior.",
+                "For brainstorm goals, compare the candidate approaches and choose the recommended path.",
+            ],
+            "acceptance_checks": [
+                "The patch changes only the files needed for the requested goal.",
+                "The requested behavior is present in the generated workflow output.",
+                "The implementation preserves the current command surface and backward compatibility.",
+            ],
+            "evidence": [
+                "edited files",
+                "goal-specific behavior",
+                "workflow steps list",
+            ],
+        },
+        "review": {
+            "objectives": [
+                "Inspect the changed files for correctness, regressions, and missing coverage.",
+                "Summarize findings first when risks remain, then note any verification gaps.",
+                "Validate that the workflow still reads cleanly as a handoff artifact.",
+            ],
+            "acceptance_checks": [
+                "The review names concrete risks or confirms the change is safe.",
+                "The review output is ordered and actionable for the next agent.",
+                "No unrelated files or behaviors are introduced into the plan.",
+            ],
+            "evidence": [
+                "changed files",
+                "risk notes",
+                "review summary",
+            ],
+        },
+        "test": {
+            "objectives": [
+                "Run the relevant automated tests for the changed workflow behavior.",
+                "Capture the exact command output or assertion evidence for the change.",
+                "Prefer the smallest test surface that still proves the new stage structure.",
+            ],
+            "acceptance_checks": [
+                "Targeted tests pass after the implementation change.",
+                "The failure mode is observable if the stage structure regresses.",
+                "The test suite still covers the existing `steps` list contract.",
+            ],
+            "evidence": [
+                "test command output",
+                "passing assertions",
+                "existing compose compatibility",
+            ],
+        },
+        "ship": {
+            "objectives": [
+                "Make the workflow output usable as a release-grade handoff artifact.",
+                "Keep the command output deterministic for CLI and file-based use.",
+                "Preserve the current release notes, rollback, and packaging signals.",
+            ],
+            "acceptance_checks": [
+                "The generated workflow includes both stage structure and the legacy `steps` list.",
+                "Compose output remains stable across repeated runs with the same inputs.",
+                "The result can be written to a file without additional cleanup.",
+            ],
+            "evidence": [
+                "workflow YAML output",
+                "output file path",
+                "deterministic render",
+            ],
+        },
+            "reflect": {
+            "objectives": [
+                "Summarize what the evidence says about the current run.",
+                "Carry forward the retry budget and feedback signals only when they exist.",
+                "Use the observed results to inform the next iteration instead of guessing.",
+            ],
+            "acceptance_checks": [
+                "Reflection text is grounded in the run's actual feedback or retry state.",
+                "Any mode suggestion comes from the current evidence, not a dummy rule.",
+                "The workflow keeps the same structure if no feedback is available.",
+            ],
+            "evidence": [
+                "feedback artifact",
+                "reflection retry count",
+                "mode suggestion state",
+            ],
+        },
+    }
+
+    if stage_focus == "debug":
+        stage_details["build"]["objectives"][2] = "Reproduce the issue and capture the failing behavior."
+        stage_details["build"]["objectives"].insert(3, "Implement the fix with focused verification for the affected area.")
+        stage_details["build"]["acceptance_checks"][0] = "Reproduce the issue and capture the failing behavior before the fix is applied."
+        stage_details["build"]["acceptance_checks"][1] = "Implement the fix with focused verification for the affected area."
+    elif stage_focus == "brainstorm":
+        stage_details["plan"]["objectives"][0] = "Generate 2-3 credible approaches with explicit tradeoffs."
+        stage_details["plan"]["objectives"].append("Choose the recommended path based on the current priorities and project stage.")
+        stage_details["build"]["objectives"][3] = "Choose the recommended path based on the current priorities and project stage."
+        stage_details["plan"]["acceptance_checks"].insert(1, "The workflow names at least one recommended path and its tradeoff.")
+    elif stage_focus == "test":
+        stage_details["test"]["objectives"][0] = "Identify the highest-risk behavior and the smallest reliable test surface."
+        stage_details["test"]["objectives"].insert(1, "Run the relevant automated tests and record the evidence.")
+        stage_details["test"]["acceptance_checks"][0] = "Run the relevant automated tests and record the evidence."
+    elif stage_focus == "deploy":
+        stage_details["ship"]["objectives"][0] = "Check release readiness against the current project stage, priorities, and target tools."
+        stage_details["ship"]["objectives"].append("Confirm tests, documentation, and rollback notes before shipping.")
+        stage_details["ship"]["acceptance_checks"][1] = "rollback notes or release checklist items are explicitly named."
+    elif stage_focus == "review":
+        stage_details["review"]["objectives"][0] = "Inspect the changed files for correctness, regressions, and release risks."
+        stage_details["review"]["acceptance_checks"].insert(0, "Findings are ordered by severity when issues are present.")
+
+    stages: list[dict] = []
+    steps: list[str] = []
+    for stage_name in WORKFLOW_STAGE_ORDER:
+        detail = stage_details[stage_name]
+        stage_entry = {
+            "name": stage_name,
+            "objective": detail["objectives"][0],
+            "objectives": detail["objectives"],
+            "acceptance_checks": detail["acceptance_checks"],
+            "evidence": detail["evidence"],
+            "summary": f"{stage_prefix[stage_name]} stage: {detail['objectives'][0]}",
+        }
+        stages.append(stage_entry)
+        acceptance_fragment = "; ".join(detail["acceptance_checks"][:2])
+        steps.append(f"{stage_prefix[stage_name]} stage: {detail['objectives'][0]} Acceptance: {acceptance_fragment}.")
+
+    steps.insert(0, "Read .agent/project_profile.yaml and .agent/context/project-context.md.")
+    steps.insert(1, "Confirm the requested goal against the current project stage and target tools.")
+    if execution_mode == "planner-editor":
+        steps.append("Planner phase: break the goal into a minimal patch plan with explicit acceptance checks.")
+        steps.append("Planner phase: identify required files, risks, and verification checkpoints before edits.")
+        steps.append("Editor phase: apply the approved plan in small diffs and keep changes scoped.")
+    if skill_names:
+        steps.append(f"Load the top relevant skills: {', '.join(skill_names)}.")
+    if feedback_adjustments:
+        budget_name = str(feedback_adjustments.get("resolved_slo_budget", {}).get("name", "default"))
+        budget_thresholds = feedback_adjustments.get("resolved_slo_budget", {}).get("thresholds", {})
+        if not isinstance(budget_thresholds, dict):
+            budget_thresholds = {}
+        breach_reasons = feedback_adjustments.get("breach_reasons", [])
+        if not isinstance(breach_reasons, list):
+            breach_reasons = []
+        budget_line = (
+            f"SLO budget: {budget_name} "
+            f"(TACR floor {budget_thresholds.get('tacr_floor', 'n/a')}, "
+            f"delta TACR floor {budget_thresholds.get('delta_tacr_floor', 'n/a')}, "
+            f"interventions threshold {budget_thresholds.get('interventions_threshold', 'n/a')}, "
+            f"latency threshold {budget_thresholds.get('latency_increase_threshold_ms', 'n/a')}, "
+            f"cost threshold {budget_thresholds.get('cost_increase_threshold_usd', 'n/a')})."
+        )
+        if breach_reasons:
+            budget_line += f" Breaches: {', '.join(str(reason) for reason in breach_reasons)}."
+        steps.append(budget_line)
+        steps.append(
+            f"Feedback loop: rolling TACR was {feedback_adjustments['rolling_tacr']:g}% "
+            f"across {feedback_adjustments['artifact_count']} artifacts; "
+            f"delta TACR {feedback_adjustments['delta_tacr']:g}pp, "
+            f"add {verification_passes} verification passes and up to {reflection_max_retries} reflection retries."
+        )
+        if execution_mode == "standard" and feedback_adjustments.get("mode_suggestion"):
+            steps.append(
+                "Planner-editor mode suggestion: recent eval trends crossed the guardrails; "
+                "consider rerunning with --mode planner-editor."
+            )
+    if reflection_max_retries > 0:
+        steps.append(
+            f"Reflection loop: after failed verification, run self-critique and retry up to {reflection_max_retries} times."
+        )
+    steps.append(
+        f"Verification loop: run {verification_passes} verification pass{'es' if verification_passes != 1 else ''} before completion."
+    )
+    steps.append("Run the most relevant test or validation command before completion.")
+    return stages, steps
+
+
 def build_workflow(
     goal: str,
     cwd: Path,
@@ -353,107 +607,16 @@ def build_workflow(
     app_type = profile.get("app_type", "application")
     frameworks = _safe_list(profile.get("frameworks"))
     priorities = _safe_list(profile.get("priorities"))
-
-    steps = [
-        "Read .agent/project_profile.yaml and .agent/context/project-context.md.",
-        "Confirm the requested goal against the current project stage and target tools.",
-    ]
-    if mode == "planner-editor":
-        steps.extend(
-            [
-                "Planner phase: break the goal into a minimal patch plan with explicit acceptance checks.",
-                "Planner phase: identify required files, risks, and verification checkpoints before edits.",
-            ]
-        )
-    if selected_skills:
-        steps.append(f"Load the top relevant skills: {', '.join(skill.name for skill in selected_skills)}.")
-    if {"brainstorm", "explore", "ideas", "design"} & goal_tokens:
-        steps.extend(
-            [
-                "Generate 2-3 credible approaches with explicit tradeoffs.",
-                "Choose the recommended path based on the current priorities and project stage.",
-            ]
-        )
-    elif {"debug", "fix", "bug"} & goal_tokens:
-        steps.extend(
-            [
-                "Reproduce the issue and capture the failing behavior.",
-                "Implement the fix with focused verification for the affected area.",
-            ]
-        )
-    elif {"test", "verify", "validation"} & goal_tokens:
-        steps.extend(
-            [
-                "Identify the highest-risk behavior and the smallest reliable test surface.",
-                "Run the relevant automated tests and record the evidence.",
-            ]
-        )
-    elif {"deploy", "release", "ship"} & goal_tokens:
-        steps.extend(
-            [
-                "Check release readiness against the current project stage, priorities, and target tools.",
-                "Confirm tests, documentation, and rollback notes before shipping.",
-            ]
-        )
-    elif {"review", "audit", "pr"} & goal_tokens:
-        steps.extend(
-            [
-                "Inspect the changed files and identify correctness or regression risks.",
-                "Summarize findings first, then verification gaps.",
-            ]
-        )
-    else:
-        steps.extend(
-            [
-                "Create a short implementation plan with verification checkpoints.",
-                "Implement the change in small steps and verify after each step.",
-            ]
-        )
-
-    if mode == "planner-editor":
-        steps.append("Editor phase: apply the approved plan in small diffs and keep changes scoped.")
-    if feedback_adjustments:
-        resolved_budget = feedback_adjustments.get("resolved_slo_budget", {})
-        if not isinstance(resolved_budget, dict):
-            resolved_budget = {}
-        budget_name = str(resolved_budget.get("name", "default"))
-        budget_thresholds = resolved_budget.get("thresholds", {})
-        if not isinstance(budget_thresholds, dict):
-            budget_thresholds = {}
-        breach_reasons = feedback_adjustments.get("breach_reasons", [])
-        if not isinstance(breach_reasons, list):
-            breach_reasons = []
-        budget_line = (
-            f"SLO budget: {budget_name} "
-            f"(TACR floor {budget_thresholds.get('tacr_floor', 'n/a')}, "
-            f"delta TACR floor {budget_thresholds.get('delta_tacr_floor', 'n/a')}, "
-            f"interventions threshold {budget_thresholds.get('interventions_threshold', 'n/a')}, "
-            f"latency threshold {budget_thresholds.get('latency_increase_threshold_ms', 'n/a')}, "
-            f"cost threshold {budget_thresholds.get('cost_increase_threshold_usd', 'n/a')})."
-        )
-        if breach_reasons:
-            budget_line += f" Breaches: {', '.join(str(reason) for reason in breach_reasons)}."
-        steps.append(budget_line)
-        feedback_line = (
-            f"Feedback loop: rolling TACR was {feedback_adjustments['rolling_tacr']:g}% "
-            f"across {feedback_adjustments['artifact_count']} artifacts; "
-            f"delta TACR {feedback_adjustments['delta_tacr']:g}pp, "
-            f"add {verification_passes} verification passes and up to {retries} reflection retries."
-        )
-        steps.append(feedback_line)
-        if mode == "standard" and feedback_adjustments.get("mode_suggestion"):
-            steps.append(
-                "Planner-editor mode suggestion: recent eval trends crossed the guardrails; "
-                "consider rerunning with --mode planner-editor."
-            )
-    if retries > 0:
-        steps.append(
-            f"Reflection loop: after failed verification, run self-critique and retry up to {retries} times."
-        )
-    steps.append(
-        f"Verification loop: run {verification_passes} verification pass{'es' if verification_passes != 1 else ''} before completion."
+    stages, steps = _build_stage_plan(
+        goal=goal,
+        goal_tokens=goal_tokens,
+        profile=profile,
+        selected_skills=selected_skills,
+        execution_mode=mode,
+        reflection_max_retries=retries,
+        verification_passes=verification_passes,
+        feedback_adjustments=feedback_adjustments,
     )
-    steps.append("Run the most relevant test or validation command before completion.")
 
     workflow = {
         "goal": goal,
@@ -470,6 +633,7 @@ def build_workflow(
         "context_available": bool(context_summary),
         "skills": [skill.name for skill in selected_skills],
         "skill_sources": [skill.source for skill in selected_skills],
+        "stages": stages,
         "steps": steps,
     }
     if feedback_adjustments:

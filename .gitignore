@@ -65,7 +65,6 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/
 FEATURE.md
 PATHS.md
 noted_down.md
@@ -164,6 +163,21 @@ my_Referce.md
 .agent/temp/
 temp_skills/
 temp_full_skills/
+
+# Local runtime/index caches and traces
+.agent/context/
+.agent/autonomy/runs/
+.agent/autonomy/latest.json
+.agent/autonomy/results.tsv
+
+# Local scratch and test artifacts
+.test-*/
+.tmp-probe*/
+.tmp-unittest-global/
+.tmp-tests-run/
+.tmp-build/
+_manual_ctx_test*/
+.uv-cache/
 
 # Essential Library Assets (Explicitly allow for packaging)
 !AGENTS.md
