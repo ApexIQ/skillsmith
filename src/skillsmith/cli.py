@@ -22,6 +22,7 @@ from .commands import (
     snapshot_command,
     watch_command,
     suggest_command,
+    roles_command,
     assets_command,
     autonomous_command,
     context_index_command,
@@ -58,6 +59,7 @@ main.add_command(serve_command, name="serve")
 main.add_command(snapshot_command, name="snapshot")
 main.add_command(watch_command, name="watch")
 main.add_command(suggest_command, name="suggest")
+main.add_command(roles_command, name="roles")
 main.add_command(assets_command, name="assets")
 main.add_command(autonomous_command, name="autonomous")
 main.add_command(context_index_command, name="context-index")

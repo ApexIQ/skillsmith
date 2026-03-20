@@ -228,6 +228,7 @@ from .serve import serve_command
 from .snapshot import snapshot_command
 from .watch import watch_command
 from .suggest import suggest_command
+from .roles import roles_command
 from .assets import assets_command
 from .autonomy import autonomous_command
 from .context_index import context_index_command
