@@ -26,6 +26,7 @@ FRESHNESS_INDEX_REMEDIATION = "skillsmith context-index build"
 FRESHNESS_SYNC_REMEDIATION = "skillsmith sync"
 FRESHNESS_INIT_REMEDIATION = "skillsmith init --guided"
 FRESHNESS_SYNC_AUTO_INSTALL_REMEDIATION = "skillsmith sync --auto-install"
+OPTIONAL_FRESHNESS_FILES = {"skills.lock.json"}
 KEY_PROJECT_FILES = [
     "AGENTS.md",
     ".agent/PROJECT.md",
@@ -924,6 +925,8 @@ def _build_freshness_report(cwd: Path, max_age_hours: float = FRESHNESS_MAX_AGE_
         )
 
     missing = [item for item in checks if item["state"] == "missing"]
+    required_missing = [item for item in missing if item.get("path") not in OPTIONAL_FRESHNESS_FILES]
+    optional_missing = [item for item in missing if item.get("path") in OPTIONAL_FRESHNESS_FILES]
     stale = [item for item in checks if item["state"] == "stale"]
     ok = [item for item in checks if item["state"] == "ok"]
     remediations: list[str] = []
@@ -933,12 +936,14 @@ def _build_freshness_report(cwd: Path, max_age_hours: float = FRESHNESS_MAX_AGE_
             remediations.append(remediation)
 
     return {
-        "ok": not missing and not stale,
+        "ok": not required_missing and not stale,
         "max_age_hours": max_age_hours,
         "summary": {
             "checked": len(checks),
             "ok": len(ok),
             "missing": len(missing),
+            "required_missing": len(required_missing),
+            "optional_missing": len(optional_missing),
             "stale": len(stale),
         },
         "checks": checks,

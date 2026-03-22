@@ -42,6 +42,27 @@ What each command does in plain language:
 - `doctor`: checks if setup is healthy.
 - `compose`: gives you a clear step-by-step plan for your goal.
 
+### `init` Command Options (Exact Usage)
+
+Use one of these, depending on what you want:
+
+- Basic setup only:
+```bash
+skillsmith init --minimal
+```
+- Guided interview setup (recommended):
+```bash
+skillsmith init --guided
+```
+- Install every available skill (large install):
+```bash
+skillsmith init --all
+```
+
+Important:
+- `skillsmith all` is not a valid command.
+- The valid command is `skillsmith init --all`.
+
 ### Non-Technical Quick Path (Copy/Paste)
 
 If this is your first time, run these exact commands and stop there:
@@ -115,6 +136,9 @@ If you are non-technical, start with only these 6 commands:
 ### Project Setup
 
 - `skillsmith init`: Create the skillsmith workspace in your project.
+- `skillsmith init --minimal`: Create only core project files with minimal setup.
+- `skillsmith init --guided`: Run interactive setup prompts and configure project profile/context.
+- `skillsmith init --all`: Install all available skills (this can be large and slower).
 - `skillsmith sync`: Re-scan your project and refresh generated files.
 - `skillsmith align`: Re-render managed files from your saved profile.
 - `skillsmith suggest`: Recommend the next 1-3 high-leverage commands based on current project state.
@@ -203,6 +227,12 @@ skillsmith init --guided
 skillsmith recommend
 skillsmith add <skill-name>
 skillsmith audit
+```
+
+If you specifically want every built-in skill:
+
+```bash
+skillsmith init --all
 ```
 
 ### B) Before starting a new task

@@ -1,4 +1,5 @@
 import click
+from . import __version__
 from .commands import (
     console,
     init_command,
@@ -33,6 +34,7 @@ from .commands import (
 )
 
 @click.group()
+@click.version_option(version=__version__, prog_name="skillsmith")
 def main():
     """Agentic Skills Library CLI"""
     pass

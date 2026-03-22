@@ -33,7 +33,7 @@ class ContextIndexFreshnessTests(unittest.TestCase):
             finally:
                 os.chdir(previous)
 
-    def _write_core_files(self, cwd: Path) -> None:
+    def _write_core_files(self, cwd: Path, *, include_lockfile: bool = True) -> None:
         (cwd / "AGENTS.md").write_text("agent rules", encoding="utf-8")
         (cwd / ".agent" / "project_profile.yaml").parent.mkdir(parents=True, exist_ok=True)
         (cwd / ".agent" / "project_profile.yaml").write_text(
@@ -42,7 +42,8 @@ class ContextIndexFreshnessTests(unittest.TestCase):
         )
         (cwd / ".agent" / "context").mkdir(parents=True, exist_ok=True)
         (cwd / ".agent" / "context" / "project-context.md").write_text("# Project Context\nfreshness demo\n", encoding="utf-8")
-        (cwd / "skills.lock.json").write_text(json.dumps({"version": 1, "skills": []}), encoding="utf-8")
+        if include_lockfile:
+            (cwd / "skills.lock.json").write_text(json.dumps({"version": 1, "skills": []}), encoding="utf-8")
 
     def _set_ages(self, cwd: Path, age_hours: float, paths: list[str]) -> None:
         timestamp = time.time() - (age_hours * 3600)
@@ -103,6 +104,22 @@ class ContextIndexFreshnessTests(unittest.TestCase):
         self.assertIn("skillsmith sync", result.output)
         self.assertIn("skillsmith sync --auto-install", result.output)
         self.assertIn("skillsmith init --guided", result.output)
+
+    def test_context_index_freshness_missing_lockfile_is_non_blocking(self):
+        with self.project_dir() as cwd:
+            self._write_core_files(cwd, include_lockfile=False)
+            build_result = self.runner.invoke(main, ["context-index", "build"])
+            self.assertEqual(build_result.exit_code, 0, build_result.output)
+
+            result = self.runner.invoke(main, ["context-index", "freshness", "--json"])
+
+        self.assertEqual(result.exit_code, 0, result.output)
+        payload = json.loads(result.output)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["summary"]["required_missing"], 0)
+        self.assertEqual(payload["summary"]["optional_missing"], 1)
+        lockfile_check = next(item for item in payload["checks"] if item["path"] == "skills.lock.json")
+        self.assertEqual(lockfile_check["state"], "missing")
 
 
 if __name__ == "__main__":
