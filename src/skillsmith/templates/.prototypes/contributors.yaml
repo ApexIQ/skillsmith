@@ -1,0 +1,16 @@
+name: contributors
+version: 1.0.0
+description: Autonomously discovered prototype from contributors.py
+logic:
+  discovered_patterns:
+  - Analyzed .py file with 316 lines.
+  - Detected high-density logical structures (classes/interfaces).
+  - Self-evolving agents should prioritize this pattern for similar system designs.
+  core_implementation_rules:
+  - Match the structural integrity of contributors.py.
+  - Ensure separation of concerns as seen in the original source.
+embodiments:
+  claude:
+  - Implement with strict type safety as observed in contributors.py.
+  gemini:
+  - Use descriptive documentation matching the patterns found in contributors.py.

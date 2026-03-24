@@ -1,0 +1,16 @@
+name: param-functions
+version: 1.0.0
+description: Autonomously discovered prototype from param_functions.py
+logic:
+  discovered_patterns:
+  - Analyzed .py file with 2460 lines.
+  - Detected high-density logical structures (classes/interfaces).
+  - Self-evolving agents should prioritize this pattern for similar system designs.
+  core_implementation_rules:
+  - Match the structural integrity of param_functions.py.
+  - Ensure separation of concerns as seen in the original source.
+embodiments:
+  claude:
+  - Implement with strict type safety as observed in param_functions.py.
+  gemini:
+  - Use descriptive documentation matching the patterns found in param_functions.py.

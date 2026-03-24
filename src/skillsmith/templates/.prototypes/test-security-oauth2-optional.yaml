@@ -1,0 +1,16 @@
+name: test-security-oauth2-optional
+version: 1.0.0
+description: Autonomously discovered prototype from test_security_oauth2_optional.py
+logic:
+  discovered_patterns:
+  - Analyzed .py file with 281 lines.
+  - Detected high-density logical structures (classes/interfaces).
+  - Self-evolving agents should prioritize this pattern for similar system designs.
+  core_implementation_rules:
+  - Match the structural integrity of test_security_oauth2_optional.py.
+  - Ensure separation of concerns as seen in the original source.
+embodiments:
+  claude:
+  - Implement with strict type safety as observed in test_security_oauth2_optional.py.
+  gemini:
+  - Use descriptive documentation matching the patterns found in test_security_oauth2_optional.py.

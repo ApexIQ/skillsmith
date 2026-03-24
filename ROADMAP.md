@@ -12,7 +12,7 @@
 - [x] **Autonomous Promotion**: `skillsmith evolve promote` for self-healing metadata repairs (Phase 2.3).
 
 ## Phase 3: Frontiers of Scaling (ACTIVE)
-- [ ] **Unlabeled Recon**: Run `evolve unlabeled` on industrial competitor repos to harvest patterns.
+- [x] **Unlabeled Recon**: Run `evolve unlabeled` on industrial competitor repos to harvest patterns.
 - [ ] **Signature Logic**: GPG/Checksum verification for the Ghost-Sync stream.
 
 ## Phase 4: Workflow Swarms (PLANNED)
