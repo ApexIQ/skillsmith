@@ -566,10 +566,10 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
                 readme.write_text(f"# .agent/{folder_name}\n\nThis directory contains project-specific {folder_name} for AI agents.\n", encoding="utf-8")
             console.print(f"[green][OK][/green] Scaffolded {folder_name}/ (advanced layer)")
 
-    # Ecosystem Siphon Logic (v1.0.1)
-    # 1. First, attempt to siphon advanced contents from the ecosystem if requested
+    # Sovereign Siphon Logic (v1.0.2 - Pure Python Distribution)
+    # 1. First, attempt to siphon advanced contents from the sovereign registry if requested
     if all_skills or bundle or (category and category not in ["core", "essentials"]):
-        _siphon_from_ecosystem(agents_dir, bundle, category, tag)
+        _siphon_from_registry(agents_dir, bundle, category, tag)
     
     # 2. Local Fallback/Primary Core
     src_skills_dir = TEMPLATE_DIR / ".agent" / "skills"
@@ -578,25 +578,84 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
     else:
         console.print("[dim][INFO][/dim] Local template skills not found. Using Siphon Hub fallback.")
 
-def _siphon_from_ecosystem(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
-    """Delegates content acquisition to the Antigravity Awesome Skills ecosystem (npx)."""
+def _siphon_from_registry(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
+    """Pure-Python Siphon: Downloads skills from the ApexIQ Sovereign Registry."""
+    # Sovereign Registry Configuration
+    REGISTRY_URL = "https://github.com/benjaminasterA/antigravity-awesome-skills.git"
+    ZIPBALL_URL = "https://github.com/benjaminasterA/antigravity-awesome-skills/archive/refs/heads/main.zip"
+    
+    target_dir = agents_dir / "skills"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    
     try:
-        cmd = ["npx", "-y", "antigravity-awesome-skills@latest", "--path", str(agents_dir / "skills")]
-        
-        # Mapping bundle/category/tag to npx args if ecosystem supports them
-        # Note: awesome-skills CLI currently takes --tag for versions, but we can pass names.
-        if bundle:
-            console.print(f"[blue][INFO][/blue] Siphoning bundle: [bold]{bundle}[/bold] from ecosystem...")
-        elif category:
-            console.print(f"[blue][INFO][/blue] Siphoning category: [bold]{category}[/bold] from ecosystem...")
-            
-        # We run it synchronously to ensure skills are present before finishing init
+        # Tier 1: Git Siphon (High Velocity Delta Sync)
         import subprocess
-        subprocess.run(cmd, check=True, capture_output=True)
-        console.print("[green][OK][/green] Ecosystem siphon complete.")
+        result = subprocess.run(["git", "version"], capture_output=True, text=True)
+        if result.returncode == 0:
+            console.print(f"[blue][INFO][/blue] Siphoning from Sovereign Registry via Git...")
+            # Use a temporary clone to avoid corrupting existing instructions
+            tmp_clone = agents_dir / ".siphon_tmp"
+            if tmp_clone.exists():
+                shutil.rmtree(tmp_clone)
+            
+            subprocess.run(["git", "clone", "--depth", "1", REGISTRY_URL, str(tmp_clone)], check=True, capture_output=True)
+            
+            # Siphon files into the local index
+            _merge_siphoned_skills(tmp_clone, target_dir)
+            shutil.rmtree(tmp_clone)
+            console.print("[green][OK][/green] Sovereign siphon complete.")
+            return
+
+    except Exception as git_err:
+        console.print(f"[dim][SKIP][/dim] Git siphon unavailable: {git_err}")
+
+    try:
+        # Tier 2: Zipball Siphon (Zero Dependency Fallback)
+        console.print(f"[blue][INFO][/blue] Siphoning from Sovereign Registry via Zipball...")
+        import requests
+        import zipfile
+        import io
+        
+        response = requests.get(ZIPBALL_URL, timeout=30)
+        response.raise_for_status()
+        
+        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+            # ZIPs from GitHub have a top-level dir like 'repo-main/'
+            top_level = z.namelist()[0].split('/')[0]
+            for member in z.namelist():
+                if not member.startswith(f"{top_level}/skills/"):
+                    continue
+                # Extract to target
+                rel_path = member.replace(f"{top_level}/skills/", "")
+                if not rel_path: continue
+                
+                dest = target_dir / rel_path
+                if member.endswith('/'):
+                    dest.mkdir(parents=True, exist_ok=True)
+                else:
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    with z.open(member) as src, open(dest, "wb") as dst:
+                        dst.write(src.read())
+        
+        console.print("[green][OK][/green] Zipball siphon complete.")
     except Exception as e:
-        console.print(f"[yellow][WARN][/yellow] Ecosystem siphon failed: {e}")
+        console.print(f"[yellow][WARN][/yellow] Sovereign siphon failed: {e}")
         console.print("[dim]Falling back to local core templates...[/dim]")
+
+def _merge_siphoned_skills(src: Path, dst: Path) -> None:
+    """Transfers siphoned content into the active project structure."""
+    src_skills = src / "skills"
+    if not src_skills.exists():
+        return
+        
+    for item in src_skills.iterdir():
+        target = dst / item.name
+        if item.is_dir():
+            if target.exists():
+                shutil.rmtree(target)
+            shutil.copytree(item, target)
+        else:
+            shutil.copy2(item, target)
 
 def _copy_local_skills(agents_dir: Path, src_skills_dir: Path, minimal: bool, all_skills: bool, category: str | None, tag: str | None, bundle: str | None = None) -> None:
     """Directly copy skills from local template directory."""

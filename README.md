@@ -48,11 +48,11 @@ When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR
 pip install skillsmith
 ```
 
-### 2. Initialize (Ecosystem Synergy)
+### 2. Initialize (Sovereign Python Siphon)
 ```bash
-# Siphon specialized skill packs directly from the 889+ ecosystem.
+# Siphon 889+ expert skill packs natively (No Node/NPX required!)
 skillsmith init --bundle python-pro
-# or guided setup with profile inference
+# or guided setup with structural profiling
 skillsmith init --guided
 ```
 

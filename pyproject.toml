@@ -1,6 +1,6 @@
 [project]
 name = "skillsmith"
-version = "1.0.1"
+version = "1.0.2"
 description = "The premier operating system for AI coding agents — standardize, compose, and scale skills-as-code."
 readme = "README.md"
 requires-python = ">=3.10"
