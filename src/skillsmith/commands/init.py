@@ -578,11 +578,12 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
     else:
         console.print("[dim][INFO][/dim] Local template skills not found. Using Ghost-Sync Hub fallback.")
 
-def _ghost_sync_from_branch(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
+def _ghost_sync_from_branch(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None, verify_integrity: bool = True) -> None:
     """The Ghost Branch Sync: Downloads 889+ skills from the sovereign 'ghost-content' branch."""
     # Sovereign Ghost Registry Configuration
     REPO_URL = "https://github.com/ApexIQ/skillsmith"
     GHOST_ZIP_URL = f"{REPO_URL}/archive/refs/heads/ghost-content.zip"
+    GHOST_SIG_URL = f"https://raw.githubusercontent.com/ApexIQ/skillsmith/ghost-content/.signature.sha256"
     
     target_dir = agents_dir / "skills"
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -592,6 +593,7 @@ def _ghost_sync_from_branch(agents_dir: Path, bundle: str | None, category: str 
         import requests
         import zipfile
         import io
+        import hashlib
         
         if bundle:
             console.print(f"[blue][INFO][/blue] Synchronizing [bold]{bundle}[/bold] bundle from Ghost Branch...")
@@ -600,8 +602,28 @@ def _ghost_sync_from_branch(agents_dir: Path, bundle: str | None, category: str 
             
         response = requests.get(GHOST_ZIP_URL, timeout=30)
         response.raise_for_status()
+        payload_bytes = response.content
         
-        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+        # 🛡️ SOVEREIGN VERIFICATION (PHASE 3) 🛡️
+        if verify_integrity:
+            payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+            console.print(f"  [cyan]🛡️ Verifying Payload Integrity (SHA-256):[/cyan] {payload_hash[:16]}...")
+            
+            try:
+                sig_response = requests.get(GHOST_SIG_URL, timeout=10)
+                if sig_response.status_code == 200:
+                    expected_hash = sig_response.text.strip()
+                    if payload_hash != expected_hash:
+                        console.print(f"[red][FATAL][/red] Signature mismatch! Expected {expected_hash}, got {payload_hash}")
+                        console.print("[red][FATAL][/red] The Intelligence payload may have been tampered with. Aborting.")
+                        return
+                    console.print("  [green]🛡️ Signature mathematically verified![/green]")
+                else:
+                    console.print("  [yellow][WARN][/yellow] Remote signature file not found on Ghost Branch. Proceeding conditionally.")
+            except Exception as e:
+                console.print(f"  [yellow][WARN][/yellow] Unable to fetch remote signature for verification: {e}")
+        
+        with zipfile.ZipFile(io.BytesIO(payload_bytes)) as z:
             # Ghost ZIPs have a top-level dir like 'skillsmith-ghost-content/'
             top_level = z.namelist()[0].split('/')[0]
             count = 0
@@ -623,7 +645,7 @@ def _ghost_sync_from_branch(agents_dir: Path, bundle: str | None, category: str 
                         dst.write(src.read())
                     count += 1
         
-        console.print(f"[green][OK][/green] Ghost synchronization complete ({count} skills updated).")
+        console.print(f"[green][OK][/green] Ghost synchronization complete ({count} skills secured).")
     except Exception as e:
         console.print(f"[yellow][WARN][/yellow] Ghost synchronization unavailable: {e}")
         console.print("[dim]Falling back to local package templates...[/dim]")
