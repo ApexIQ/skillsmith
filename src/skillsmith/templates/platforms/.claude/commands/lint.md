@@ -1,0 +1,1 @@
+# /lint\n\nRun linter checks and fix stylistic or simple structural issues in the code.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

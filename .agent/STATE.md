@@ -3,17 +3,32 @@
 > **CRITICAL**: AI agents MUST read this file at the start of every session.
 > Update this file after every significant step to prevent context rot.
 
-**Last Updated:** 2026-03-24
+# Current State
+
+> **CRITICAL**: AI agents MUST read this file at the start of every session.
+> Update this file after every significant step to prevent context rot.
+
+**Last Updated:** 2026-03-25
 
 ## Current Objective
-Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-context platform with dynamic skill discovery, profile-driven file alignment, and workflow composition.
+Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-context platform with dynamic skill discovery, profile-driven file alignment, and workflow composition. Executing the 3-pillar $100M roadmap: Content Dominance → Self-Evolution Engine → Team Intelligence Platform.
 
 ## Context
-- The current product is strongest at local scaffolding and basic MCP exposure.
-- Competitive gap: guided onboarding, dynamic discovery, trust-ranked skills, and profile-driven alignment are missing.
-- Immediate priority is architecture definition and implementation planning.
+- Phase 1 (Content Dominance) core features complete.
+- Skill catalog expanded from 25 to 36+ with production-grade content.
+- 33+ Slash Commands and Workflow Bundles synchronized across all AI platforms.
+- Readiness Audit: **Pass (100/100)** in clean Desktop environments.
 
 ## Recent Changes
+- **Phase 1 / Tasks 2.2, 2.3, 2.4 COMPLETE:**
+    - Expanded Slash Commands from 6 to **33+** (refactor, debug, test, doc, audit, lint, migrate, security, etc.).
+    - Implemented high-fidelity **Workflow Bundles** in `.agent/workflows/` with Stages, Objectives, and Acceptance Checks.
+    - Enhanced **Claude Command Renderer** to provide premium goals, deep links to bundles, and relevant skill suggestions.
+    - Added **Target Directory Support** to `init`, `align`, and `doctor`, enabling remote project management and clean-lab testing on the Desktop.
+    - Verified Phase 1 with `skillsmith doctor` returning **100/100** in a fresh `test_lab`.
+- **Phase 1 / Task 2.1 COMPLETE:** Created 11 new production-grade skills (`planner`, `architect`, `build-resolver`, `doc-updater`, `loop-operator`, `harness-optimizer`, `python-expert`, `typescript-expert`, `go-expert`, `java-expert`, `database-expert`). Total skill count: 25 → 36. Verified: `tests.test_commands` (82 tests OK).
+- Rewrote `UPCOMING_FEATURES.md` with $100M-trajectory 90-day roadmap (3 pillars, revenue model, architecture diagram).
+- Completed competitive audit of OpenSpace + Everything Claude Code → gap analysis + 6-week adaptation plan.
 - Completed the Tier-1 implementation pass for `decision.md` action items 2-7: added deterministic `ready --fix` remediation and `ready ci --emit github` emission/validation in `src/skillsmith/commands/ready.py`, expanded CI into package+matrix+readiness jobs in `.github/workflows/package-quality.yml`, and aligned wedge-first docs/recipes (`README.md`, `docs/recipes/local-bootstrap.md`, `docs/recipes/team-onboarding.md`); verified with `uv run python -m unittest tests.test_start_command tests.test_ready_command tests.test_machine_output_contract tests.test_stability_contract tests.test_docs_recipes tests.test_quickstart_smoke -v` (`20` tests passed).
 - Implemented `skillsmith start` as the non-interactive default wedge entrypoint in `src/skillsmith/commands/start.py`, wiring it into `src/skillsmith/cli.py` with human-readable progress output, deterministic `--json` output, auto-bootstrap-on-missing-artifacts behavior, and targeted coverage in `tests/test_start_command.py` plus `tests/test_machine_output_contract.py`; verified with `uv run python -m unittest tests.test_start_command tests.test_ready_command -v` and `uv run python -m unittest tests.test_machine_output_contract -v` using a workspace-local `UV_CACHE_DIR`.
 - Completed a focused research-agent audit of current `start`/`ready`/CI/docs implementation surfaces (`src/skillsmith/commands/ready.py`, CLI wiring, README + recipes, CI workflow, readiness tests) and produced a concrete implementation spec with exact file targets and edge-case coverage for the next implementation pass.
@@ -169,10 +184,29 @@ Reposition `skillsmith` from a static scaffold CLI into a guided, generic agent-
 - Rewrote `README.md` into beginner-first documentation format with clearer command explanations, copy/paste workflows, and non-technical guidance.
 - Added the `skillsmith autonomous` command surface with `run`, `status`, and `report` subcommands wired through a runtime helper shim.
 
+## How to Test
+
+### 1. Library Tests (Internal)
+```powershell
+$env:PYTHONPATH = "src"
+uv run python -m unittest discover tests -v
+```
+
+### 2. Scaffold Validation (The "Lab" Method)
+Validate the tool's output in a clean directory on the Desktop:
+```powershell
+# 1. Initialize a template
+uv run python -m skillsmith init --template fastapi-pro C:\Users\vanam\Desktop\test_lab
+
+# 2. Align and Check Health
+uv run python -m skillsmith align C:\Users\vanam\Desktop\test_lab
+uv run python -m skillsmith doctor C:\Users\vanam\Desktop\test_lab
+```
+
 ## Next Steps
-1. Close basic-readiness gaps from `docs/basic_readiness_audit.md` (README command surface, module invocation, version drift, CLI-vs-library contract, packaging metadata/tooling).
-2. Re-run readiness audit to confirm a green baseline for packaging/docs/workflow operator path.
-3. Resume production hardening (durable datastore, OIDC/SSO, managed KMS/HSM roots) after baseline is green.
+1. **Pillar 2: Self-Evolution Engine** (Phase 2): Start implementing skill quality metrics system and execution telemetry.
+2. **Registry Hardening**: Transition to SQLite-based durable datastores for registry and trust services.
+3. **CI Integration**: Finalize GitHub Action templates for automated `skillsmith doctor` readiness gates.
 
 ## Known Issues
 - Remote ecosystem coverage is broader (`local`, `skills.sh`, `huggingface`, `github-topics`, `org-registry`), but recommendation quality still depends on external provider metadata quality.

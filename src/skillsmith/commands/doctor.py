@@ -170,9 +170,10 @@ def _doctor_machine_summary(cwd: Path, *, strict: bool) -> dict:
 @click.option("--fix", is_flag=True, help="Auto-fix missing platform files by running init")
 @click.option("--strict", is_flag=True, help="Exit non-zero when any warning or error is detected")
 @click.option("--json", "as_json", is_flag=True, help="Emit machine-readable JSON summary output")
-def doctor_command(fix, strict, as_json):
-    """Check your skillsmith setup health across all AI platforms."""
-    cwd = Path.cwd()
+@click.argument("directory", required=False, type=click.Path(file_okay=False, dir_okay=True, path_type=Path), default=".")
+def doctor_command(fix, strict, as_json, directory):
+    """Diagnose project alignment and skill health."""
+    cwd = directory.resolve()
     if as_json:
         payload = _doctor_machine_summary(cwd, strict=strict)
         click.echo(json.dumps(payload, indent=2, sort_keys=True))

@@ -1,0 +1,1 @@
+# /profile\n\nUpdate the .agent/project_profile.yaml based on detected repository changes.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

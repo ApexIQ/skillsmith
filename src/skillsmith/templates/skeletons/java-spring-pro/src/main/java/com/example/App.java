@@ -1,0 +1,1 @@
+package com.example;\nimport org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n@SpringBootApplication\npublic class App { public static void main(String[] args) { SpringApplication.run(App.class, args); } }

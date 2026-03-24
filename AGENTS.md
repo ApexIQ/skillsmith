@@ -49,11 +49,50 @@
 
 - `.agent/skills/`: reusable task guides.
 - `.agent/params/`: project constraints.
+
+## Project Structure
+
+- `.agent/skills/`: reusable task guides.
+- `.agent/params/`: project constraints.
 - `.agent/PROJECT.md`: product and architecture context.
 - `.agent/ROADMAP.md`: strategic milestones.
 - `.agent/STATE.md`: current tactical state.
 - `.agent/project_profile.yaml`: structured project source of truth.
 - `.agent/context/project-context.md`: generated repository context.
+
+## Testing & Validation
+
+### 1. Library Validation (CLI & Core)
+To verify the core library logic and CLI commands:
+```powershell
+# Set PYTHONPATH to the src directory
+$env:PYTHONPATH = "src"
+
+# Run the test suite
+uv run python -m unittest discover tests -v
+```
+
+### 2. Scaffold Validation (The "Lab" Method)
+To test project initialization and alignment in a clean environment:
+```powershell
+# 1. Create a temporary lab directory
+mkdir test_lab
+
+# 2. Initialize from a template
+uv run python -m skillsmith init --template fastapi-pro test_lab
+
+# 3. Align the project (updates agents, rules, and workflows)
+uv run python -m skillsmith align test_lab
+
+# 4. Run the doctor to verify 100% healthy alignment
+uv run python -m skillsmith doctor test_lab
+```
+
+### 3. Acceptance Criteria
+- `skillsmith doctor` must return **100/100** with no failing checks.
+- All tool-native instruction files (CLAUDE.md, GEMINI.md, etc.) must be rendered.
+- All 33+ managed slash commands must be present in `.claude/commands/`.
+- All workflow bundles must be present in `.agent/workflows/`.
 
 ## Active Skills
 

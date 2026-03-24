@@ -1,0 +1,1 @@
+# /verify\n\nRun verification checks (tests, lints, audits) before completing the task.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

@@ -1,0 +1,1 @@
+# /autonomous\n\nEnter an autonomous agent loop to solve a high-level task with safety guards.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

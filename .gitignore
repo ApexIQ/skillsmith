@@ -172,6 +172,7 @@ temp_full_skills/
 .agent/autonomy/results.tsv
 
 # Local scratch and test artifacts
+test_lab/
 .test-*/
 .tmp-probe*/
 .tmp-unittest-global/

@@ -1,0 +1,1 @@
+# /migrate\n\nPlan and execute a database or architecture migration safely.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

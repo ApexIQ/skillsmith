@@ -1,0 +1,1 @@
+# /cleanup\n\nRemove obsolete code, files, and artifacts to keep the repository clean.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

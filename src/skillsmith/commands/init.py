@@ -691,10 +691,28 @@ def _install_recommended_skills(cwd: Path, profile: dict, limit: int = 3) -> lis
 @click.option("--agents-md-only", is_flag=True, help="Only create AGENTS.md")
 @click.option("--all", "all_skills", is_flag=True, help="Install ALL available skills (warning: large)")
 @click.option("--category", help="Install all skills from a specific category (e.g., 'data-ai')")
+@click.option("--template", help="Initialize from a high-performance project template (e.g., 'fastapi-pro', 'nextjs-pro')")
 @click.option("--tag", help="Install all skills with a specific tag (e.g., 'python')")
-def init_command(minimal, guided, auto_install, agents_md_only, all_skills, category, tag):
+@click.argument("directory", required=False, type=click.Path(file_okay=False, dir_okay=True, path_type=Path), default=".")
+def init_command(minimal, guided, auto_install, agents_md_only, all_skills, category, tag, template, directory):
     """Initialize .agent and tool-native instruction structure."""
-    cwd = Path.cwd()
+    cwd = directory.resolve() if directory else Path.cwd()
+    cwd.mkdir(parents=True, exist_ok=True)
+
+    if template:
+        skeleton_dir = Path(__file__).parent.parent / "templates" / "skeletons" / template
+        if not skeleton_dir.exists():
+            console.print(f"[red][ERROR][/red] Template '{template}' not found in {skeleton_dir}")
+            return
+        
+        console.print(f"[cyan][INFO][/cyan] Initializing from template '{template}'...")
+        # Copy skeleton content as root project files
+        for item in skeleton_dir.iterdir():
+            if item.is_dir():
+                shutil.copytree(item, cwd / item.name, dirs_exist_ok=True)
+            else:
+                shutil.copy(item, cwd / item.name)
+        console.print(f"[green][OK][/green] Scaffolded {template} files.")
 
     agents_md = cwd / "AGENTS.md"
     if not agents_md.exists():

@@ -1,0 +1,1 @@
+# /review\n\nPerform a deep code review of the changes against the project standards.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

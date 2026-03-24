@@ -1,0 +1,1 @@
+# /bootstrap\n\nInitialize a new module or service using the standard project skeletons.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

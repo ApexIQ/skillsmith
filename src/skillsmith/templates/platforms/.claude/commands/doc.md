@@ -1,0 +1,1 @@
+# /doc\n\nSynchronize documentation (README, API docs) with the latest codebase changes.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

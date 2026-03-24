@@ -1,0 +1,1 @@
+export function App() { return <div>React Vite Pro</div>; }

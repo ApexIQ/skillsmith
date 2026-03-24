@@ -1,0 +1,1 @@
+# /refactor\n\nAnalyze the codebase for technical debt and perform a safe refactoring using established patterns.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

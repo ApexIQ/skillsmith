@@ -1,0 +1,1 @@
+# /explain\n\nProvide a high-level architectural walkthrough of the current logic.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

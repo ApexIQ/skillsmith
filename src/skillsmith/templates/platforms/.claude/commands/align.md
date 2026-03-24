@@ -1,0 +1,1 @@
+# /align\n\nEnsure the local environment is aligned with the project profile and standards.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

@@ -1,0 +1,1 @@
+import click\n@click.command()\ndef main(): click.echo('CLI Pro');

@@ -1,0 +1,1 @@
+[project]\nname = "cli-pro"\n[project.scripts]\ncli-pro = "cli:main"

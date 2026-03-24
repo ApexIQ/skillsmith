@@ -1,0 +1,1 @@
+[package]\nname = "rust-cli-pro"\nversion = "0.1.0"\n[dependencies]\nclap = "4.0"

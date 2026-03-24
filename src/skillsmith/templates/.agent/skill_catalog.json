@@ -4152,5 +4152,155 @@
     "description": "No-code automation democratizes workflow building. Zapier and Make (formerly Integromat) let non-developers automate business processes without writing code. But no-code doesn't mean no-complexity - these platforms have their own patterns, pitfalls, and breaking points.  This skill covers when to use which platform, how to build reliable automations, and when to graduate to code-based solutions. Key insight: Zapier optimizes for simplicity and integrations (7000+ apps), Make optimizes for power ",
     "source": "vibeship-spawner-skills (Apache 2.0)",
     "version": "0.1.0"
+  },
+  {
+    "name": "planner",
+    "description": "Professional implementation planning for complex features. Includes requirement decomposition, risk assessment, and testable acceptance criteria.",
+    "version": "1.0.0",
+    "tags": [
+      "planning",
+      "architecture",
+      "product"
+    ]
+  },
+  {
+    "name": "architect",
+    "description": "System design and decision making. Covers ADRs, component boundaries, trade-off analysis, and scalability planning.",
+    "version": "1.0.0",
+    "tags": [
+      "architecture",
+      "design",
+      "system"
+    ]
+  },
+  {
+    "name": "build_resolver",
+    "description": "Expert diagnostics and resolution for build errors across Python, Node.js, Go, Rust, Java, and CI environments.",
+    "version": "1.0.0",
+    "tags": [
+      "debugging",
+      "build",
+      "ci",
+      "devops"
+    ]
+  },
+  {
+    "name": "doc_updater",
+    "description": "Keep documentation in sync with code changes, including READMEs, API docs, and changelogs.",
+    "version": "1.0.0",
+    "tags": [
+      "documentation",
+      "sync",
+      "maintenance"
+    ]
+  },
+  {
+    "name": "loop_operator",
+    "description": "Autonomous agent loop execution with safety guards, progress tracking, and bounded execution.",
+    "version": "1.0.0",
+    "tags": [
+      "agentic",
+      "autonomy",
+      "workflow"
+    ]
+  },
+  {
+    "name": "harness_optimizer",
+    "description": "Optimize AI agent performance: token efficiency, context management, and cost reduction strategies.",
+    "version": "1.0.0",
+    "tags": [
+      "optimization",
+      "agentic",
+      "cost"
+    ]
+  },
+  {
+    "name": "python_expert",
+    "description": "Modern Python 3.10+ specialist. Covers idiomatic patterns, typing, async, and project structure.",
+    "version": "1.0.0",
+    "tags": [
+      "python",
+      "backend",
+      "language"
+    ]
+  },
+  {
+    "name": "go_expert",
+    "description": "Production-grade Go specialist. Concurrency, error handling, interfaces, and testing patterns.",
+    "version": "1.0.0",
+    "tags": [
+      "go",
+      "backend",
+      "concurrency",
+      "language"
+    ]
+  },
+  {
+    "name": "java_expert",
+    "description": "Modern Java 17+ and Spring Boot specialist. Enterprise patterns, JPA, and virtual threads.",
+    "version": "1.0.0",
+    "tags": [
+      "java",
+      "enterprise",
+      "backend",
+      "language"
+    ]
+  },
+  {
+    "name": "database_expert",
+    "description": "Database design and optimization expert. Schema migrations, indexing, and complex query performance.",
+    "version": "1.0.0",
+    "tags": [
+      "database",
+      "sql",
+      "architecture"
+    ]
+  },
+  {
+    "name": "rust_expert",
+    "description": "Systems programming with Rust. Ownership, borrowing, lifetimes, and safety patterns.",
+    "version": "1.0.0",
+    "tags": [
+      "rust",
+      "backend",
+      "systems",
+      "language"
+    ]
+  },
+  {
+    "name": "cpp_expert",
+    "description": "Modern C++ specialist (C++17/20/23). Smart pointers, move semantics, and generic programming.",
+    "version": "1.0.0",
+    "tags": [
+      "cpp",
+      "c++",
+      "systems",
+      "performance",
+      "language"
+    ]
+  },
+  {
+    "name": "ruby_expert",
+    "description": "Ruby and Rails specialist. Productive, idiomatic web development with a focus on developer happiness.",
+    "version": "1.0.0",
+    "tags": [
+      "ruby",
+      "rails",
+      "backend",
+      "web",
+      "language"
+    ]
+  },
+  {
+    "name": "swift_expert",
+    "description": "Swift and iOS/macOS specialist. Protocol-oriented programming and SwiftUI patterns.",
+    "version": "1.0.0",
+    "tags": [
+      "swift",
+      "ios",
+      "macos",
+      "mobile",
+      "language"
+    ]
   }
 ]

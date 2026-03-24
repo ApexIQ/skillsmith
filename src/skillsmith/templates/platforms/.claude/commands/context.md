@@ -1,0 +1,1 @@
+# /context\n\nIndex and optimize the context for AI agents using context engineering patterns.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

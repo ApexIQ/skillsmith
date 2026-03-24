@@ -7,9 +7,10 @@ from .rendering import load_project_profile, render_all
 
 
 @click.command()
-def align_command():
+@click.argument("directory", required=False, type=click.Path(file_okay=False, dir_okay=True, path_type=Path), default=".")
+def align_command(directory):
     """Re-render managed files from .agent/project_profile.yaml."""
-    cwd = Path.cwd()
+    cwd = directory.resolve() if directory else Path.cwd()
     try:
         profile = load_project_profile(cwd)
     except FileNotFoundError as exc:

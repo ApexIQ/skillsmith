@@ -1,0 +1,1 @@
+# /compose\n\nIntegrate multiple skills or components to build a complex feature.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

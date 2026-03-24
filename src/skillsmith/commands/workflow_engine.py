@@ -824,6 +824,31 @@ def workflow_bundle_definitions(cwd: Path) -> list[tuple[str, str]]:
         ("review-changes", f"review changes for {app_type} {framework_text}"),
         ("test-changes", f"test and verify changes for {app_type} {framework_text}"),
         ("deploy-checklist", f"deploy release checklist for {app_type} {framework_text}"),
+        ("refactor", f"refactor project structure and technical debt for {app_type} {framework_text}"),
+        ("debug", f"debug complex runtime issues for {app_type} {framework_text}"),
+        ("test", f"test and verify implementation for {app_type} {framework_text}"),
+        ("doc", f"update and synchronize documentation for {app_type} {framework_text}"),
+        ("audit", f"perform security and performance audit for {app_type} {framework_text}"),
+        ("lint", f"run linter and fix stylistic issues for {app_type} {framework_text}"),
+        ("compose", f"compose multiple skills and workflows for {app_type} {framework_text}"),
+        ("evolve", f"evolve and improve skill instructions for {app_type} {framework_text}"),
+        ("align", f"align project instructions and rules with the profile for {app_type} {framework_text}"),
+        ("profile", f"inspect and tune the project profile for {app_type} {framework_text}"),
+        ("report", f"generate a progress and readiness report for {app_type} {framework_text}"),
+        ("sync", f"sync local configuration and skills for {app_type} {framework_text}"),
+        ("autonomous", f"run an autonomous agent loop for {app_type} {framework_text}"),
+        ("context", f"index and optimize context for {app_type} {framework_text}"),
+        ("verify", f"verify project health and requirements for {app_type} {framework_text}"),
+        ("review", f"review code and architecture for {app_type} {framework_text}"),
+        ("bootstrap", f"bootstrap a new module or service for {app_type} {framework_text}"),
+        ("migrate", f"plan and execute migration for {app_type} {framework_text}"),
+        ("benchmark", f"benchmark performance for {app_type} {framework_text}"),
+        ("security", f"audit and harden security for {app_type} {framework_text}"),
+        ("performance", f"profile and optimize performance for {app_type} {framework_text}"),
+        ("cleanup", f"cleanup obsolete code and artifacts for {app_type} {framework_text}"),
+        ("search", f"search and research repository for {app_type} {framework_text}"),
+        ("explain", f"explain project architecture and logic for {app_type} {framework_text}"),
+        ("ready", f"check production readiness for {app_type} {framework_text}"),
     ]
 
 
@@ -831,15 +856,35 @@ def workflow_markdown(name: str, workflow: dict) -> str:
     lines = [
         f"# Workflow: {name}",
         "",
-        f"- Goal: {workflow['goal']}",
-        f"- Project idea: {workflow['profile']['idea']}",
-        f"- Stage: {workflow['profile']['project_stage']}",
-        f"- App type: {workflow['profile']['app_type']}",
-        f"- Frameworks: {', '.join(workflow['profile']['frameworks']) if workflow['profile']['frameworks'] else 'none-detected'}",
-        f"- Priorities: {', '.join(workflow['profile']['priorities']) if workflow['profile']['priorities'] else 'none-specified'}",
-        f"- Skills: {', '.join(workflow['skills']) if workflow['skills'] else 'none'}",
+        f"- **Goal**: {workflow['goal']}",
+        f"- **Idea**: {workflow['profile']['idea']}",
+        f"- **Stage**: {workflow['profile']['project_stage']}",
+        f"- **App type**: {workflow['profile']['app_type']}",
+        f"- **Frameworks**: {', '.join(workflow['profile']['frameworks']) if workflow['profile']['frameworks'] else 'none-detected'}",
+        f"- **Priorities**: {', '.join(workflow['profile']['priorities']) if workflow['profile']['priorities'] else 'none-specified'}",
+        f"- **Skills**: {', '.join(workflow['skills']) if workflow['skills'] else 'none'}",
         "",
-        "## Steps",
+        "## Stages",
+        "",
     ]
+    
+    for stage in workflow.get("stages", []):
+        lines.append(f"### {stage['name'].title()}")
+        lines.append(f"> {stage['objective']}")
+        lines.append("")
+        lines.append("**Objectives**:")
+        for obj in stage.get("objectives", []):
+            lines.append(f"- {obj}")
+        lines.append("")
+        lines.append("**Acceptance Checks**:")
+        for check in stage.get("acceptance_checks", []):
+            lines.append(f"- [ ] {check}")
+        lines.append("")
+        lines.append("**Evidence**:")
+        for ev in stage.get("evidence", []):
+            lines.append(f"- {ev}")
+        lines.append("")
+
+    lines.append("## Steps Summary")
     lines.extend([f"{index}. {step}" for index, step in enumerate(workflow["steps"], start=1)])
     return "\n".join(lines) + "\n"

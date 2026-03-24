@@ -1,0 +1,1 @@
+# /report\n\nGenerate a progress report covering completed tasks and next steps.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

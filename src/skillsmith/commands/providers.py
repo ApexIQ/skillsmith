@@ -607,9 +607,21 @@ def curated_pack_names(profile: dict | None = None) -> list[str]:
         names.extend(["bash_defensive_patterns", "uv_package_manager", "python_patterns"])
 
     if "python" in languages:
-        names.extend(["python_patterns", "python_pro"])
+        names.extend(["python_expert", "python_patterns", "python_pro"])
     if "typescript" in languages:
-        names.extend(["typescript_pro"])
+        names.extend(["typescript_expert", "typescript_pro"])
+    if "go" in languages:
+        names.extend(["go_expert"])
+    if "java" in languages:
+        names.extend(["java_expert"])
+    if "rust" in languages:
+        names.extend(["rust_expert"])
+    if "cpp" in languages or "c++" in languages:
+        names.extend(["cpp_expert"])
+    if "ruby" in languages:
+        names.extend(["ruby_expert"])
+    if "swift" in languages:
+        names.extend(["swift_expert"])
     if "fastapi" in frameworks:
         names.extend(["fastapi-best-practices", "fastapi_pro"])
     if "next" in frameworks:

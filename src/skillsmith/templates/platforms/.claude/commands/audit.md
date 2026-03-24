@@ -1,0 +1,1 @@
+# /audit\n\nPerform a security and performance audit of the current module or feature.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

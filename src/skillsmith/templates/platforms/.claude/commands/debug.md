@@ -1,0 +1,1 @@
+# /debug\n\nInvestigate complex runtime bugs using the 'debugging' skill and fix the root cause.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

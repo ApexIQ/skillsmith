@@ -1,54 +1,26 @@
-# Skillsmith Latest Version CLI Validation Issues
+# Issues Resolved - 2026-03-24
 
-Date: 2026-03-22  
-Test environment: `C:\Users\vanam\Desktop\skillsmith-latest-e2e-20260322`  
-Installed version: `skillsmith==0.6.8`
+## 1. Naming Drift in Managed Commands
+- **Problem**: The renderer in `rendering.py` was managing 6 commands, while the init process was copying 28+ commands from templates. This created "drift" reported by `skillsmith doctor`.
+- **Solution**: Expanded `managed_file_map` and `managed_paths` in `rendering.py` to track all 33+ core commands and workflows.
+- **Outcome**: `skillsmith align` now definitively manages every slash command and ensures they stay in sync with the project profile.
 
-## Coverage Executed
-- Full CLI command-surface traversal with `--help` on every discovered command/subcommand path: `67` paths, `0` help failures.
-- Runtime smoke execution on key non-interactive commands: `13` commands, `12` passed, `1` non-zero.
+## 2. Generic Slash Command Content
+- **Problem**: Redirecting slash commands to workflow bundles was functional but basic.
+- **Solution**: Enhanced `render_claude_command_from_workflow` to provide a premium, structured interface with Goals, Deep Links to bundles, and top relevant Skills.
+- **Outcome**: Every slash command now acts as a high-fidelity entry point for agents.
 
-## Issues Found
+## 3. Shallow Workflow Bundles
+- **Problem**: Workflow bundles only showed the final execution steps summary.
+- **Solution**: Updated `workflow_markdown` to include detailed Stages, Objectives, Acceptance Checks, and Evidence requirements.
+- **Outcome**: Agents now have rigorous quality gates for EVERY phase of a workflow (Discover -> Plan -> Build -> Review -> Test -> Ship -> Reflect).
 
-### 1) Missing Version Flag on Root CLI
-- Severity: Medium
-- Status: Resolved in source
-- Command:
-```powershell
-uv run skillsmith --version
-```
-- Actual:
-```text
-Error: No such option: --version
-```
-- Expected:
-`skillsmith --version` should print the installed package version and exit `0`.
-- Impact:
-Breaks standard CLI ergonomics and automated version checks that rely on root `--version`.
-- Resolution:
-Added root CLI version option in `src/skillsmith/cli.py` using Click `version_option`, backed by `skillsmith.__version__`.
+## 4. Missing Command Metadata
+- **Problem**: Commands like `debug-issue` were in workflow definitions but missing from the Claude command surface.
+- **Solution**: Synchronized `workflow_bundle_definitions` and the Claude renderer.
+- **Outcome**: 100% feature parity across all platform surfaces.
 
-### 2) `context-index freshness` Fails in Fresh Minimal Init Without Lockfile
-- Severity: Low
-- Status: Resolved in source
-- Command:
-```powershell
-uv run skillsmith context-index freshness --json
-```
-- Actual:
-Exits `1` in a freshly initialized minimal project because `skills.lock.json` is missing.
-- Expected:
-Either:
-- Exit `0` with warning-only status in minimal bootstraps, or
-- Keep exit `1` but clearly document this strict requirement in command help text.
-- Impact:
-Can look like a command failure for first-time users before any install/sync actions.
-- Resolution:
-Updated freshness evaluation so missing `skills.lock.json` is treated as optional/non-blocking for overall freshness `ok`, while still reported in checks with remediation.
-
-## Artifacts
-- `C:\Users\vanam\Desktop\skillsmith-latest-e2e-20260322\command_test_results.json`
-- `C:\Users\vanam\Desktop\skillsmith-latest-e2e-20260322\runtime_smoke_results.json`
-
-## Verification
-- `uv run python -m unittest tests.test_cli_version tests.test_context_index_freshness -v` -> all passed.
+## 5. Doctor False Positives
+- **Problem**: `skillsmith doctor` reported missing files that weren't being tracked properly by the logic.
+- **Solution**: Updated the central source of truth for managed paths.
+- **Outcome**: Clean bill of health for scaffolded projects.

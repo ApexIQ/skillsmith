@@ -1,0 +1,1 @@
+# /search\n\nPerform deep repository research using the 'how_to_research' skill.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

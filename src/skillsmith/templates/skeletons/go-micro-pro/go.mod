@@ -1,0 +1,1 @@
+module go-micro-pro\ngo 1.21

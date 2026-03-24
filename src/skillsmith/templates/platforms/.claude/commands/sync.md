@@ -1,0 +1,1 @@
+# /sync\n\nSync local skills and configuration with the centralized registry.\n\n## Workflow\n1. Analyze requirements.\n2. Choose relevant skills.\n3. Execute with verification.\n

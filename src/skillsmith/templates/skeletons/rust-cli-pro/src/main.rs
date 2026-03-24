@@ -1,0 +1,1 @@
+fn main() { println!("Rust CLI Pro"); }
