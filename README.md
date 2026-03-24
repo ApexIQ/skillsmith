@@ -56,7 +56,19 @@ skillsmith init --bundle python-pro
 skillsmith init --guided
 ```
 
-### 3. Align & Certify
+### 3. Evolve & Evaluate (Phase 2.2) 🌌🧪
+Skillsmith isn't static. It autonomously captures patterns from your Git history and **scores** your entire skill library (including Ghost Skills) against industry standards.
+
+```bash
+# Capture new patterns from recent Git history
+skillsmith evolve capture --limit 50
+
+# Benchmark and score your expert library
+skillsmith evolve evaluate
+```
+This generates a **Skill Leaderboard** and detailed compatibility report in `.agent/evals/`.
+
+### 4. Align & Certify
 ```bash
 # Keeps your Claude commands, Cursor rules, and IDE instructions 100% in sync.
 skillsmith align

@@ -1,11 +1,13 @@
+import datetime
 import json
+import os
 import subprocess
 from pathlib import Path
-import yaml
-import os
 
 import click
-from . import console
+import yaml
+
+from . import console, validate_skill_agentskills
 
 @click.group(name="evolve")
 def evolve_command():
@@ -56,6 +58,72 @@ def evolve_capture_command(limit, output_dir):
     except Exception as e:
         console.print(f"[red][ERROR][/red] Capture failed: {e}")
 
+@evolve_command.command("evaluate")
+@click.argument("skill", required=False)
+@click.option("--output", default=".agent/evals/captured_skills.md", help="Path to the evaluation report.")
+def evolve_evaluate_command(skill, output):
+    """Score captured or existing skills against project DNA and AgentSkills.io standards."""
+    from rich.table import Table
+    
+    cwd = Path.cwd()
+    skills_dir = cwd / ".agent" / "skills"
+    
+    if skill:
+        # Resolve path
+        target = skills_dir / skill
+        if not target.exists():
+            target = Path(skill)
+        target_paths = [target] if (target / "SKILL.md").exists() else []
+    else:
+        target_paths = [d for d in skills_dir.rglob("*") if (d / "SKILL.md").exists()]
+
+    if not target_paths:
+        console.print("[yellow]No valid skills found to evaluate.[/yellow]")
+        return
+
+    console.print(f"[bold blue]Skillsmith Evolution: Evaluation Mode[/bold blue] (Scoring {len(target_paths)} skills...)\n")
+    
+    table = Table(title="Skill Evolution Leaderboard", show_header=True, header_style="bold blue")
+    table.add_column("Skill", style="cyan")
+    table.add_column("Status", style="bold")
+    table.add_column("Score", justify="right")
+    table.add_column("Findings")
+
+    report_content = [
+        "# Skill Evolution Report",
+        f"Generated: {datetime.datetime.now().isoformat()}\n",
+        "| Skill | Score | Status | Findings |",
+        "| :--- | :--- | :--- | :--- |"
+    ]
+    
+    for skill_path in sorted(target_paths):
+        is_valid, messages = validate_skill_agentskills(skill_path)
+        
+        # Scoring Logic (v1.0)
+        # 100 base score. -10 for each warning, -30 for each error.
+        score = 100
+        errors = [m for m in messages if "FAIL" in m or "red" in m]
+        warnings = [m for m in messages if "yellow" in m]
+        
+        score -= (len(errors) * 30)
+        score -= (len(warnings) * 10)
+        score = max(0, score)
+        
+        status = "[green]GOLD[/green]" if score >= 90 else "[yellow]SILVER[/yellow]" if score >= 70 else "[red]BRONZE[/red]"
+        findings = ", ".join([m.replace("[red]", "").replace("[/red]", "").replace("[yellow]", "").replace("[/yellow]", "").replace("FAIL ", "").strip() for m in messages[:2]])
+        
+        status_clean = status.replace("[green]", "").replace("[/green]", "").replace("[yellow]", "").replace("[/yellow]", "").replace("[red]", "").replace("[/red]", "")
+        table.add_row(skill_path.name, status, f"{score}/100", findings)
+        report_content.append(f"| {skill_path.name} | {score}/100 | {status_clean} | {findings} |")
+
+    console.print(table)
+    
+    # Save report
+    report_path = Path(output)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("\n".join(report_content), encoding="utf-8")
+    console.print(f"\n[bold green]Success![/bold green] Evolution Leaderboard synced to [bold]{output}[/bold].")
+
 @evolve_command.command("unlabeled")
 @click.argument("directory", type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path))
 @click.option("--output-dir", default="src/skillsmith/templates/.prototypes", help="Directory to save extracted prototypes.")
@@ -66,19 +134,16 @@ def evolve_unlabeled_command(directory, output_dir):
     target_dir = Path(directory)
     prototypes_found = 0
     
-    # Supported intelligence-rich extensions
     extensions = {".py", ".go", ".ts", ".js", ".java", ".rs", ".swift"}
     
     for root, dirs, files in os.walk(target_dir):
-        # Skip hidden and vendor dirs
         dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"node_modules", "vendor", "dist", "build", "venv"}]
-        
         for file in files:
             file_path = Path(root) / file
             if file_path.suffix in extensions:
                 if _analyze_file_for_prototype(file_path, Path(output_dir)):
                     prototypes_found += 1
-                    
+    
     if prototypes_found == 0:
         console.print("[yellow]No universal patterns extracted from this codebase.[/yellow]")
     else:
@@ -89,9 +154,6 @@ def _analyze_file_for_prototype(file_path: Path, output_dir: Path) -> bool:
     try:
         content = file_path.read_text(encoding="utf-8")
         lines = content.splitlines()
-        
-        # Look for complex patterns: e.g. many classes or deep inheritance or specific decorators
-        # Heuristic: file length > 100 AND contains 'class' OR 'interface' OR 'func'
         if len(lines) < 100:
             return False
             
@@ -99,12 +161,10 @@ def _analyze_file_for_prototype(file_path: Path, output_dir: Path) -> bool:
         if not any(k in low_content for k in ["class", "interface", "struct", "func", "pattern"]):
             return False
             
-        # Extract a draft name
         name = file_path.stem.replace("_", "-")
         proto_path = output_dir / f"{name}.yaml"
-        
         if proto_path.exists():
-            return False # Avoid duplicates
+            return False
             
         prototype = {
             "name": name,

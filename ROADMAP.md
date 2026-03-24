@@ -1,29 +1,26 @@
-# Roadmap: skillsmith
+# Roadmap: Skillsmith v1.x
 
-## Phase 1: Guided Onboarding
-- Add `skillsmith init --guided` to interview the user about idea, app type, stack, deployment, team preferences, quality bar, and constraints.
-- Infer defaults from the repo before prompting.
-- Save the result as `.agent/project_profile.yaml`.
+## Phase 1: Guided Onboarding (COMPLETED)
+- [x] `skillsmith init --guided` for structural profiling.
+- [x] Inference engine for project defaults.
+- [x] `.agent/project_profile.yaml` generation.
 
-## Phase 2: Alignment Engine
-- Generate all rule files and `.agent/*.md` from the same profile.
-- Add `skillsmith align` to re-render aligned files when the profile changes.
-- Stop duplicating logic across `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, Cursor, Windsurf, and Copilot instructions.
+## Phase 2: Alignment & Sovereignty (COMPLETED)
+- [x] `skillsmith align` for multi-platform rule synchronization.
+- [x] **Ghost-Sync Sovereignty**: Decoupled 882+ skills into the `ghost-content` branch.
+- [x] **Evolution Evaluator**: `skillsmith evolve evaluate` for expert benchmarking.
 
-## Phase 3: Registry Federation
-- Add a provider abstraction for local templates, `skills.sh`, curated registries, and MCP-backed discovery.
-- Score skills by relevance, trust, freshness, popularity, and compatibility.
-- Add lockfiles so teams can reproduce the exact skill set.
+## Phase 3: Frontiers of Evolution (ACTIVE)
+- [ ] **Skill Promotion**: Automate Phase 2.3 for internal skill versioning.
+- [ ] **Unlabeled Recon**: Run `evolve unlabeled` on industrial competitor repos to harvest patterns.
+- [ ] **Signature Logic**: GPG/Checksum verification for the Ghost-Sync stream.
 
-## Phase 4: Workflow Composer
-- Replace simple keyword composition with profile-aware workflow generation.
-- Generate workflows by project stage: discovery, implementation, debugging, review, release.
-- Add parameterized workflow templates and acceptance criteria.
+## Phase 4: Workflow Swarms (PLANNED)
+- [ ] Multi-agent orchestration with `/swarm` and `/team-exec` performance tuning.
+- [ ] Recursive Reasoning: Refine AND/OR Thinking Tree logic for complex codebase migrations.
+- [ ] Parameterized Acceptance Criteria: Link workflows to explicit test results.
 
-## Phase 5: Continuous Adaptation
-- Add `skillsmith doctor --fix`, `watch`, and recommendation loops that suggest missing skills when the stack changes.
-- Support branch-specific state, roadmap drift detection, and skill update suggestions.
-
-## Phase 6: Ecosystem Quality
-- Add stronger validation, provenance tracking, and security policy enforcement for remote skills.
-- Publish a stable schema for project profiles, registry records, and workflow bundles.
+## Phase 5: Continuous OS (PLANNED)
+- [ ] `skillsmith doctor --fix` for self-healing agentic environments.
+- [ ] Real-time recommendations: Suggesting skills based on `uv` dependency changes.
+- [ ] Visual Hub: A local Web-UI for browsing the 882+ Ghost Skill library.
