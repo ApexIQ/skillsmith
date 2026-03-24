@@ -1,8 +1,16 @@
 ---
 version: 0.1.0
 name: frontend-testing
-description: Use this skill when writing tests for React/Vue/Angular frontend applications. It covers component testing with modern testing libraries.
-tags: [testing, frontend, react, jest, vitest]
+description: Use this skill when writing tests for React/Vue/Angular frontend applications.
+  It covers component testing with modern testing libraries.
+tags:
+- testing
+- frontend
+- react
+- jest
+- vitest
+globs:
+- '**/*.py'
 ---
 
 # ⚛️ Frontend Testing Best Practices

@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: doc-updater
-description: Use this skill when documentation needs to be synced with code changes. Covers README updates, API docs, inline comments, changelogs, and ensuring docs stay accurate after refactors.
+description: Use this skill when documentation needs to be synced with code changes.
+  Covers README updates, API docs, inline comments, changelogs, and ensuring docs
+  stay accurate after refactors.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 📝 Doc Updater — Keep Documentation Alive

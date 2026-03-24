@@ -1,8 +1,15 @@
 ---
 version: 0.1.0
 name: refactoring-patterns
-description: Use this skill when improving existing code without changing its behavior. It defines when and how to refactor safely.
-tags: [refactoring, code-quality, patterns, clean-code]
+description: Use this skill when improving existing code without changing its behavior.
+  It defines when and how to refactor safely.
+tags:
+- refactoring
+- code-quality
+- patterns
+- clean-code
+globs:
+- '**/*.py'
 ---
 
 # ♻️ Refactoring Patterns

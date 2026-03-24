@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: python-expert
-description: Use this skill when writing or reviewing Python code. Covers modern Python idioms (3.10+), type hints, project structure, packaging, performance patterns, async/await, error handling, and production-grade coding standards.
+description: Use this skill when writing or reviewing Python code. Covers modern Python
+  idioms (3.10+), type hints, project structure, packaging, performance patterns,
+  async/await, error handling, and productio...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🐍 Python Expert — Production-Grade Python

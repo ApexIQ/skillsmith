@@ -4,6 +4,11 @@ description: Guide for quality focused software architecture. This skill should 
   used when users want to write code, design architecture, analyze code, in any case
   that relates to software development.
 version: 0.1.0
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # Software Architecture Development Skill

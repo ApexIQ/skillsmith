@@ -1,8 +1,15 @@
 ---
 version: 0.1.0
 name: integration-testing
-description: Use this skill when testing the full-stack integration between frontend and backend. Covers contract testing and E2E patterns.
-tags: [testing, integration, e2e, fullstack]
+description: Use this skill when testing the full-stack integration between frontend
+  and backend. Covers contract testing and E2E patterns.
+tags:
+- testing
+- integration
+- e2e
+- fullstack
+globs:
+- '**/*.py'
 ---
 
 # 🔗 Integration Testing Best Practices

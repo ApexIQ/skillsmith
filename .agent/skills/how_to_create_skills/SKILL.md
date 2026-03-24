@@ -1,7 +1,13 @@
 ---
 version: 0.1.0
 name: how-to-create-skills
-description: Use this skill when creating new agentic skills. It defines the format, structure, and best practices for writing effective SKILL.md files.
+description: Use this skill when creating new agentic skills. It defines the format,
+  structure, and best practices for writing effective SKILL.md files.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 📚 How to Create Skills

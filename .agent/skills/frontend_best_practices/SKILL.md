@@ -1,8 +1,16 @@
 ---
 version: 0.1.0
 name: frontend-best-practices
-description: Use this skill when creating or modifying React frontend components. It defines UI/UX, styling, and architecture standards.
-tags: [frontend, react, ui, ux, components]
+description: Use this skill when creating or modifying React frontend components.
+  It defines UI/UX, styling, and architecture standards.
+tags:
+- frontend
+- react
+- ui
+- ux
+- components
+globs:
+- '**/*.py'
 ---
 
 # ⚛️ Frontend Best Practices

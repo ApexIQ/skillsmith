@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: loop-operator
-description: Use this skill when executing autonomous or semi-autonomous agent loops. Covers bounded execution, safety guards, checkpoint/resume patterns, progress tracking, and graceful termination for long-running agentic workflows.
+description: Use this skill when executing autonomous or semi-autonomous agent loops.
+  Covers bounded execution, safety guards, checkpoint/resume patterns, progress tracking,
+  and graceful termination for long-ru...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🔄 Loop Operator — Autonomous Execution with Safety

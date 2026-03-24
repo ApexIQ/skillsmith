@@ -1,8 +1,16 @@
 ---
 version: 0.1.0
 name: database-migrations
-description: Use this skill when modifying database schemas or running migrations. It defines safe patterns for SQLModel/Alembic.
-tags: [database, sql, migrations, schema, alembic]
+description: Use this skill when modifying database schemas or running migrations.
+  It defines safe patterns for SQLModel/Alembic.
+tags:
+- database
+- sql
+- migrations
+- schema
+- alembic
+globs:
+- '**/*.py'
 ---
 
 # 🗄️ Database & Migrations

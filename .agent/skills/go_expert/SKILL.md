@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: go-expert
-description: Use this skill when writing or reviewing Go code. Covers Go idioms, concurrency patterns, error handling, project structure, testing, benchmarks, and production-grade Go standards.
+description: Use this skill when writing or reviewing Go code. Covers Go idioms, concurrency
+  patterns, error handling, project structure, testing, benchmarks, and production-grade
+  Go standards.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🔷 Go Expert — Production-Grade Go

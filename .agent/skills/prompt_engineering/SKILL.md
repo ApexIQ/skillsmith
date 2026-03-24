@@ -1,8 +1,17 @@
 ---
 version: 1.0.0
 name: prompt_engineering
-description: Expert guide on prompt engineering for 2024-2025 models (GPT-4o, Claude 3.5, o1, o3, Gemini 2.0). Covers reasoning models, delimiters, structured output, and context engineering.
-tags: [prompting, reasoning, llm, optimization, structured-output]
+description: Expert guide on prompt engineering for 2024-2025 models (GPT-4o, Claude
+  3.5, o1, o3, Gemini 2.0). Covers reasoning models, delimiters, structured output,
+  and context engineering.
+tags:
+- prompting
+- reasoning
+- llm
+- optimization
+- structured-output
+globs:
+- '**/*.py'
 ---
 
 # ✍️ Prompt Engineering (2025 Edition)

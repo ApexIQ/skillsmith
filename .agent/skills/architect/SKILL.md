@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: architect
-description: Use this skill when making system design decisions. Covers architecture patterns, tradeoff analysis, scalability planning, component boundaries, data flow design, and technology selection.
+description: Use this skill when making system design decisions. Covers architecture
+  patterns, tradeoff analysis, scalability planning, component boundaries, data flow
+  design, and technology selection.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🏗️ Architect — System Design Decisions

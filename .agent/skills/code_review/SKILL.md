@@ -1,7 +1,13 @@
 ---
 version: 0.1.0
 name: code-review
-description: Use this skill when reviewing code (your own or others'). It provides a structured checklist to catch bugs and ensure quality.
+description: Use this skill when reviewing code (your own or others'). It provides
+  a structured checklist to catch bugs and ensure quality.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 👁️ Code Review

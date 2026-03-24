@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: harness-optimizer
-description: Use this skill when tuning AI agent configurations for performance, cost, and reliability. Covers token optimization, context window management, model selection, prompt engineering for agents, and cost-per-task reduction strategies.
+description: Use this skill when tuning AI agent configurations for performance, cost,
+  and reliability. Covers token optimization, context window management, model selection,
+  prompt engineering for agents, and ...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # ⚡ Harness Optimizer — Tune Your Agent for Peak Performance

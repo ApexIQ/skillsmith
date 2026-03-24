@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: planner
-description: Use this skill when planning feature implementations. Covers requirements decomposition, acceptance criteria, task sequencing, risk identification, and creating executable implementation plans before writing code.
+description: Use this skill when planning feature implementations. Covers requirements
+  decomposition, acceptance criteria, task sequencing, risk identification, and creating
+  executable implementation plans befo...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 📋 Planner — Feature Implementation Planning

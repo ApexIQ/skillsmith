@@ -1,7 +1,13 @@
 ---
 version: 1.1.0
 name: git-expert
-description: Use this skill for version control best practices. Covers branching, commit messages, PR conventions, worktree management, and conventional commit automation.
+description: Use this skill for version control best practices. Covers branching,
+  commit messages, PR conventions, worktree management, and conventional commit automation.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🌿 Git Expert — Production-Grade Source Control

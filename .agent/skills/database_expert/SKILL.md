@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: database-expert
-description: Use this skill when designing databases, writing queries, optimizing performance, or planning migrations. Covers SQL optimization, schema design, indexing strategies, PostgreSQL patterns, migration safety, and production database operations.
+description: Use this skill when designing databases, writing queries, optimizing
+  performance, or planning migrations. Covers SQL optimization, schema design, indexing
+  strategies, PostgreSQL patterns, migration...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🗄️ Database Expert — Production-Grade Database Engineering

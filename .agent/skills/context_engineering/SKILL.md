@@ -1,8 +1,16 @@
 ---
 version: 0.1.0
 name: context-engineering
-description: Use this skill for optimizing AI context windows. Covers context sizing, prioritization, and avoiding context overflow.
-tags: [ai, context, memory, tokens, optimization]
+description: Use this skill for optimizing AI context windows. Covers context sizing,
+  prioritization, and avoiding context overflow.
+tags:
+- ai
+- context
+- memory
+- tokens
+- optimization
+globs:
+- '**/*.py'
 ---
 
 # 🎯 Context Engineering

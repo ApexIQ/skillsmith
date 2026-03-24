@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: build-resolver
-description: Use this skill when diagnosing and fixing build errors across any language or framework. Covers dependency resolution, compilation errors, configuration issues, CI failures, and environment mismatches.
+description: Use this skill when diagnosing and fixing build errors across any language
+  or framework. Covers dependency resolution, compilation errors, configuration issues,
+  CI failures, and environment mismatc...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 🔧 Build Resolver — Fix Build Errors Fast

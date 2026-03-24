@@ -9,9 +9,9 @@
 - [x] `skillsmith align` for multi-platform rule synchronization.
 - [x] **Ghost-Sync Sovereignty**: Decoupled 882+ skills into the `ghost-content` branch.
 - [x] **Evolution Evaluator**: `skillsmith evolve evaluate` for expert benchmarking.
+- [x] **Autonomous Promotion**: `skillsmith evolve promote` for self-healing metadata repairs (Phase 2.3).
 
-## Phase 3: Frontiers of Evolution (ACTIVE)
-- [ ] **Skill Promotion**: Automate Phase 2.3 for internal skill versioning.
+## Phase 3: Frontiers of Scaling (ACTIVE)
 - [ ] **Unlabeled Recon**: Run `evolve unlabeled` on industrial competitor repos to harvest patterns.
 - [ ] **Signature Logic**: GPG/Checksum verification for the Ghost-Sync stream.
 

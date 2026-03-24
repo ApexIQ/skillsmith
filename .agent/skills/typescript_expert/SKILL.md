@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: typescript-expert
-description: Use this skill when writing or reviewing TypeScript/JavaScript code. Covers modern TS patterns, React best practices, Node.js patterns, type system mastery, bundler config, testing, and production-grade frontend/backend standards.
+description: Use this skill when writing or reviewing TypeScript/JavaScript code.
+  Covers modern TS patterns, React best practices, Node.js patterns, type system mastery,
+  bundler config, testing, and production-...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 📘 TypeScript Expert — Production-Grade TypeScript

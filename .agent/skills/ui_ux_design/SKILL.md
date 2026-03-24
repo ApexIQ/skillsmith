@@ -1,7 +1,14 @@
 ---
 name: ui_ux_design
 version: 0.1.0
-description: "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks. Actions: plan, build, create, design, implement, review. Integrations: shadcn/ui MCP."
+description: 'UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings,
+  20 charts, 9 stacks. Actions: plan, build, create, design, implement, review. Integrations:
+  shadcn/ui MCP.'
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # UI/UX Pro Max - Design Intelligence

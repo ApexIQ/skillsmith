@@ -1,7 +1,13 @@
 ---
 version: 0.1.0
 name: how-to-create-implementation-plan
-description: Use this skill when creating technical design documents (RFCs) before implementing features.
+description: Use this skill when creating technical design documents (RFCs) before
+  implementing features.
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # 📝 How to Create an Implementation Plan

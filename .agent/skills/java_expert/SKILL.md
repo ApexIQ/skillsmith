@@ -1,7 +1,14 @@
 ---
 version: 1.0.0
 name: java-expert
-description: Use this skill when writing or reviewing Java code. Covers modern Java (17+), Spring Boot patterns, JPA/Hibernate, Maven/Gradle, testing with JUnit 5, security patterns, and production-grade enterprise Java standards.
+description: Use this skill when writing or reviewing Java code. Covers modern Java
+  (17+), Spring Boot patterns, JPA/Hibernate, Maven/Gradle, testing with JUnit 5,
+  security patterns, and production-grade enterp...
+tags:
+- promoted
+- autonomous-repair
+globs:
+- '**/*.py'
 ---
 
 # ☕ Java Expert — Production-Grade Java
