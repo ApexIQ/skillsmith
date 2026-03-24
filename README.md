@@ -53,7 +53,11 @@ Skillsmith manages rule-sets and workflow surfaces for the entire AI engineering
 pip install skillsmith
 ```
 
-### 2. Initialize (The "Guided" Path)
+### 2. Learn the Commands
+> [!TIP]
+> **View the Complete [Reference Guide](docs/COMMANDS.md)** for a deep dive into all 33+ command surfaces.
+
+### 3. Initialize (The "Guided" Path)
 ```bash
 skillsmith init --guided
 ```
