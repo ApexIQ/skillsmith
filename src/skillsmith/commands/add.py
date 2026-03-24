@@ -133,15 +133,18 @@ def _validate_remote_domain(url: str, profile: dict | None) -> tuple[bool, str]:
     return False, f"remote domain '{host}' is not in allowed_remote_domains {sorted(allowed)}"
 
 
-def _install_local_skill(cwd: Path, skill_name: str, dest_dir: Path) -> bool:
+def _install_local_skill(cwd: Path, skill_name: str, dest_dir: Path, overwrite: bool = False) -> bool:
     src_dir = find_template_skill_dir(skill_name)
     if not src_dir:
         return False
 
     target = dest_dir / skill_name
     if target.exists():
-        console.print(f"[yellow][SKIP][/yellow] Skill '{skill_name}' already exists in .agent/skills/")
-        return True
+        if not overwrite:
+            console.print(f"[yellow][SKIP][/yellow] Skill '{skill_name}' already exists in .agent/skills/")
+            return True
+        shutil.rmtree(target)
+
 
     shutil.copytree(src_dir, target)
     record_skill_install(
@@ -166,6 +169,10 @@ def _install_local_skill(cwd: Path, skill_name: str, dest_dir: Path) -> bool:
     return True
 
 
+def _is_install_url(name_or_url: str) -> bool:
+    return name_or_url.startswith("http")
+
+
 def _install_from_url(
     cwd: Path,
     url: str,
@@ -175,6 +182,7 @@ def _install_from_url(
     requested_query: str | None = None,
     profile: dict | None = None,
     selected_by: str = "manual",
+    overwrite: bool = False,
 ) -> bool:
     domain_ok, domain_reason = _validate_remote_domain(url, profile)
     if not domain_ok:
@@ -187,8 +195,18 @@ def _install_from_url(
 
     name = url.rstrip("/").split("/")[-1] or "skill"
     target = dest_dir / name
+    if target.exists():
+        if not overwrite:
+            console.print(f"[yellow][SKIP][/yellow] Skill '{name}' already exists in .agent/skills/")
+            return True
+        shutil.rmtree(target, ignore_errors=True)
+
     with console.status(f"[bold green]Downloading {name} from GitHub..."):
-        download_github_dir(url, target)
+        try:
+            download_github_dir(url, target)
+        except Exception as exc:
+            console.print(f"[red]Error downloading skill: {exc}[/red]")
+            return False
 
     verification = verify_remote_skill_artifact(target, profile, cwd=cwd)
     if verification["state"] == "valid":
@@ -273,24 +291,20 @@ def discover_skills(query: str, cwd: Path, source: str = "all", limit: int = 10)
     show_default=True,
     help="Discovery source",
 )
-def add_command(name_or_url, use_discovery, source):
+@click.option("--overwrite", is_flag=True, help="Overwrite existing skill directory")
+def add_command(name_or_url, use_discovery, source, overwrite):
     """Add a skill from local library, GitHub URL, or discovered providers."""
     cwd = Path.cwd()
     dest_dir = cwd / ".agent" / "skills"
     dest_dir.mkdir(parents=True, exist_ok=True)
     profile = _load_profile(cwd)
 
-    if name_or_url.startswith("http"):
-        try:
-            installed = _install_from_url(cwd, name_or_url, dest_dir, profile=profile)
-            if not installed:
-                raise click.exceptions.Exit(1)
-        except Exception as exc:
-            console.print(f"[red]Error downloading skill: {exc}[/red]")
-            raise click.exceptions.Exit(1)
-        return
+    if _is_install_url(name_or_url):
+        if _install_from_url(cwd, name_or_url, dest_dir, profile=profile, overwrite=overwrite):
+            return
+        raise click.exceptions.Exit(1)
 
-    if _install_local_skill(cwd, name_or_url, dest_dir):
+    if _install_local_skill(cwd, name_or_url, dest_dir, overwrite=overwrite):
         return
 
     try:
@@ -302,6 +316,7 @@ def add_command(name_or_url, use_discovery, source):
         suggestions = []
         diagnostics = []
         telemetry = []
+
     for item in diagnostics:
         console.print(f"[yellow][WARN][/yellow] {item}")
     for item in telemetry:
@@ -310,12 +325,13 @@ def add_command(name_or_url, use_discovery, source):
             f"attempts={item.get('attempts')} elapsed_ms={item.get('elapsed_ms')} "
             f"error_type={item.get('error_type') or 'none'}[/dim]"
         )
+
     console.print(f"[red]Error: Skill '{name_or_url}' not found locally.[/red]")
 
     if use_discovery and suggestions:
         for candidate in suggestions:
             if candidate.source == "local":
-                if _install_local_skill(cwd, candidate.name, dest_dir):
+                if _install_local_skill(cwd, candidate.name, dest_dir, overwrite=overwrite):
                     return
                 continue
 
@@ -335,7 +351,7 @@ def add_command(name_or_url, use_discovery, source):
                 continue
 
             try:
-                _install_from_url(
+                if _install_from_url(
                     cwd,
                     install_url,
                     dest_dir,
@@ -343,8 +359,9 @@ def add_command(name_or_url, use_discovery, source):
                     requested_query=name_or_url,
                     profile=profile,
                     selected_by="skillsmith-discovery",
-                )
-                return
+                    overwrite=overwrite,
+                ):
+                    return
             except Exception as exc:
                 console.print(f"[yellow][SKIP][/yellow] Failed to install {candidate.name}: {exc}")
 

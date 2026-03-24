@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "schema_version": 2,
+  "skills": [
+    {
+      "name": "python_expert",
+      "source": "local",
+      "version": "0.0.0",
+      "install_ref": "python_expert",
+      "trust_score": 90,
+      "category": "general",
+      "tags": [],
+      "installed_at": "2026-03-24T19:55:14.081728Z",
+      "verification_timestamp": "2026-03-24T19:55:14Z",
+      "path": ".agent/skills/python_expert",
+      "checksum": "3d945104226c9550f7068f7f31ce9cf33e4a13dddbf86a5fa06ebbdf8ca2b69c",
+      "metadata": {
+        "provenance": {
+          "install_kind": "local-template",
+          "source": "local",
+          "install_ref": "python_expert",
+          "requested_name": "python_expert",
+          "requested_query": null,
+          "requested_url": null,
+          "selected_by": "manual"
+        },
+        "recommendation": {
+          "reasons": [
+            "manual install",
+            "local template"
+          ],
+          "selected_by": "manual",
+          "selection_mode": "manual",
+          "query": "python_expert"
+        }
+      },
+      "provenance": {
+        "install_kind": "local-template",
+        "source": "local",
+        "install_ref": "python_expert",
+        "requested_name": "python_expert",
+        "selected_by": "manual"
+      },
+      "recommendation": {
+        "reasons": [
+          "manual install",
+          "local template"
+        ],
+        "score": 90,
+        "reason_hash": "5ea233ca3ccccd65b3d18e8b823a7bafee8b2434b58ffc43f074162863f90685",
+        "selected_by": "manual",
+        "selection_mode": "manual",
+        "query": "python_expert"
+      },
+      "metrics": {
+        "applied_count": 4,
+        "success_rate": 1.0,
+        "avg_token_cost": 0.0,
+        "last_used_at": "2026-03-24T20:26:13Z",
+        "failure_count": 0
+      }
+    }
+  ]
+}

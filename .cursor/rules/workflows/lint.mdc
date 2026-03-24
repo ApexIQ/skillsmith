@@ -1,0 +1,10 @@
+---
+description: Run the lint workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/lint.md`.
+- Goal: run linter and fix stylistic issues for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

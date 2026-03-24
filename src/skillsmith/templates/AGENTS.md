@@ -2,13 +2,28 @@
 
 > Start here. This is the primary entry point for agents working in this project.
 
-## Prime Directives
+## 1. Prime Directives
 
-1. Read `.agent/STATE.md` first.
-2. Read `.agent/project_profile.yaml` and `.agent/context/project-context.md` before making assumptions.
-3. Search `.agent/skills/` and read the 2-3 most relevant `SKILL.md` files before planning.
-4. Follow the loop: Discuss -> Plan -> Execute -> Verify.
-5. Update `.agent/STATE.md` after significant steps.
+1. Read `AGENTS.md` and `.agent/STATE.md` first.
+2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
+3. Read `.agent/project_profile.yaml` and `.agent/context/project-context.md`.
+4. Search `.agent/skills/` and read the 2-3 most relevant `SKILL.md` files before planning.
+5. Follow the **7-Stage Workflow**: Discover → Plan → Build → Review → Test → Ship → Reflect.
+6. **AND/OR Thinking**: Treat every goal as a root node in a dynamic Thinking Tree. If Strategy A fails, prune it and branch to Strategy B (OR) at the exact failure node.
+7. Update `.agent/STATE.md` after significant steps.
+
+## 2. The 7-Stage Development Cycle
+
+| Stage | Objective |
+|:---|:---|
+| **Discover** | Audit profile, context, and code for constraints. |
+| **Plan** | Define minimal patch with verification points. |
+| **Build** | Implement atomic changes in isolation. |
+| **Review** | Adversarial check for risks and regressions. |
+| **Test** | Identify highest-risk behavior and verify. |
+| **Ship** | Generate clean handoff with evidence. |
+| **Reflect** | Record lessons and update project state. |
+
 
 ## Execution Standard
 
@@ -47,8 +62,10 @@
 
 ## Project Structure
 
-- `.agent/skills/`: reusable task guides.
-- `.agent/params/`: project constraints.
+- `.agent/skills/`: reusable procedural skills.
+- `.agent/principles/`: project behavioral rules.
+- `.agent/hooks/`: tool execution automations.
+- `.agent/scripts/`: project helper utilities.
 - `.agent/PROJECT.md`: product and architecture context.
 - `.agent/ROADMAP.md`: strategic milestones.
 - `.agent/STATE.md`: current tactical state.

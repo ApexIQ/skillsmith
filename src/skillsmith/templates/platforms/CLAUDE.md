@@ -4,10 +4,23 @@
 > Claude Code loads this file automatically at session start.
 > See: https://docs.anthropic.com/en/docs/claude-code
 
-## Context
+## Prime Directives
 
-- Read `AGENTS.md` first.
-- Read `.agent/STATE.md`, `.agent/PROJECT.md`, `.agent/ROADMAP.md`, `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
+1. Read `AGENTS.md` and `.agent/STATE.md` first.
+2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
+3. Read `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
+4. Search `.agent/skills/` before implementation.
+5. Follow the **7-Stage Workflow**: Discover → Plan → Build → Review → Test → Ship → Reflect.
+
+## 7-Stage Workflow
+
+1. **Discover**: Audit profile, context, and code for constraints.
+2. **Plan**: Define minimal patch with verification points.
+3. **Build**: Implement atomic changes in isolation.
+4. **Review**: Adversarial check for risks and regressions.
+5. **Test**: Identify highest-risk behavior and verify.
+6. **Ship**: Generate clean handoff with evidence.
+7. **Reflect**: Record lessons and update project state.
 
 ## Workflow Protocol
 

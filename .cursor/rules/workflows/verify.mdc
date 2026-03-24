@@ -1,0 +1,10 @@
+---
+description: Run the verify workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/verify.md`.
+- Goal: verify project health and requirements for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

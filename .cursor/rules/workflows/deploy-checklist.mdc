@@ -1,0 +1,10 @@
+---
+description: Run the deploy-checklist workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/deploy-checklist.md`.
+- Goal: deploy release checklist for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -179,6 +179,25 @@ Exit: Quality threshold met ✅
 
 **Rule:** If quality score doesn't increase for 2 consecutive iterations, stop — you've hit diminishing returns.
 
+### Pattern 5: AND/OR Strategic Branching Loop
+
+Inspired by [StructuredAgent (arXiv:2603.05294v1)](https://arxiv.org/html/2603.05294v1). This is the "Brain-Like" approach for complex situations where linear retries are insufficient.
+
+```
+          ┌─────── Goal (AND Node) ───────┐
+          │                               │
+  ┌── Strategy A (OR) ──┐         ┌── Strategy B (OR) ──┐
+  │                     │         │                     │
+Step 1 (AND)        Step 2 (AND)  Step 1 (AND)      Step 2 (AND)
+  │                     │         │                     │
+[Entering]           [Failed]──▶[Pruning]────────▶[Entering]
+```
+
+**Rules:**
+- **Atomic AND Nodes**: Every tool execution must have an explicit validator. If it fails, report `Failed` state to the parent immediately.
+- **Strategic OR Branches**: Never retry the exact same approach. If "Strategy A" (e.g., standard library) fails, branch to "Strategy B" (e.g., custom implementation) at the same node level.
+- **State Traversal**: Track nodes through `Entering` (pre-execution), `Exiting` (verification), and `Failed` (pruning/pivot) states.
+
 ## 4. Safety Guards
 
 ### Guard 1: Resource Limits

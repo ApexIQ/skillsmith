@@ -14,6 +14,7 @@ from .commands import (
     lint_command,
     compose_command,
     audit_command,
+    evolve_command,
     doctor_command,
     eval_command,
     budget_command,
@@ -27,10 +28,14 @@ from .commands import (
     assets_command,
     autonomous_command,
     context_index_command,
+    metrics_command,
     registry_command,
     registry_service_command,
     trust_service_command,
     safety_command,
+    tree_command,
+    swarm_command,
+    team_exec_command,
 )
 from .commands.ready import ready_command
 from .commands.start import start_command
@@ -54,6 +59,7 @@ main.add_command(add_command, name="add")
 main.add_command(lint_command, name="lint")
 main.add_command(compose_command, name="compose")
 main.add_command(audit_command, name="audit")
+main.add_command(evolve_command, name="evolve")
 main.add_command(doctor_command, name="doctor")
 main.add_command(eval_command, name="eval")
 main.add_command(budget_command, name="budget")
@@ -73,7 +79,11 @@ main.add_command(ready_command, name="ready")
 main.add_command(registry_command, name="registry")
 main.add_command(registry_service_command, name="registry-service")
 main.add_command(trust_service_command, name="trust-service")
+main.add_command(metrics_command, name="metrics")
 main.add_command(safety_command, name="safety")
+main.add_command(tree_command, name="tree")
+main.add_command(swarm_command, name="swarm")
+main.add_command(team_exec_command, name="team-exec")
 
 if __name__ == "__main__":
     main()

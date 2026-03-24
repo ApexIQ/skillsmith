@@ -1,0 +1,10 @@
+---
+description: Run the review workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/review.md`.
+- Goal: review code and architecture for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

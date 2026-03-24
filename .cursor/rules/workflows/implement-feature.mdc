@@ -1,0 +1,10 @@
+---
+description: Run the implement-feature workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/implement-feature.md`.
+- Goal: implement feature for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -6,6 +6,7 @@ import yaml
 
 from . import console
 from .context_index import build_context_retrieval_trace, persist_context_retrieval_trace, retrieve_context_candidates
+from .lockfile import record_skill_usage
 from .workflow_engine import build_workflow, load_rolling_eval_feedback
 
 
@@ -89,6 +90,13 @@ def compose_command(goal, goal_option, max_skills, mode, planner_editor, reflect
         workflow["context_trace"] = trace_path.relative_to(cwd).as_posix()
     except Exception:
         trace_path = None
+
+    # F1 Telemetry: Record that these skills were applied to a workflow
+    try:
+        for skill_name in workflow.get("skills", []):
+            record_skill_usage(cwd, skill_name, tokens=0) # tokens=0 as this is planning only
+    except Exception:
+        pass
 
     payload = {
         "ok": bool(workflow.get("skills")),

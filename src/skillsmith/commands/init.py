@@ -8,6 +8,8 @@ from urllib.parse import urlparse
 import click
 import yaml
 
+from rich.console import Console
+from rich.prompt import Prompt, Confirm
 from . import (
     CORE_SKILLS,
     PLATFORM_DIR,
@@ -365,90 +367,67 @@ def _format_key_rotation(value: dict | None) -> str:
 
 def _collect_guided_profile(cwd: Path) -> dict:
     profile = _infer_project_profile(cwd)
-    console.print("[bold cyan]Guided setup[/bold cyan]")
-    profile["idea"] = click.prompt("What are you building?", default=profile["idea"], show_default=True)
-    profile["project_stage"] = click.prompt("Project stage", default=profile["project_stage"], show_default=True)
-    profile["app_type"] = click.prompt("App type", default=profile["app_type"], show_default=True)
-    profile["languages"] = _prompt_list("Languages", profile["languages"])
-    profile["frameworks"] = _prompt_list("Frameworks", profile["frameworks"] or ["none"])
-    profile["package_manager"] = click.prompt("Package manager", default=profile["package_manager"], show_default=True)
-    profile["deployment_target"] = click.prompt("Deployment target", default=profile["deployment_target"], show_default=True)
-    profile["priorities"] = _prompt_list("Priorities", profile["priorities"])
-    profile["target_tools"] = _prompt_list("Target tools", profile["target_tools"])
-    profile["allow_remote_skills"] = click.confirm("Allow remote skill discovery?", default=profile["allow_remote_skills"])
+    console.print("\n[bold cyan]🚀 Skillsmith Guided Interview (Phase 2)[/bold cyan]")
+    console.print("[dim]This helps us customize your .agent architecture for your specific project.[/dim]\n")
+
+    # Group 1: Product Strategy
+    console.print("[bold yellow]1. Product Strategy[/bold yellow]")
+    profile["idea"] = Prompt.ask("What are you building?", default=profile.get("idea", "Project using skillsmith"))
+    profile["project_stage"] = Prompt.ask("Project stage", choices=["greenfield", "existing", "maintenance"], default=profile.get("project_stage", "existing"))
+    profile["app_type"] = Prompt.ask("App type", choices=["application", "library", "web-app", "api-service", "fullstack-app", "cli-tool"], default=profile.get("app_type", "application"))
+    console.print("")
+
+    # Group 2: Technical Stack
+    console.print("[bold yellow]2. Technical Stack[/bold yellow]")
+    profile["languages"] = _prompt_list("Languages (comma-separated)", profile.get("languages", ["python"]))
+    profile["frameworks"] = _prompt_list("Frameworks (comma-separated)", profile.get("frameworks", ["none"]))
+    profile["package_manager"] = Prompt.ask("Package manager", choices=["pip", "uv", "npm", "yarn", "pnpm", "poetry", "go", "cargo", "maven", "gradle"], default=profile.get("package_manager", "pip"))
+    profile["deployment_target"] = Prompt.ask("Deployment target", default=profile.get("deployment_target", "not-specified"))
+    console.print("")
+
+    # Group 3: Engineering Priorities
+    console.print("[bold yellow]3. Engineering Priorities[/bold yellow]")
+    profile["priorities"] = _prompt_list("Priorities (comma-separated)", profile.get("priorities", ["maintainability", "verification"]))
+    profile["target_tools"] = _prompt_list("Tools targeted (claude, cursor...)", profile.get("target_tools", ["claude"]))
+    console.print("")
+
+    # Group 4: Governance & Trust (The $100M Layer)
+    console.print("[bold blue]4. Governance & Trust Layer[/bold blue]")
+    profile["allow_remote_skills"] = Confirm.ask("Allow remote skill discovery from GitHub/Registry?", default=bool(profile.get("allow_remote_skills", False)))
+    
     if profile["allow_remote_skills"]:
-        profile["trusted_skill_sources"] = _prompt_list("Trusted skill sources", ["local", "github", "skills.sh"])
+        profile["trusted_skill_sources"] = _prompt_list("Trusted sources", ["local", "github", "skills.sh"])
     else:
         profile["trusted_skill_sources"] = ["local"]
-    profile["blocked_skill_sources"] = _prompt_optional_list(
-        "Blocked skill sources", profile.get("blocked_skill_sources", [])
+
+    profile["require_pinned_github_refs"] = Confirm.ask("Require commit-pinned GitHub refs for security?", default=True)
+    
+    profile["publisher_verification_mode"] = Prompt.ask(
+        "Publisher verification stringency",
+        choices=["off", "optional", "required"],
+        default=profile.get("publisher_verification_mode", "optional")
     )
-    profile["require_pinned_github_refs"] = click.confirm(
-        "Require commit-pinned GitHub refs for remote installs?",
-        default=bool(profile.get("require_pinned_github_refs", True)),
-    )
-    raw_trusted_publisher_public_keys = click.prompt(
-        "Trusted publisher public keys (key_id=modulus_hex[:exponent], comma-separated)",
+
+    console.print("\n[bold green]Gathering advanced configurations...[/bold green]")
+    # Maintain raw data collection for expert fields
+    raw_trusted_publisher_public_keys = Prompt.ask(
+        "Trusted publisher public keys (key_id=modulus:exponent)",
         default=", ".join(
-            f"{key_id}={key_info['n']}:{key_info.get('e', 65537)}"
-            for key_id, key_info in _normalize_publisher_public_keys(profile.get("trusted_publisher_public_keys", {})).items()
-        ),
-        show_default=True,
+            f"{k}={v['n']}:{v.get('e', 65537)}"
+            for k, v in _normalize_publisher_public_keys(profile.get("trusted_publisher_public_keys", {})).items()
+        ) or "none"
     )
-    profile["trusted_publisher_public_keys"] = _normalize_publisher_public_keys(
-        [item.strip() for item in raw_trusted_publisher_public_keys.split(",") if item.strip()]
+    profile["trusted_publisher_public_keys"] = _parse_publisher_public_keys((raw_trusted_publisher_public_keys,))
+
+    raw_trusted_publisher_keys = Prompt.ask(
+        "Trusted publisher keys (key_id=secret)",
+        default=", ".join(f"{k}={v}" for k, v in _normalize_publisher_keys(profile.get("trusted_publisher_keys", {})).items()) or "none"
     )
-    raw_trusted_publisher_keys = click.prompt(
-        "Trusted publisher keys (key_id=secret, comma-separated)",
-        default=", ".join(f"{key_id}={value}" for key_id, value in _normalize_publisher_keys(profile.get("trusted_publisher_keys", {})).items()),
-        show_default=True,
-    )
-    profile["trusted_publisher_keys"] = _normalize_publisher_keys(
-        [item.strip() for item in raw_trusted_publisher_keys.split(",") if item.strip()]
-    )
-    profile["publisher_signature_scheme_mode"] = click.prompt(
-        "Publisher signature scheme mode",
-        default=_publisher_signature_scheme_mode(profile.get("publisher_signature_scheme_mode", "auto")),
-        show_default=True,
-        type=click.Choice(["auto", "hmac", "rsa"], case_sensitive=False),
-    ).lower()
-    raw_publisher_signature_algorithms = click.prompt(
-        "Allowed publisher signature algorithms (comma-separated)",
-        default=", ".join(_publisher_signature_algorithms(profile.get("publisher_signature_algorithms", []))),
-        show_default=True,
-    )
-    profile["publisher_signature_algorithms"] = _publisher_signature_algorithms(
-        [item.strip() for item in raw_publisher_signature_algorithms.split(",") if item.strip()]
-    )
-    profile["publisher_verification_mode"] = click.prompt(
-        "Publisher verification mode",
-        default=_publisher_signature_mode(profile.get("publisher_verification_mode", "optional")),
-        show_default=True,
-        type=click.Choice(["off", "optional", "required"], case_sensitive=False),
-    ).lower()
-    profile["min_remote_trust_score"] = click.prompt(
-        "Minimum remote trust score",
-        default=profile["min_remote_trust_score"],
-        show_default=True,
-        type=int,
-    )
-    profile["min_remote_freshness_score"] = click.prompt(
-        "Minimum remote freshness score",
-        default=profile["min_remote_freshness_score"],
-        show_default=True,
-        type=click.IntRange(0, 100),
-    )
-    raw_key_rotation = click.prompt(
-        "Publisher key rotation (current_key_id=..., previous_key_ids=id1|id2, rotation_grace_period_days=N)",
-        default=_format_key_rotation(profile.get("publisher_key_rotation", {})),
-        show_default=True,
-    )
-    profile["publisher_key_rotation"] = _parse_key_rotation(
-        [item.strip() for item in raw_key_rotation.split(",") if item.strip()]
-    )
-    profile["required_remote_licenses"] = _prompt_optional_list(
-        "Required remote licenses", profile.get("required_remote_licenses", [])
-    )
+    profile["trusted_publisher_keys"] = _normalize_publisher_keys((raw_trusted_publisher_keys,))
+
+    profile["min_remote_trust_score"] = int(Prompt.ask("Minimum remote trust score (0-100)", default=str(profile.get("min_remote_trust_score", 65))))
+    profile["min_remote_freshness_score"] = int(Prompt.ask("Minimum remote freshness (0-100)", default="0"))
+
     return profile
 
 
@@ -576,6 +555,16 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
 
     if minimal:
         return
+
+    # Scaffold advanced directories (parity with ECC/CCG)
+    for folder_name in ["principles", "hooks", "scripts", "snapshots"]:
+        folder = agents_dir / folder_name
+        if not folder.exists():
+            folder.mkdir(exist_ok=True)
+            readme = folder / "README.md"
+            if not readme.exists():
+                readme.write_text(f"# .agent/{folder_name}\n\nThis directory contains project-specific {folder_name} for AI agents.\n", encoding="utf-8")
+            console.print(f"[green][OK][/green] Scaffolded {folder_name}/ (advanced layer)")
 
     src_skills_zip = resolve_runtime_asset(".agent/skills.zip", required=False)
     if not src_skills_zip or not src_skills_zip.exists():

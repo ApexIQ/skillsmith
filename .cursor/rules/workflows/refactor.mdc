@@ -1,0 +1,10 @@
+---
+description: Run the refactor workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/refactor.md`.
+- Goal: refactor project structure and technical debt for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -1,0 +1,10 @@
+---
+description: Run the ready workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/ready.md`.
+- Goal: check production readiness for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

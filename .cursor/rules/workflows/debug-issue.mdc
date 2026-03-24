@@ -1,0 +1,10 @@
+---
+description: Run the debug-issue workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/debug-issue.md`.
+- Goal: debug issue for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -1,0 +1,10 @@
+---
+description: Run the evolve workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/evolve.md`.
+- Goal: evolve and improve skill instructions for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

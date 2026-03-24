@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command' 2>/dev/null | grep -q 'git.*--no-verify' && echo '{\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"deny\", \"permissionDecisionReason\": \"Git hook bypass denied by Skillsmith policy. Never skip quality checks.\"}}' || true",
+            "timeout": 1
+          }
+        ]
+      }
+    ]
+  }
+}

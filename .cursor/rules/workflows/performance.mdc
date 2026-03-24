@@ -1,0 +1,10 @@
+---
+description: Run the performance workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/performance.md`.
+- Goal: profile and optimize performance for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

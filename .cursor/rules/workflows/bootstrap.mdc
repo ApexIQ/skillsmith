@@ -1,0 +1,10 @@
+---
+description: Run the bootstrap workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/bootstrap.md`.
+- Goal: bootstrap a new module or service for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

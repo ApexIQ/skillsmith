@@ -1,0 +1,10 @@
+---
+description: Run the security workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/security.md`.
+- Goal: audit and harden security for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -163,16 +163,26 @@ my_Referce.md
 .agent/temp/
 temp_skills/
 temp_full_skills/
+.agent/autonomy_snapshots/
 
 # Local runtime/index caches and traces
-.agent/context/*
+.agent/context/index.json
+.agent/context/recall_cache.json
+.agent/context/traces/
 !.agent/context/project-context.md
 .agent/autonomy/runs/
 .agent/autonomy/latest.json
 .agent/autonomy/results.tsv
+.agent/autonomy/lessons.json
+.agent/skills/captured/
 
 # Local scratch and test artifacts
 test_lab/
+test_lab_v*/
+lab_gemini*/
+lab_test*/
+tmp*/
+.tmp*/
 .test-*/
 .tmp-probe*/
 .tmp-unittest-global/

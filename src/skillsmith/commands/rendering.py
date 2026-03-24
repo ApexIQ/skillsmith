@@ -14,6 +14,48 @@ from .lockfile import (
 from .workflow_engine import build_workflow, workflow_bundle_definitions, workflow_markdown
 
 
+def _resolve_prototypes(embodiment: str) -> str:
+    """Resolve universal Skill Prototypes to specific agent embodiments (arXiv:2307.09955)."""
+    prototype_dir = Path(__file__).parent.parent / "templates" / ".prototypes"
+    if not prototype_dir.exists():
+        return ""
+
+    instructions = []
+    for proto_file in prototype_dir.glob("*.yaml"):
+        try:
+            proto = yaml.safe_load(proto_file.read_text(encoding="utf-8"))
+            if not proto:
+                continue
+            
+            # Universal Logic
+            instructions.append(f"### Prototype: {proto.get('name', proto_file.stem).title()}")
+            instructions.append(proto.get("description", ""))
+            
+            logic = proto.get("logic", {})
+            if isinstance(logic, dict):
+                for section, steps in logic.items():
+                    instructions.append(f"#### {section.replace('_', ' ').title()}")
+                    if isinstance(steps, list):
+                        for step in steps:
+                            instructions.append(f"- {step}")
+            
+            # Embodiment-specific mapping
+            emb_logic = proto.get("embodiments", {}).get(embodiment, [])
+            if emb_logic:
+                instructions.append(f"#### {embodiment.title()} Optimization")
+                for step in emb_logic:
+                    instructions.append(f"- {step}")
+            
+            instructions.append("")
+        except Exception:
+            continue
+    
+    if not instructions:
+        return ""
+    
+    return "\n## Skill Prototypes (Universal Logic)\n\n" + "\n".join(instructions)
+
+
 def _list_or_default(values: list[str], fallback: str = "not-specified") -> str:
     cleaned = [value for value in values if value and value != "none"]
     return ", ".join(cleaned) if cleaned else fallback
@@ -65,15 +107,29 @@ def render_agents_md(profile: dict) -> str:
 
 > Primary project instructions for AI coding agents.
 
-## Prime Directives
+## 1. Prime Directives
 
-1. Read `.agent/STATE.md` first.
-2. Read `.agent/project_profile.yaml` and `.agent/context/project-context.md` before making stack assumptions.
-3. Search `.agent/skills/` for the most relevant instructions before implementation.
-4. Follow the Discuss -> Plan -> Execute -> Verify loop.
-5. Update `.agent/STATE.md` after significant steps.
+1. Read `AGENTS.md` and `.agent/STATE.md` first.
+2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
+3. Read `.agent/project_profile.yaml` and `.agent/context/project-context.md` before making stack assumptions.
+4. Search `.agent/skills/` for the most relevant instructions before implementation.
+5. Follow the **7-Stage Workflow**: Discover → Plan → Build → Review → Test → Ship → Reflect.
+6. **AND/OR Thinking**: Treat every goal as a root node in a dynamic Thinking Tree. If Strategy A fails, prune it and branch to Strategy B (OR) at the exact failure node.
+7. Update `.agent/STATE.md` after significant steps.
 
-## Execution Standard
+## 2. The 7-Stage Development Cycle
+
+| Stage | Objective |
+|:---|:---|
+| **Discover** | Audit profile, context, and code for constraints. |
+| **Plan** | Define minimal patch with verification points. |
+| **Build** | Implement atomic changes in isolation. |
+| **Review** | Adversarial check for risks and regressions. |
+| **Test** | Identify highest-risk behavior and verify. |
+| **Ship** | Generate clean handoff with evidence. |
+| **Reflect** | Record lessons and update project state. |
+
+## 3. Execution Standard
 
 - Plan first for non-trivial work (3+ steps, architecture changes, migrations, or risky edits).
 - Keep fixes minimal and focused. Avoid broad refactors unless required for correctness.
@@ -165,7 +221,9 @@ uv run python -m skillsmith doctor C:\\Users\\vanam\\Desktop\\test_lab
 
 ### 3. Acceptance Criteria
 - `skillsmith doctor` returns **100/100**.
-- All 33+ slash commands rendered in `.claude/commands/`.
+- All 33+ slash commands rendered in `.claude/commands/`: `brainstorm`, `plan-feature`, `implement-feature`, `review-changes`, `test-changes`, `deploy-checklist`, `debug-issue`, `refactor`, `debug`, `test`, `doc`, `audit`, `lint`, `compose`, `evolve`, `align`, `profile`, `report`, `sync`, `autonomous`, `context`, `verify`, `review`, `bootstrap`, `migrate`, `benchmark`, `security`, `performance`, `cleanup`, `search`, `explain`, `ready`, [bold green]`swarm`[/bold green], [bold green]`team-exec`[/bold green].
+
+{_resolve_prototypes('claude')}
 """
 
 
@@ -263,31 +321,63 @@ None recorded.
 """
 
 
+def render_principles_md(profile: dict) -> str:
+    priorities = profile.get("priorities", []) or ["maintainability", "verification"]
+    return f"""# Core Principles
+
+> **Standard Operating Procedure**: These rules are immutable and must be applied to every tool execution.
+
+## 1. Engineering Priorities
+""" + "\n".join(f"- **{p.title()}**: {p}" for p in priorities) + f"""
+
+## 2. Security & Trust Policy
+- **Remote Skills**: {"Allowed" if profile.get("allow_remote_skills") else "Blocked"}
+- **GitHub Pins**: {"Required" if profile.get("require_pinned_github_refs", True) else "Optional"}
+- **Trust Score**: {profile.get("min_remote_trust_score", 65)}+ required
+- **Verification Mode**: {profile.get("publisher_verification_mode", "optional").upper()}
+
+## 3. Behavioral Guardrails
+- **Atomic Edits**: Never combine unrelated changes in a single file write.
+- **Verification First**: Prove success with command output before claiming completion.
+- **Minimalist Design**: Prefer the simplest code that satisfies the requirement.
+- **No Placeholders**: Never use `// TODO` or `// implement later` in production-bound code.
+"""
+
 def render_claude_md(profile: dict) -> str:
     return f"""# CLAUDE.md
 
-## Context
-- Read `AGENTS.md` first.
-- Read `.agent/STATE.md`, `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
-- Project idea: {profile.get("idea", "not-specified")}
-- Target stack: {_list_or_default(profile.get("frameworks", []), _list_or_default(profile.get("languages", [])))}
-- Trusted remote sources: {_list_or_default(profile.get("trusted_skill_sources", []), "local")}
-- Allowed remote domains: {_list_or_default(profile.get("allowed_remote_domains", []), "github.com, skills.sh")}
-- Require pinned GitHub refs: {"true" if profile.get("require_pinned_github_refs", True) else "false"}
-- Trusted publisher keys: {_publisher_key_ids(profile)}
-- Trusted publisher public keys: {_publisher_public_key_ids(profile)}
-- Publisher verification mode: {profile.get("publisher_verification_mode", "optional")}
-- Publisher signature scheme mode: {profile.get("publisher_signature_scheme_mode", "auto")}
-- Allowed publisher signature algorithms: {", ".join(_publisher_signature_algorithms(profile.get("publisher_signature_algorithms", [])))}
-- Publisher key rotation: {_key_rotation_summary(profile)}
+## Prime Directives
 
-## Workflow Protocol
+1. Read `AGENTS.md` and `.agent/STATE.md` first.
+2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
+3. Read `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
+4. Search `.agent/skills/` before implementation.
+5. Follow the **7-Stage Workflow**: Discover → Plan → Build → Review → Test → Ship → Reflect.
 
-1. Discuss: confirm intent, constraints, and edge cases.
-2. Plan: required for non-trivial work; include verification steps.
-3. Execute: make focused, reversible edits with clear ownership.
-4. Verify: run tests/checks and confirm observed behavior.
-5. Report: summarize changes, risks, and evidence.
+## 7-Stage Workflow
+
+1. **Discover**: Audit profile, context, and code for constraints.
+2. **Plan**: Define minimal patch with AND/OR branches (Recursion Strategy).
+3. **Build**: Implement atomic changes in isolation.
+4. **Review**: Adversarial check for risks and regressions.
+5. **Test**: Identify highest-risk behavior and verify.
+6. **Ship**: Generate clean handoff with evidence.
+7. **Reflect**: Record lessons and update project state.
+
+## Strategic Branching (Brain-Aware Tooling)
+
+- **Failure pivots**: For complex tasks, if one approach (e.g., standard lib) fails, the orchestrator MUST pivot to an alternative (e.g., custom implementation) as a sibling branch.
+- **Atomic Integrity**: Every `OR` strategy must be bound by its own `AND` verification subgoals.
+
+## Slash Commands
+
+Skillsmith provides 33+ specialized commands for high-fidelity engineering. Run these to maintain 100% architectural integrity:
+- **Core Ops**: `/plan`, `/audit`, `/refactor`, `/ready`, `/sync`, `/profile`, `/report`, `/align`.
+- **Specialists**: `/security`, `/performance`, `/benchmark`, `/migrate`, `/bootstrap`.
+- **Engineering**: `/debug`, `/test`, `/doc`, `/lint`, `/verify`, `/review`.
+- **Agent Orchestration**: [bold green]`/swarm`[/bold green], [bold green]`/team-exec`[/bold green], `/compose`, `/evolve`, `/autonomous`.
+- **Knowledge**: `/context`, `/search`, `/explain`, `/brainstorm`.
+- **Workflow**: `/plan-feature`, `/implement-feature`, `/review-changes`, `/test-changes`, `/debug-issue`, `/deploy-checklist`.
 
 ## Delegation Policy
 
@@ -327,6 +417,8 @@ def render_claude_md(profile: dict) -> str:
 - Keep work aligned with `.agent/PROJECT.md` and `.agent/ROADMAP.md`.
 - Do not claim completion without concrete verification evidence.
 - Prefer the simplest correct solution over clever complexity.
+
+{_resolve_prototypes('claude')}
 """
 
 
@@ -334,10 +426,21 @@ def render_gemini_md(profile: dict) -> str:
     return f"""# GEMINI.md
 
 ## Prime Directives
-1. Read `AGENTS.md`.
-2. Read `.agent/STATE.md`, `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
-3. Search `.agent/skills/` before implementation.
-4. Follow Discuss -> Plan -> Execute -> Verify.
+1. Read `AGENTS.md` and `.agent/STATE.md` first.
+2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
+3. Read `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
+4. Search `.agent/skills/` before implementation.
+5. Follow the **7-Stage Workflow**: Discover → Plan → Build → Review → Test → Ship → Reflect.
+
+## 7-Stage Workflow
+
+1. **Discover**: Audit profile, context, and code for constraints.
+2. **Plan**: Define minimal patch with verification points.
+3. **Build**: Implement atomic changes in isolation.
+4. **Review**: Adversarial check for risks and regressions.
+5. **Test**: Identify highest-risk behavior and verify.
+6. **Ship**: Generate clean handoff with evidence.
+7. **Reflect**: Record lessons and update project state.
 
 ## Execution Policy
 - Plan before coding for non-trivial work (3+ steps or architectural impact).
@@ -373,6 +476,11 @@ def render_gemini_md(profile: dict) -> str:
 - Trusted publisher public keys: {_publisher_public_key_ids(profile)}
 - Publisher signature scheme mode: {profile.get("publisher_signature_scheme_mode", "auto")}
 
+## Agent Commands
+
+The following 33+ commands are available as structured workflows:
+`brainstorm`, `plan-feature`, `implement-feature`, `review-changes`, `test-changes`, `deploy-checklist`, `debug-issue`, `refactor`, `debug`, `test`, `doc`, `audit`, `lint`, `compose`, `evolve`, `align`, `profile`, `report`, `sync`, `autonomous`, `context`, `verify`, `review`, `bootstrap`, `migrate`, `benchmark`, `security`, `performance`, `cleanup`, `search`, `explain`, `ready`, `tree`, [bold green]`swarm`[/bold green], [bold green]`team-exec`[/bold green].
+
 ## Testing & Validation
 
 1. Set environment: `$env:PYTHONPATH = "src"`.
@@ -384,6 +492,8 @@ def render_gemini_md(profile: dict) -> str:
 - `.agent/PROJECT.md` for architecture and direction.
 - `.agent/ROADMAP.md` for milestone priorities.
 - `.agent/workflows/` for reusable runbooks.
+
+{_resolve_prototypes('gemini')}
 """
 
 
@@ -614,6 +724,7 @@ def managed_file_map(cwd: Path, profile: dict) -> dict[Path, str]:
         cwd / ".agent" / "PROJECT.md": render_project_md(profile),
         cwd / ".agent" / "ROADMAP.md": render_roadmap_md(profile),
         cwd / ".agent" / "STATE.md": render_state_md(profile),
+        cwd / ".agent" / "principles" / "CORE_PRINCIPLES.md": render_principles_md(profile),
     }
 
     workflow_map = {}
@@ -630,7 +741,7 @@ def managed_file_map(cwd: Path, profile: dict) -> dict[Path, str]:
         for command_name in ["brainstorm", "plan-feature", "implement-feature", "review-changes", "test-changes", "deploy-checklist", "debug-issue",
                              "refactor", "debug", "test", "doc", "audit", "lint", "compose", "evolve", "align", "profile", "report", 
                              "sync", "autonomous", "context", "verify", "review", "bootstrap", "migrate", "benchmark", "security", 
-                             "performance", "cleanup", "search", "explain", "ready"]:
+                             "performance", "cleanup", "search", "explain", "ready", "swarm", "team-exec"]:
             command_workflow = workflow_map.get(command_name) or build_workflow(command_name, cwd, max_skills=5)
             files[cwd / ".claude" / "commands" / f"{command_name}.md"] = render_claude_command_from_workflow(command_name, command_workflow, cwd)
     if "gemini" in tools:
@@ -661,6 +772,7 @@ def managed_paths(cwd: Path) -> list[Path]:
         cwd / ".agent" / "PROJECT.md",
         cwd / ".agent" / "ROADMAP.md",
         cwd / ".agent" / "STATE.md",
+        cwd / ".agent" / "principles" / "CORE_PRINCIPLES.md",
         cwd / "CLAUDE.md",
         cwd / "GEMINI.md",
         cwd / ".cursor" / "rules" / "skillsmith.mdc",
@@ -679,7 +791,7 @@ def managed_paths(cwd: Path) -> list[Path]:
         "review-changes", "test-changes", "deploy-checklist", "refactor", "debug", "test", 
         "doc", "audit", "lint", "compose", "evolve", "align", "profile", "report", "sync", 
         "autonomous", "context", "verify", "review", "bootstrap", "migrate", "benchmark", 
-        "security", "performance", "cleanup", "search", "explain", "ready"
+        "security", "performance", "cleanup", "search", "explain", "ready", "swarm", "team-exec"
     ]
     
     for name in workflow_names:

@@ -2,125 +2,107 @@
 
 <img src="skillsmith_hero_banner_1774380976071.png" width="100%" alt="Skillsmith Hero Banner">
 
-# ⚡ Skillsmith
-### The Operating System for AI Coding Agents
+# ⚡ Skillsmith: The Agentic OS
+### The $100M Infrastructure Layer for AI-Assisted Engineering
 
-[![PyPI version](https://img.shields.io/pypi/v/skillsmith.svg?color=blue)](https://pypi.org/project/skillsmith/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://img.shields.io/pypi/v/skillsmith.svg?color=blue&style=flat-square)](https://pypi.org/project/skillsmith/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Stars](https://img.shields.io/github/stars/ApexIQ/skillsmith?style=social)](https://github.com/ApexIQ/skillsmith)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=flat-square&logo=discord)](https://discord.gg/skillsmith)
 
-**Standardize, Compose, and Scale your AI-Assisted Engineering.**
+**Standardize instructions. Evolve skills. Orchestrate swarms.**
 
-[Overview](#-overview) • [Quick Start](#-quick-start) • [Supported Tools](#-supported-tools) • [The Skills Catalog](#-the-skills-catalog) • [Pillars](#-three-pillars-to-scale)
+[Overview](#-the-vision) • [Competitive Moat](#-the-competitive-moat) • [Quick Start](#-high-velocity-setup) • [Pillars](#-architectural-pillars) • [Command Reference](docs/COMMANDS.md)
 
 </div>
 
 ---
 
-## 🚀 Overview
+## 🚀 The Vision
 
-**Skillsmith** is the infrastructure layer every developer needs before their first AI-assisted commit. It bridges the gap between raw LLMs and professional codebase execution by turning static project instructions into dynamic, profile-driven **Skills-as-Code**.
+**Skillsmith** isn't just a linter or a template generator. It is the **Intelligence Backbone** for professional engineering teams in the era of Agentic AI. 
 
-While tools like Claude Code and Cursor offer great interfaces, **Skillsmith** provides the *intelligence backbone* that makes them 10x more effective through structured roles, deterministic workflows, and rigorous readiness gates.
-
-### Why Skillsmith?
-*   **Trust X Evolution X Content**: Native support for trust-verified publisher keys and self-evolving skills.
-*   **Multi-Agent Orchestration**: Standardize instructions across Claude, Cursor, Windsurf, Zencoder, and more.
-*   **33+ Power Workflows**: Instant access to `/refactor`, `/audit`, `/debug`, `/tdd`, and `/deploy-checklist`.
-*   **Zero Drift**: Use `skillsmith doctor` to keep your AI rules 100% aligned with your code.
+While LLMs are powerful, they are context-poor and structurally drift. **Skillsmith** solves this by turning static codebase rules into dynamic, **Self-Evolving Skills-as-Code**. It bridges the gap between raw AI inference and production-grade software delivery.
 
 ---
 
-## 🛠 Supported Tools
+## 🛡️ The Competitive Moat
 
-Skillsmith manages rule-sets and workflow surfaces for the entire AI engineering ecosystem:
+Skillsmith v1.0 introduces features that place it at the absolute frontier of AI engineering:
 
-| Platform | Surface Type | Management Path |
-|----------|--------------|-----------------|
-| **Claude Code** | Slash Commands | `.claude/commands/*.md` |
-| **Cursor** | MDC Rules | `.cursor/rules/*.mdc` |
-| **Windsurf** | Global Rules | `.windsurf/rules/skillsmith.md` |
-| **Zencoder** | Agent Instructions | `.zencoder/rules/*.md` |
-| **GitHub Copilot** | Custom Instructions | `.github/copilot-instructions.md` |
-| **Custom Agents** | Unified Context | `AGENTS.md` & `GEMINI.md` |
+### 🐝 Multi-Agent Swarm Orchestration
+Stop running in single-agent loops. Skillsmith can decompose massive goals into **Parallelized Task Graphs**, assigning specialized roles (**Orchestrator, Researcher, Implementer, Reviewer**) to coordinate complex missions across multiple agent threads.
+
+### 🧬 Autonomous Evolution (XSkill)
+Your project instructions should learn from your wins. Use `skillsmith evolve` to capture structural engineering patterns from your Git history or raw source code. Skillsmith translates developer experience into repeatable, benchmarked agent skills automatically.
+
+### 🌲 Recursive Thinking Trees
+When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR Thinking Trees** to resolve goals, exploring multiple implementation paths and strategy fallbacks before a single line of bad code is written.
 
 ---
 
-## 🏁 Quick Start
+## 🏁 High-Velocity Setup
 
 ### 1. Install
 ```bash
 pip install skillsmith
 ```
 
-### 2. Learn the Commands
-> [!TIP]
-> **View the Complete [Reference Guide](docs/COMMANDS.md)** for a deep dive into all 33+ command surfaces.
-
-### 3. Initialize (The "Guided" Path)
+### 2. Initialize (Deep Repo Sensing)
 ```bash
+# Skillsmith scans your DNA, infers your stack, and recommendations a persona-set.
 skillsmith init --guided
 ```
-*Skillsmith will scan your repo, infer your tech stack, and recommend a starter skill-set.*
 
-### 3. Align & Verify
+### 3. Align & Certify
 ```bash
+# Keeps your Claude commands, Cursor rules, and IDE instructions 100% in sync.
 skillsmith align
 skillsmith doctor
 ```
 
-### 4. Compose a Workflow
+### 4. Deploy a Swarm
 ```bash
-skillsmith compose "Implement a robust JWT authentication system"
+# Decompose a complex mission into a parallel multi-agent plan.
+skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"
 ```
-*Creates a detailed, stage-based runbook in `.agent/workflows/` for your AI agent to follow.*
 
 ---
 
-## 📚 The Skills Catalog
+## 🏗️ Architectural Pillars
 
-Skillsmith ships with **36+ production-grade skills** ready to be injected into your agents:
-
-*   **Personas**: `orchestrator`, `researcher`, `implementer`, `reviewer`.
-*   **Specialists**: `planner`, `architect`, `build-resolver`, `security-reviewer`.
-*   **Experts**: `python-expert`, `typescript-expert`, `go-expert`, `database-expert`.
-*   **Workflows**: `test-changes`, `deploy-checklist`, `migration-planner`.
-
-Run `skillsmith check` to see your installed skills or `skillsmith recommend` to see what's missing.
+| Pillar | Focus | Capability |
+|:---|:---|:---|
+| **Pillar 1: Structural Integrity** | **Zero Drift** | Unified instructions across **Claude, Cursor, Windsurf, Zencoder, Copilot**. |
+| **Pillar 2: Autonomous Evolution** | **Self-Improvement** | Skills that auto-learn from history and code structures (**XSkill/EvoSkill**). |
+| **Pillar 3: Team Intelligence** | **Swarm Logic** | Role-based execution with structured handoffs and verification loops. |
 
 ---
 
-## 🏛 Three Pillars to Scale
+## 🤖 Power Commands for Top-Tier Performance
 
-1.  **Content Gravity**: 60+ production-grade skills and 15+ subagent personas.
-2.  **Self-Evolution Engine**: Skills that auto-fix, auto-improve, and auto-learn from execution logs.
-3.  **Team Intelligence**: Shared skill registries and CI readiness gates to standardize agent behavior across Orgs.
+Skillsmith injects a specialized command surface into your AI tools:
 
----
-
-## 🤖 Commands for AI Agents
-
-Once Skillsmith is initialized, your AI agents gain access to a powerful command surface:
-
-- `/plan` — Multi-stage implementation planning with acceptance criteria.
-- `/audit` — Full project integrity, security, and drift audit.
-- `/refactor` — Strategic refactoring with automated verification.
-- `/ready` — High-speed pre-release sanity check.
-- `/sync` — Refresh project context and re-render all instructions.
+- `/swarm` — Decompose massive goals into parallelized agent graphs.
+- `/team-exec` — Execute missions with structured roles (O-R-I-R).
+- `/evolve` — Capture structural engineering patterns from experience.
+- `/tree` — Strategic recursive reasoning for deep goal resolution.
+- `/ready` — High-speed pre-release sanity check (Git, Profile, Index).
 
 ---
 
-## 📈 Roadmap
+## 📈 Roadmap: The Path to v2.0
 
-We are currently moving towards **Pillar 2: The Evolution Engine**, enabling skills to learn from every successful task completion. Check our [ROADMAP.md](.agent/ROADMAP.md) for more details.
+- [x] **v0.7**: Content Gravity & 33+ Workflows
+- [x] **v0.9**: Autonomous Evolution (XSkill Phase 1)
+- [x] **v1.0**: **Competitive Evolution (Swarms & Thinking Trees)**
+- [ ] **v2.0**: **The Collective** — Decentralized skill sharing & autonomous agent economies.
 
 ---
 
 ## 📄 License
 MIT © ApexIQ
 
----
-
 <div align="center">
-Built for the era of Agentic AI Engineering.
+Built by the Google Deepmind team for those who engineer at the speed of thought.
 </div>

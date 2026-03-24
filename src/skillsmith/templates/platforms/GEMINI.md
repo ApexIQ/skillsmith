@@ -6,16 +6,34 @@
 
 ## Prime Directives
 
-1. Read `AGENTS.md`.
-2. Read `.agent/STATE.md`, `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
-3. Search `.agent/skills/` before implementation.
-4. Follow Discuss -> Plan -> Execute -> Verify.
+1. Read `AGENTS.md` and `.agent/STATE.md` first.
+2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
+3. Read `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
+4. Search `.agent/skills/` before implementation.
+5. Follow Discuss -> Plan -> Execute -> Verify.
 
 ## Execution Policy
 
 - Plan before coding for non-trivial work (3+ steps or architectural impact).
 - Keep changes minimal, explicit, and easy to verify.
 - Use subagents only when parallelism or specialization is clearly beneficial.
+
+## 7-Stage Workflow
+
+1. **Discover**: Audit profile, context, and code for constraints.
+2. **Plan**: Define minimal patch with verification points.
+3. **Build**: Implement atomic changes in isolation.
+4. **Review**: Adversarial check for risks and regressions.
+5. **Test**: Identify highest-risk behavior and verify.
+6. **Ship**: Generate clean handoff with evidence.
+7. **Reflect**: Record lessons and update project state.
+
+## Model Mapping
+
+- **`orchestrator`**: Claude 3.5 Sonnet / GPT-4o
+- **`researcher`**: Claude 3.5 Sonnet / Gemini 2.0 Flash
+- **`implementer`**: Claude 3.5 Sonnet / Codex
+- **`reviewer`**: Gemini 2.0 Flash / Claude 3.5 Sonnet
 - Verify with tests/checks before marking done.
 
 ## Memory and Cost Policy

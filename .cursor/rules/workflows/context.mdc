@@ -1,0 +1,10 @@
+---
+description: Run the context workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/context.md`.
+- Goal: manage and query project context index for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

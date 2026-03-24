@@ -1,0 +1,10 @@
+---
+description: Run the migrate workflow for this project
+globs:
+alwaysApply: false
+---
+
+- Read `.agent/workflows/migrate.md`.
+- Goal: plan and execute migration for library click, pytest
+- Skills: python_expert
+- Follow the workflow steps, then verify with project tests or the closest validation command.

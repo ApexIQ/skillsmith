@@ -340,7 +340,19 @@ def _goal_kind(goal_tokens: set[str]) -> str:
         return "deploy"
     if {"review", "audit", "pr"} & goal_tokens:
         return "review"
+    if {"refactor", "migrate", "rewrite", "new", "feature", "build", "create"} & goal_tokens:
+        return "strategic"
     return "default"
+
+
+def _is_complex_goal(goal_tokens: set[str]) -> bool:
+    """Complex goals trigger 'OR' node strategic branches."""
+    strategic_keywords = {
+        "refactor", "migrate", "rewrite", "port", "architecture",
+        "new", "feature", "implement", "build", "create",
+        "complex", "engine", "system", "logic"
+    }
+    return bool(strategic_keywords & goal_tokens)
 
 
 def _build_stage_plan(
@@ -519,19 +531,48 @@ def _build_stage_plan(
 
     stages: list[dict] = []
     steps: list[str] = []
+    is_complex = _is_complex_goal(goal_tokens)
+
     for stage_name in WORKFLOW_STAGE_ORDER:
         detail = stage_details[stage_name]
+        
+        # Base AND node for the stage
         stage_entry = {
             "name": stage_name,
+            "node_type": "AND",
             "objective": detail["objectives"][0],
             "objectives": detail["objectives"],
             "acceptance_checks": detail["acceptance_checks"],
             "evidence": detail["evidence"],
             "summary": f"{stage_prefix[stage_name]} stage: {detail['objectives'][0]}",
+            "state": "pending",
         }
+
+        # Strategic 'OR' branches for Plan and Build stages in complex tasks
+        if is_complex and stage_name in {"plan", "build"}:
+            stage_entry["node_type"] = "OR"
+            stage_entry["strategies"] = [
+                {
+                    "id": "strategy_a",
+                    "name": "Standard Recursive Approach" if stage_name == "plan" else "Direct Implementation",
+                    "objectives": detail["objectives"],
+                    "node_type": "AND",
+                },
+                {
+                    "id": "strategy_b",
+                    "name": "Iterative Decomposition" if stage_name == "plan" else "Isolated Module Prototype",
+                    "objectives": [f"Fallback: {obj}" for obj in detail["objectives"]],
+                    "node_type": "AND",
+                    "recovery_trigger": "If Strategy A enters 'Failed' state due to depth or complexity limits.",
+                }
+            ]
+            stage_entry["summary"] = f"{stage_prefix[stage_name]} stage (Strategic OR Tree): {detail['objectives'][0]}"
+
         stages.append(stage_entry)
+        
+        node_signal = f"[{stage_entry['node_type']}] "
         acceptance_fragment = "; ".join(detail["acceptance_checks"][:2])
-        steps.append(f"{stage_prefix[stage_name]} stage: {detail['objectives'][0]} Acceptance: {acceptance_fragment}.")
+        steps.append(f"{node_signal}{stage_prefix[stage_name]} stage: {detail['objectives'][0]} Acceptance: {acceptance_fragment}.")
 
     steps.insert(0, "Read .agent/project_profile.yaml and .agent/context/project-context.md.")
     steps.insert(1, "Confirm the requested goal against the current project stage and target tools.")
@@ -836,8 +877,9 @@ def workflow_bundle_definitions(cwd: Path) -> list[tuple[str, str]]:
         ("profile", f"inspect and tune the project profile for {app_type} {framework_text}"),
         ("report", f"generate a progress and readiness report for {app_type} {framework_text}"),
         ("sync", f"sync local configuration and skills for {app_type} {framework_text}"),
-        ("autonomous", f"run an autonomous agent loop for {app_type} {framework_text}"),
-        ("context", f"index and optimize context for {app_type} {framework_text}"),
+        ("autonomous", f"run autonomous or benchmark workflows for {app_type} {framework_text}"),
+        ("metrics", f"analyze skill quality and usage metrics for {app_type} {framework_text}"),
+        ("context", f"manage and query project context index for {app_type} {framework_text}"),
         ("verify", f"verify project health and requirements for {app_type} {framework_text}"),
         ("review", f"review code and architecture for {app_type} {framework_text}"),
         ("bootstrap", f"bootstrap a new module or service for {app_type} {framework_text}"),

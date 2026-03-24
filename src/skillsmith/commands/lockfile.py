@@ -1363,6 +1363,13 @@ def record_skill_install(cwd: Path, candidate: Any, installed_path: Path) -> Non
         "metadata": candidate.metadata,
         "provenance": _normalize_provenance(candidate),
         "recommendation": _normalize_recommendation(candidate),
+        "metrics": {
+            "applied_count": 0,
+            "success_rate": 0.0,
+            "avg_token_cost": 0.0,
+            "last_used_at": None,
+            "failure_count": 0,
+        }
     }
 
     replaced = False
@@ -1376,3 +1383,50 @@ def record_skill_install(cwd: Path, candidate: Any, installed_path: Path) -> Non
         skills.append(entry)
 
     write_lockfile(cwd, payload)
+
+
+def record_skill_usage(
+    cwd: Path, 
+    skill_name: str, 
+    *, 
+    success: bool = True, 
+    tokens: int = 0
+) -> None:
+    """Record a single usage instance for a skill in the lockfile."""
+    payload = load_lockfile(cwd)
+    skills = payload.get("skills", [])
+    changed = False
+
+    for entry in skills:
+        if entry.get("name") == skill_name:
+            metrics = entry.setdefault("metrics", {
+                "applied_count": 0,
+                "success_rate": 0.0,
+                "avg_token_cost": 0.0,
+                "last_used_at": None,
+                "failure_count": 0
+            })
+            
+            old_count = metrics.get("applied_count", 0)
+            new_count = old_count + 1
+            metrics["applied_count"] = new_count
+            metrics["last_used_at"] = _timestamp_to_string()
+            
+            if not success:
+                metrics["failure_count"] = metrics.get("failure_count", 0) + 1
+            
+            # Update running average for success rate
+            success_count = new_count - metrics.get("failure_count", 0)
+            metrics["success_rate"] = round(success_count / new_count, 4)
+            
+            # Update running average for token cost
+            old_avg_tokens = metrics.get("avg_token_cost", 0.0)
+            metrics["avg_token_cost"] = round(
+                (old_avg_tokens * old_count + tokens) / new_count, 2
+            )
+            
+            changed = True
+            break
+            
+    if changed:
+        write_lockfile(cwd, payload)

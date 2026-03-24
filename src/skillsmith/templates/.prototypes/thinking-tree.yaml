@@ -1,0 +1,24 @@
+name: thinking-tree
+version: 1.0.0
+description: "Universal logic for AND/OR Thinking Tree orchestration (arXiv:2603.05294v1)."
+logic:
+  and_nodes:
+    - "Bind every action to a strict validator."
+    - "Stop immediately on state violation (AND-failure)."
+  or_nodes:
+    - "If a path fails, pivot to Strategy B at the exact failure point."
+    - "Re-conceive the solution instead of linear retry."
+  state_lifecycle:
+    - "Entering: Evidence gathering and branch selection."
+    - "Exiting: Verification and result propagation."
+
+# Transfer Mapping Logic (Prototypes -> Embodiments)
+embodiments:
+  claude:
+    - "Use markdown lists for AND/OR labels."
+    - "Focus on XML-style tags for state transitions."
+  gemini:
+    - "Prioritize bold headers for node types."
+    - "Use bulleted lists for state propagation."
+  windsurf:
+    - "Render as .windsurfrules context injections."

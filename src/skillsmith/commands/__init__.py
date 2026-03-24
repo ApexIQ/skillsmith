@@ -42,6 +42,7 @@ PLATFORM_FILES = {
     "claude_report": {"src": ".claude/commands/report.md", "dest": ".claude/commands/report.md"},
     "claude_sync": {"src": ".claude/commands/sync.md", "dest": ".claude/commands/sync.md"},
     "claude_autonomous": {"src": ".claude/commands/autonomous.md", "dest": ".claude/commands/autonomous.md"},
+    "claude_metrics": {"src": ".claude/commands/metrics.md", "dest": ".claude/commands/metrics.md"},
     "claude_context": {"src": ".claude/commands/context.md", "dest": ".claude/commands/context.md"},
     "claude_verify": {"src": ".claude/commands/verify.md", "dest": ".claude/commands/verify.md"},
     "claude_review": {"src": ".claude/commands/review.md", "dest": ".claude/commands/review.md"},
@@ -54,7 +55,7 @@ PLATFORM_FILES = {
     "claude_search": {"src": ".claude/commands/search.md", "dest": ".claude/commands/search.md"},
     "claude_explain": {"src": ".claude/commands/explain.md", "dest": ".claude/commands/explain.md"},
     "claude_ready": {"src": ".claude/commands/ready.md", "dest": ".claude/commands/ready.md"},
-
+    "claude_settings": {"src": ".claude/settings.json", "dest": ".claude/settings.json"},
     "cursor": {"src": ".cursorrules", "dest": ".cursorrules"},
     "cursor_mdc": {"src": ".cursor/rules/skillsmith.mdc", "dest": ".cursor/rules/skillsmith.mdc"},
     "windsurf": {"src": ".windsurfrules", "dest": ".windsurfrules"},
@@ -251,6 +252,7 @@ from .add import add_command
 from .lint import lint_command
 from .compose import compose_command
 from .audit import audit_command
+from .evolve import evolve_command
 from .doctor import doctor_command
 from .eval_cmd import eval_command
 from .budget import budget_command
@@ -264,7 +266,10 @@ from .roles import roles_command
 from .assets import assets_command
 from .autonomy import autonomous_command
 from .context_index import context_index_command
+from .metrics import metrics_command
 from .registry import registry_command
 from .registry_service import registry_service_command
 from .trust_service import trust_service_command
 from .safety import safety_command
+from .tree import tree_command
+from .swarm import swarm_command, team_exec_command

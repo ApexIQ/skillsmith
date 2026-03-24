@@ -1,0 +1,16 @@
+name: workflow-engine
+version: 1.0.0
+description: Autonomously discovered prototype from workflow_engine.py
+logic:
+  discovered_patterns:
+  - Analyzed .py file with 932 lines.
+  - Detected high-density logical structures (classes/interfaces).
+  - Self-evolving agents should prioritize this pattern for similar system designs.
+  core_implementation_rules:
+  - Match the structural integrity of workflow_engine.py.
+  - Ensure separation of concerns as seen in the original source.
+embodiments:
+  claude:
+  - Implement with strict type safety as observed in workflow_engine.py.
+  gemini:
+  - Use descriptive documentation matching the patterns found in workflow_engine.py.
