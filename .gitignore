@@ -131,7 +131,6 @@ venv.bak/
 # mkdocs documentation
 /site
 
-my_Referce.md
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -157,7 +156,6 @@ patch_doctor.py
 test_cli.py
 verify_zip.ps1
 zip_library.py
-my_Referce.md
 "# MCP Python SDK.txt"
 .agent/snapshots/
 .agent/temp/
@@ -200,3 +198,5 @@ _manual_ctx_test*/
 !.github/
 !.cursor/
 !.windsurf/
+!UPCOMING_FEATURES.md
+!my_Referce.md
