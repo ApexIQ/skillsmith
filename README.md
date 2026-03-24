@@ -48,9 +48,9 @@ When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR
 pip install skillsmith
 ```
 
-### 2. Initialize (Sovereign Python Siphon)
+### 2. Initialize (Sovereign Ghost-Sync)
 ```bash
-# Siphon 889+ expert skill packs natively (No Node/NPX required!)
+# Sync 889+ expert skill packs natively (No Node/NPX required!)
 skillsmith init --bundle python-pro
 # or guided setup with structural profiling
 skillsmith init --guided

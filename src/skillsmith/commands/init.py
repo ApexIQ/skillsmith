@@ -566,20 +566,20 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
                 readme.write_text(f"# .agent/{folder_name}\n\nThis directory contains project-specific {folder_name} for AI agents.\n", encoding="utf-8")
             console.print(f"[green][OK][/green] Scaffolded {folder_name}/ (advanced layer)")
 
-    # Ghost Branch Siphon Logic (v1.0.3 - Thin Core, Deep Content)
-    # 1. First, attempt to siphon advanced contents from our sovereign Ghost Branch if requested
+    # Ghost Branch Sync Logic (v1.0.3 - Thin Core, Deep Content)
+    # 1. First, attempt to synchronize advanced contents from our sovereign Ghost Branch if requested
     if all_skills or bundle or (category and category not in ["core", "essentials"]):
-        _siphon_from_ghost_branch(agents_dir, bundle, category, tag)
+        _ghost_sync_from_branch(agents_dir, bundle, category, tag)
     
     # 2. Local Fallback/Primary Core
     src_skills_dir = TEMPLATE_DIR / ".agent" / "skills"
     if src_skills_dir.exists():
         _copy_local_skills(agents_dir, src_skills_dir, minimal, all_skills, category, tag, bundle)
     else:
-        console.print("[dim][INFO][/dim] Local template skills not found. Using Siphon Hub fallback.")
+        console.print("[dim][INFO][/dim] Local template skills not found. Using Ghost-Sync Hub fallback.")
 
-def _siphon_from_ghost_branch(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
-    """The Ghost Branch Siphon: Downloads 889+ skills from the sovereign 'ghost-content' branch."""
+def _ghost_sync_from_branch(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
+    """The Ghost Branch Sync: Downloads 889+ skills from the sovereign 'ghost-content' branch."""
     # Sovereign Ghost Registry Configuration
     REPO_URL = "https://github.com/ApexIQ/skillsmith"
     GHOST_ZIP_URL = f"{REPO_URL}/archive/refs/heads/ghost-content.zip"
@@ -588,15 +588,15 @@ def _siphon_from_ghost_branch(agents_dir: Path, bundle: str | None, category: st
     target_dir.mkdir(parents=True, exist_ok=True)
     
     try:
-        # Tier 1: Thin Siphon (Zipball from Ghost Branch)
+        # Tier 1: Thin Sync (Zipball from Ghost Branch)
         import requests
         import zipfile
         import io
         
         if bundle:
-            console.print(f"[blue][INFO][/blue] Siphoning [bold]{bundle}[/bold] bundle from Ghost Branch...")
+            console.print(f"[blue][INFO][/blue] Synchronizing [bold]{bundle}[/bold] bundle from Ghost Branch...")
         else:
-            console.print(f"[blue][INFO][/blue] Siphoning expert intelligence from Ghost Branch...")
+            console.print(f"[blue][INFO][/blue] Synchronizing expert intelligence from Ghost Branch...")
             
         response = requests.get(GHOST_ZIP_URL, timeout=30)
         response.raise_for_status()
@@ -623,13 +623,13 @@ def _siphon_from_ghost_branch(agents_dir: Path, bundle: str | None, category: st
                         dst.write(src.read())
                     count += 1
         
-        console.print(f"[green][OK][/green] Ghost siphon complete ({count} skills synchronized).")
+        console.print(f"[green][OK][/green] Ghost synchronization complete ({count} skills updated).")
     except Exception as e:
-        console.print(f"[yellow][WARN][/yellow] Ghost siphon unavailable: {e}")
+        console.print(f"[yellow][WARN][/yellow] Ghost synchronization unavailable: {e}")
         console.print("[dim]Falling back to local package templates...[/dim]")
 
-def _merge_siphoned_skills(src: Path, dst: Path) -> None:
-    """Transfers siphoned content into the active project structure."""
+def _merge_ghost_skills(src: Path, dst: Path) -> None:
+    """Transfers synchronized content into the active project structure."""
     src_skills = src / "skills"
     if not src_skills.exists():
         return

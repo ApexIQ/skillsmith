@@ -41,15 +41,15 @@ Shared skill evolution across teams, governance, CI gates, compliance audit trai
 **Goal:** Integrate the **Antigravity Awesome Skills (889+)** as the primary knowledge upstream.
 **Success metric:** 50,000+ GitHub stars (Combined Ecosystem), 10,000+ PyPI downloads.
 
-### 2.1 The Awesome Skills Siphon (Week 1)
+### 2.1 The Ghost-Sync Engine (Week 1)
 
 Instead of building individual skills, we'll implement **Native Integration** with the global skill library:
-- [x] **Ghost Branch Siphon**: Sovereign Python-managed distribution of 889+ skills (👻 ghost-content) - v1.0.3.
+- [x] **Ghost Branch Sync**: Sovereign Python-managed distribution of 889+ skills (👻 ghost-content) - v1.0.3.
 - **`skillsmith add --remote awesome`**: Install any skill directly from our sovereign ghost branch.
-- **`npx` Integration**: Unified installer that pre-scaffolds `.agent/skills/` using the awesome library's DNA.
+- **Python-Native Integration**: Unified installer that pre-scaffolds `.agent/skills/` using the awesome library's DNA.
 - **Trust-Verified Catalogs**: Pre-sign the top 100 most used skills from the awesome library for instant **Zero-Configuration Trust**.
 
-### 2.2 Siphon & Evolve (XSkill v1.5) (Week 1-2)
+### 2.2 Sync & Evolve (XSkill v1.5) (Week 1-2)
 
 Leverage our **Autonomous Evolution Engine** on the massive 889+ skill pool:
 - **DNA Extraction**: Use `evolve unlabeled` to reverse-engineer the most complex skills in the awesome library.
