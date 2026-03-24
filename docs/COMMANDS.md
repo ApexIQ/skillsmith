@@ -64,7 +64,12 @@ The "Reasoning Engine". Generates a recursive **AND/OR Thinking Tree** to resolv
 ## 🔎 Skill Management
 
 ### `skillsmith list` & `skillsmith roles`
-Inspect your currently installed skills and active subagent personas.
+Inspect your currently installed skills and active subagent personas locally.
+
+### `skillsmith search`
+The "CLI Discovery Hub". This command natively queries the external `ghost-content` skills index (889+ skills) and renders an interactive, formatted terminal Explorer.
+- **Flag `--categories`**: View the global taxonomy and count of skills per category seamlessly without downloading all skills.
+- **Filtering**: Supports `--category` and `--limit` flags to easily hunt down specific ecosystem tools.
 
 ### `skillsmith discover` & `skillsmith recommend`
 Search the global catalog or get personalized skill suggestions based on your tech stack.
