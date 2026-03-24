@@ -36,6 +36,7 @@ from .commands import (
     tree_command,
     swarm_command,
     team_exec_command,
+    search_command,
 )
 from .commands.ready import ready_command
 from .commands.start import start_command
@@ -84,6 +85,7 @@ main.add_command(safety_command, name="safety")
 main.add_command(tree_command, name="tree")
 main.add_command(swarm_command, name="swarm")
 main.add_command(team_exec_command, name="team-exec")
+main.add_command(search_command, name="search")
 
 if __name__ == "__main__":
     main()

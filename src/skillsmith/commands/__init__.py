@@ -273,3 +273,5 @@ from .trust_service import trust_service_command
 from .safety import safety_command
 from .tree import tree_command
 from .swarm import swarm_command, team_exec_command
+from .search_cmd import search_command
+
