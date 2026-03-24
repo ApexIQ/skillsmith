@@ -1,0 +1,16 @@
+# Global default owner
+* @ApexIQ
+
+# Core CLI and command logic
+/src/skillsmith/cli.py @ApexIQ
+/src/skillsmith/commands/ @ApexIQ
+
+# CI and repo governance
+/.github/workflows/ @ApexIQ
+/.github/PULL_REQUEST_TEMPLATE.md @ApexIQ
+/.github/CODEOWNERS @ApexIQ
+
+# Product docs and strategy artifacts
+/README.md @ApexIQ
+/docs/ @ApexIQ
+/decision.md @ApexIQ

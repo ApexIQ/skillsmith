@@ -5,15 +5,13 @@ Goal: bootstrap a local repository into an agent-ready project with minimal manu
 ## Commands
 
 ```bash
-skillsmith init --guided
-skillsmith doctor
-skillsmith compose "build a project summary"
+skillsmith start
+skillsmith report --artifact-dir .agent/reports/readiness
 ```
 
 ## Expected Result
 
 - `AGENTS.md` exists.
 - `.agent/project_profile.yaml` and `.agent/context/project-context.md` exist.
-- `skillsmith doctor` reports a healthy setup.
-- `skillsmith compose` prints a generated workflow.
-
+- `skillsmith start` completes the default readiness path.
+- `skillsmith report --artifact-dir` writes `report.json`, `readiness_pr.md`, and `scorecard.json`.

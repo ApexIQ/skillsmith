@@ -1,0 +1,47 @@
+idea: Project using skillsmith
+project_stage: existing
+app_type: library
+languages:
+  - python
+frameworks:
+  - click
+  - pytest
+package_manager: uv
+deployment_target: github-actions
+priorities:
+  - testability
+  - maintainability
+  - verification
+  - automation
+target_tools:
+  - antigravity
+  - claude
+  - codex
+  - copilot
+  - cursor
+  - gemini
+  - windsurf
+allow_remote_skills: false
+trusted_skill_sources:
+  - local
+allowed_remote_domains:
+  - github.com
+  - skills.sh
+blocked_skill_sources: []
+require_pinned_github_refs: true
+trusted_publisher_keys: {}
+trusted_publisher_public_keys: {}
+publisher_verification_mode: optional
+publisher_signature_scheme_mode: auto
+publisher_signature_algorithms:
+  - hmac-sha256
+  - rsa-sha256
+publisher_key_rotation: {}
+min_remote_trust_score: 65
+min_remote_freshness_score: 0
+required_remote_licenses: []
+build_commands:
+  - uv build
+test_commands:
+  - pytest
+  - python -m unittest

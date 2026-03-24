@@ -5,15 +5,15 @@ Goal: onboard a teammate quickly using profile sync and generated agent instruct
 ## Commands
 
 ```bash
-skillsmith init --guided
+skillsmith start
+skillsmith report --artifact-dir .agent/reports/readiness
 skillsmith sync
 skillsmith align
-skillsmith report
 ```
 
 ## Expected Result
 
 - Shared project profile and context are generated in `.agent/`.
+- Readiness artifacts are emitted for CI/PR handoff.
 - Tool-native instruction files are rendered consistently from profile data.
 - `skillsmith report` gives a quick status snapshot for handoff.
-

@@ -2,235 +2,141 @@
 
 Date: 2026-03-21  
 Horizon: Next 30 days  
-Decision rule: optimize for one promise only: `pip install skillsmith` -> project is agent-ready without extra infrastructure.
+Decision rule: optimize for one fundable wedge only: `pip install skillsmith` -> `init` -> `compose` -> user ships real change.
 
-## 1) Current Baseline (As of 2026-03-21)
+## 1) Reality Check (Current Snapshot)
 
-Already shipped and verified:
+This is the current truth based on repo evidence:
 
-- Core CLI/library flow exists: `init`, `align`, `doctor`, `discover`, `add`, `compose`, `eval`, `report`, `audit`.
-- Runtime packaging is reduced and asset bootstrap exists.
-- Core governance/trust/context features exist (including optional registry/trust service surfaces).
-- Durable local service persistence and optional OIDC/signer paths now exist.
-- Full suite is green.
+- Product capability is broad and technically strong (large command surface, strong test depth, rich trust/eval/context features).
+- PMF signal is weak relative to scope.
+- A core release-quality gap still exists:
+  - Full test suite currently has 1 failure in README command parity (`roles` command docs drift).
+  - Core project setup files are missing in this workspace (`.agent/project_profile.yaml`, `.agent/context/project-context.md`) and flagged by `doctor`/`audit`.
 
-What is true right now:
+Investor interpretation:
 
-- The product has many capabilities, but the default “library-first golden path” is not yet simplified enough for fast new-user success.
-- Core UX, docs, and stability guarantees are still less clear than they need to be for broad Python-library adoption.
+- Strong builder signal.
+- Not yet "fund now" signal because core wedge clarity and operational sharpness are diluted by breadth.
 
-## 2) Top 5 Upcoming Features (Next 30 Days, Library-First)
+## 2) Overengineering Assessment (Keep / Trim / Defer)
 
-Each feature is scoped to 2-4 days of focused work.
+### Keep (Core Wedge)
 
-### Feature 1: Golden Path Installer Experience
+- `init --guided`, `doctor`, `compose`, `report`, `audit`.
+- Local-first skill discovery and profile alignment.
+- Deterministic machine outputs for core automation paths.
 
-- Problem statement:
-  - New users can install, but first successful run is still too fragmented.
-- Why now:
-  - Adoption depends on time-to-first-success, not feature depth.
-- Smallest shippable slice:
-  - One canonical flow: `pip install skillsmith` -> `skillsmith init --guided` -> `skillsmith doctor` -> `skillsmith compose`.
-  - Add one copy-paste quickstart block in README that is tested in CI.
-- Success metrics:
-  - Fresh machine setup to first successful compose in <10 minutes.
-  - Zero manual file edits required for the happy path.
-- Acceptance checks (binary):
-  - [x] Quickstart commands run successfully in a clean temp project.
-  - [x] README quickstart matches real command behavior exactly.
-  - [x] CI includes one smoke test executing the same sequence.
-- Dependencies and risks:
-  - Dependency: stable command defaults.
-  - Risk: drift between docs and behavior.
+### Trim (Default Surface Reduction)
 
-### Feature 2: Public API/CLI Stability Contract (v0.x hardening)
+- Keep advanced commands available, but remove them from the default onboarding story and beginner docs.
+- Treat non-core surfaces as "advanced mode", not first-class for new users.
 
-- Problem statement:
-  - Users cannot rely on a clear stability policy for library and CLI surfaces.
-- Why now:
-  - Trust in a Python library comes from predictable upgrades.
-- Smallest shippable slice:
-  - Define and publish “stable vs experimental” surfaces for CLI and Python imports.
-  - Add deprecation warning behavior and migration notes template.
-- Success metrics:
-  - Every user-facing command/import mapped to stability tier.
-  - Breaking changes fail contract checks in CI.
-- Acceptance checks (binary):
-  - [x] `README` + `STATE` document the stability contract.
-  - [x] At least one automated check fails when command surface drifts without docs update.
-  - [x] Deprecation path is tested for one representative command option.
-- Dependencies and risks:
-  - Dependency: command surface inventory.
-  - Risk: hidden surface area in tests/docs mismatch.
+### Defer (Post-PMF)
 
-### Feature 3: Core Reliability Pack (Deterministic Defaults)
+- Additional enterprise depth beyond current implementation:
+  - OIDC expansion and auth-policy complexity
+  - trust authority hardening beyond local MVP
+  - registry/trust service scale-out concerns
+- Any new major command group not directly improving first-time success, activation, or retention.
 
-- Problem statement:
-  - Advanced behavior exists, but core outputs are not yet deterministic enough for teams and CI.
-- Why now:
-  - Reliability beats breadth for a core library.
-- Smallest shippable slice:
-  - Tighten deterministic output paths for `compose`, `recommend`, `doctor` machine outputs.
-  - Enforce strict JSON schemas for machine-consumed commands.
-- Success metrics:
-  - Repeat runs with same inputs produce stable machine outputs.
-  - Core command regressions detected before merge.
-- Acceptance checks (binary):
-  - [x] JSON schema checks added for core machine outputs.
-  - [x] Snapshot-style regression tests pass for deterministic paths.
-  - [x] No flaky tests in core command suite across 3 repeated runs.
-- Dependencies and risks:
-  - Dependency: explicit schema definitions.
-  - Risk: over-constraining output evolution.
+## 3) 30-Day Plan (Fundability-Oriented)
 
-### Feature 4: Docs-as-Product for Python Users
+## Week 1: Baseline Integrity
 
-- Problem statement:
-  - Current docs are broad, but not focused enough on library adoption tasks.
-- Why now:
-  - For Python libraries, docs quality is product quality.
-- Smallest shippable slice:
-  - Publish 3 production-oriented recipes:
-    - local project bootstrap
-    - CI gate flow (`doctor` + `eval`)
-    - team onboarding flow with minimal config
-  - Add “failure recovery” section with exact commands.
-- Success metrics:
-  - New user can complete any recipe without source-code reading.
-  - Support questions about basic setup reduced.
-- Acceptance checks (binary):
-  - [x] Three recipe docs added and command-verified.
-  - [x] Failure recovery section includes at least 5 concrete failure modes + fixes.
-  - [x] Links and command snippets validated in CI.
-- Dependencies and risks:
-  - Dependency: stable quickstart behavior.
-  - Risk: docs drift if command output changes.
+Goal: eliminate credibility leaks.
 
-### Feature 5: Minimal Python SDK Entry Points
+Deliverables:
 
-- Status: partially complete; minimal import-first SDK entry points are implemented and documented, with remaining contract/test hardening pending.
+1. Fix README parity failure for `roles` command.
+2. Ensure `.agent/project_profile.yaml` and `.agent/context/project-context.md` are consistently generated in local workflows.
+3. Re-run full suite and publish clean evidence.
 
-- Problem statement:
-  - CLI is strong, but Python-native embedding path is still unclear for users integrating into their own tools.
-- Why now:
-  - “Best Python library” requires a clean import-first API.
-- Smallest shippable slice:
-  - Add documented Python API entry points for 3 core operations:
-    - bootstrap/init flow
-    - compose workflow generation
-    - health checks/doctor summary
-  - Keep thin wrappers over existing command internals.
-- Success metrics:
-  - Python users can perform core flow without shelling out.
-  - SDK examples run in CI.
-- Acceptance checks (binary):
-  - [x] `from skillsmith import ...` examples exist and pass tests.
-  - [x] API signatures documented and type-annotated.
-  - [x] Semver notes include SDK surface commitments.
-- Dependencies and risks:
-  - Dependency: decide official public module paths.
-  - Risk: exposing unstable internals too early.
+Exit criteria:
 
-## 3) Execution Sequence (Week 1-4)
+- `uv run python -m unittest discover tests -v` passes.
+- `skillsmith doctor --json` shows no missing core profile/context artifacts in a fresh initialized repo.
 
-### Week 1
+## Week 2: Wedge Compression
 
-- Priority items:
-  - Feature 1 (Golden path)
-  - Feature 4 (Docs quickstart + recovery)
-- Owner roles:
-  - Orchestrator: lock exact first-run flow and success criteria.
-  - Researcher: identify current friction points from baseline commands/docs.
-  - Implementer: command default tuning + docs updates.
-  - Reviewer: clean-environment replay and doc-command parity check.
-- Verification evidence:
-  - Clean env run log for quickstart sequence.
-  - `uv run python -m unittest tests.test_commands -v` (targeted core checks).
+Goal: one obvious happy path for new users.
 
-### Week 2
+Deliverables:
 
-- Priority items:
-  - Feature 2 (stability contract)
-  - Feature 3 (deterministic JSON/schema checks)
-- Owner roles:
-  - Orchestrator: define stable vs experimental list.
-  - Researcher: enumerate surface area and drift risk.
-  - Implementer: contract docs + CI checks + schema assertions.
-  - Reviewer: regression pass on repeated runs.
-- Verification evidence:
-  - Contract check output in CI.
-  - Repeated-run determinism proof (3-run consistency report).
+1. Rewrite docs/navigation so 80% of users only see:
+   - install
+   - init
+   - doctor
+   - compose
+   - report/audit before merge
+2. Move enterprise/advanced material into dedicated advanced sections.
+3. Add one activation-focused quickstart smoke path in CI.
 
-### Week 3
+Exit criteria:
 
-- Priority items:
-  - Feature 5 (minimal SDK entry points)
-  - Finish remaining determinism/test debt from Week 2
-- Owner roles:
-  - Orchestrator: bound SDK scope to 3 APIs only.
-  - Researcher: identify safe public import boundaries.
-  - Implementer: API wrappers + typed docs + examples.
-  - Reviewer: API backward-compat and test quality check.
-- Verification evidence:
-  - SDK example tests passing.
-  - Core suite still green.
+- New user can copy/paste one path and get successful compose in <10 minutes.
+- No required manual file edits in happy path.
 
-### Week 4
+## Week 3: Outcome Proof
 
-- Priority items:
-  - Integration hardening and release prep.
-- Owner roles:
-  - Orchestrator: release gate decision.
-  - Researcher: release-risk checklist.
-  - Implementer: fix release blockers only.
-  - Reviewer: full regression + docs parity final pass.
-- Verification evidence:
-  - `uv run python -m unittest discover tests -v` green.
-  - quickstart replay from scratch still green.
+Goal: show the product helps users ship.
 
-## 4) Do Not Build Now
+Deliverables:
 
-Explicitly deprioritized this cycle:
+1. Add outcome-focused examples from real tasks (before/after workflow evidence).
+2. Standardize one KPI artifact format for:
+   - time to first successful compose
+   - compose-to-implemented task completion rate
+   - repeat usage in 7 days
+3. Ship lightweight instrumentation/reporting for these KPIs (local artifact-first, no mandatory hosted infra).
 
-1. Additional enterprise infrastructure depth (full KMS/HSM integrations, distributed service clustering)
-- Reason:
-  - Valuable, but not needed for the default Python-library promise.
-- Re-entry trigger:
-  - After library-first release gate is fully green and core adoption metrics are positive.
+Exit criteria:
 
-2. Large new command-surface expansion
-- Reason:
-  - More commands increase cognitive load and docs drift risk.
-- Re-entry trigger:
-  - Only after current core commands show stable usage and low support friction.
+- At least one reproducible benchmark pack demonstrates measurable improvement on core flow.
 
-3. Broad provider/catalog expansion
-- Reason:
-  - Current blocker is reliability/UX, not provider count.
-- Re-entry trigger:
-  - After deterministic output + docs parity + SDK baseline are complete.
+## Week 4: Investor-Ready Narrative Pack
 
-4. Major UI/dashboard buildout
-- Reason:
-  - The product promise here is Python library + CLI first.
-- Re-entry trigger:
-  - When CLI-first users explicitly demand UI for daily workflows.
+Goal: convert technical depth into a simple funding story.
 
-## 5) Release Gate (End of 30 Days)
+Deliverables:
 
-Month is successful only if all are true:
+1. One-page "why now / why us / why this wedge" summary grounded in repo evidence.
+2. Metrics snapshot for activation, retention, and reliability trends.
+3. Explicit roadmap split:
+   - next 60 days: PMF acceleration
+   - post-PMF: enterprise and platform expansion
 
-- [x] Fresh install quickstart works exactly as documented.
-- [x] Core contract (stable vs experimental surfaces) is published and enforced.
-- [x] Deterministic machine outputs for core commands are schema-checked and regression-tested.
-- [x] Minimal Python SDK entry points are documented, tested, and usable.
-- [x] `uv run python -m unittest discover tests -v` passes on main.
-- [x] `.agent/STATE.md` updated with objective evidence.
+Exit criteria:
 
-Mandatory evidence bundle:
+- Narrative and metrics can answer: "Why this instead of Continue/Aider/Cursor workflows?"
 
-- Clean-environment quickstart transcript.
-- Contract/surface check output.
-- Determinism and schema test results.
-- SDK usage examples and passing tests.
-- Full regression test output.
+## 4) Hard No List (Next 30 Days)
+
+Do not ship unless it directly improves wedge metrics:
+
+1. New large command families.
+2. New remote provider classes beyond current set.
+3. New enterprise auth/trust infrastructure depth.
+4. UI/dashboard expansion.
+
+## 5) Release Gate (Must Pass)
+
+All must be true by end of this cycle:
+
+- [ ] Full tests green on main.
+- [ ] README command parity tests green (including `roles`).
+- [ ] Fresh install -> init -> doctor -> compose validated in clean environment.
+- [ ] Core docs are wedge-first, advanced features clearly separated.
+- [ ] KPI artifact exists and is updated from real runs.
+
+## 6) Funding Readiness Rule
+
+Do not optimize for "more features".  
+Optimize for this evidence package:
+
+1. Reliability: green suite, stable core behavior.
+2. Clarity: one user story that is easy to explain.
+3. Outcomes: measurable user success and repeat usage.
+4. Focus: advanced/enterprise depth intentionally staged behind PMF.
+
+If this package is strong, the `$500k` conversation becomes realistic.

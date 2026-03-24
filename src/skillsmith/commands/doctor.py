@@ -86,6 +86,23 @@ def _report_workflow_surfaces(files: dict[Path, str], cwd: Path) -> bool:
     return section_ok
 
 
+def _readiness_check(name: str, ok: bool, details: str) -> dict:
+    return {"name": name, "ok": ok, "details": details}
+
+
+def _readiness_summary(checks: list[dict]) -> dict:
+    total = len(checks)
+    passed = sum(1 for item in checks if item["ok"])
+    score = 100 if total == 0 else round((passed / total) * 100)
+    failing = [item for item in checks if not item["ok"]]
+    return {
+        "score": int(score),
+        "total": total,
+        "passed": passed,
+        "failing": failing,
+    }
+
+
 def _format_recommendation_summary(recommendation: dict) -> str:
     if not isinstance(recommendation, dict):
         return "no recorded rationale"
@@ -132,12 +149,19 @@ def _doctor_machine_summary(cwd: Path, *, strict: bool) -> dict:
         add_check(".agent/STATE.md age <=24h", age_hours <= 24, "present" if age_hours <= 24 else "stale")
 
     ok = all(item["ok"] for item in checks)
+    readiness_checks = [_readiness_check(item["name"], item["ok"], item["details"]) for item in checks]
+    readiness = _readiness_summary(readiness_checks)
     return {
         "ok": ok,
         "cwd": str(cwd),
         "checks": checks,
         "missing": missing,
         "stale": stale,
+        "readiness_score": readiness["score"],
+        "readiness_checklist": readiness_checks,
+        "readiness_failing_checks": readiness["failing"],
+        "readiness_passing_checks": readiness["passed"],
+        "readiness_total_checks": readiness["total"],
         "strict_failed": bool(strict and not ok),
     }
 
@@ -342,6 +366,39 @@ def doctor_command(fix, strict, as_json):
             console.print(f"  [red][!!][/red] Failed to read {LOCKFILE_NAME}: {exc}")
     else:
         console.print(f"  [dim]-[/dim] {LOCKFILE_NAME} not found")
+
+    readiness_checks = [
+        _readiness_check("AGENTS.md", agents_md.exists(), "present" if agents_md.exists() else "missing"),
+        _readiness_check(
+            ".agent/project_profile.yaml",
+            profile_path.exists(),
+            "present" if profile_path.exists() else "missing",
+        ),
+        _readiness_check(
+            ".agent/context/project-context.md",
+            context_path.exists(),
+            "present" if context_path.exists() else "missing",
+        ),
+        _readiness_check(
+            ".agent/STATE.md age <=24h",
+            cwd.joinpath(".agent", "STATE.md").exists()
+            and ((time.time() - cwd.joinpath(".agent", "STATE.md").stat().st_mtime) / 3600) <= 24,
+            "present"
+            if cwd.joinpath(".agent", "STATE.md").exists()
+            and ((time.time() - cwd.joinpath(".agent", "STATE.md").stat().st_mtime) / 3600) <= 24
+            else "stale",
+        ),
+    ]
+    readiness = _readiness_summary(readiness_checks)
+    console.print("\n[bold]Readiness Checklist[/bold]")
+    console.print(
+        f"  [bold]{readiness['score']}/100[/bold] from {readiness['passed']} of {readiness['total']} required checks"
+    )
+    if readiness["failing"]:
+        for item in readiness["failing"]:
+            console.print(f"  [red][!!][/red] {item['name']} - {item['details']}")
+    else:
+        console.print("  [green][OK][/green] No failing checklist entries")
 
     console.print()
     if all_ok:

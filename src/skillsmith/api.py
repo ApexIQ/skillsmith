@@ -9,6 +9,7 @@ from typing import TypedDict
 from click.testing import CliRunner
 
 from .commands.init import init_command
+from .commands.doctor import _readiness_check, _readiness_summary
 from .commands.workflow_engine import build_workflow, load_rolling_eval_feedback
 from .commands.context_index import (
     build_context_retrieval_trace,
@@ -238,11 +239,18 @@ def doctor_summary(cwd: str | Path, *, strict: bool = False) -> dict:
         add_check(".agent/STATE.md age <=24h", False, f"stale age={state_age:.1f}h")
 
     ok = all(item["ok"] for item in checks)
+    readiness_checks = [_readiness_check(item["name"], item["ok"], item["details"]) for item in checks]
+    readiness = _readiness_summary(readiness_checks)
     return {
         "ok": ok,
         "cwd": str(resolved_cwd),
         "checks": checks,
         "missing": missing,
         "stale": stale,
+        "readiness_score": readiness["score"],
+        "readiness_checklist": readiness_checks,
+        "readiness_failing_checks": readiness["failing"],
+        "readiness_passing_checks": readiness["passed"],
+        "readiness_total_checks": readiness["total"],
         "strict_failed": bool(strict and not ok),
     }

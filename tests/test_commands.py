@@ -2377,6 +2377,48 @@ class SkillsmithCommandTests(unittest.TestCase):
         self.assertEqual(payload["registry_governance"]["deprecated_count"], 1)
         self.assertEqual(payload["registry_governance"]["recent_history_events"][0]["name"], "approved-skill")
         self.assertEqual(payload["registry_governance"]["recent_history_events"][0]["action"], "approve")
+        self.assertIn("readiness_summary", payload)
+        self.assertTrue(payload["readiness_summary"]["ready"])
+        self.assertEqual(payload["readiness_summary"]["status"], "ready")
+        self.assertGreaterEqual(payload["readiness_summary"]["score"], 80)
+        self.assertIn("/100", payload["readiness_summary"]["summary"])
+        self.assertEqual(payload["readiness_summary"]["blockers"], [])
+        self.assertTrue(
+            any("context index has 1 stale file" in warning for warning in payload["readiness_summary"]["warnings"])
+        )
+
+    def test_report_pr_snippet_emits_markdown_readiness_block(self):
+        with self.project_dir() as cwd:
+            init_result = self.runner.invoke(main, ["init", "--minimal"])
+            self.assertEqual(init_result.exit_code, 0, init_result.output)
+
+            write_eval_policy_fixture(cwd)
+            write_context_index_fixture(cwd)
+            write_registry_fixture(cwd)
+
+            candidate = SkillCandidate(
+                name="python-packaging",
+                description="Package and publish Python libraries",
+                source="local",
+                install_ref="python-packaging",
+                trust_score=95,
+                metadata={"starter_pack": True, "starter_pack_label": "library:python"},
+            )
+            with mock.patch.dict(os.environ, {"CI": "true"}, clear=False), mock.patch(
+                "skillsmith.commands.report.curated_pack_candidates", return_value=[candidate]
+            ), mock.patch(
+                "skillsmith.commands.report.curated_pack_label", return_value="library:python"
+            ):
+                result = self.runner.invoke(main, ["report", "--pr-snippet"])
+
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("## Skillsmith Readiness", result.output)
+        self.assertIn("- Status: ready", result.output)
+        self.assertIn("- Ready: yes", result.output)
+        self.assertIn("- Score:", result.output)
+        self.assertIn("- Blockers:", result.output)
+        self.assertIn("- Warnings:", result.output)
+        self.assertIn("Run `skillsmith doctor`", result.output)
 
     def test_report_infers_profile_and_handles_missing_lockfile(self):
         with self.project_dir() as cwd:

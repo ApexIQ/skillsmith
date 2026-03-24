@@ -165,7 +165,8 @@ temp_skills/
 temp_full_skills/
 
 # Local runtime/index caches and traces
-.agent/context/
+.agent/context/*
+!.agent/context/project-context.md
 .agent/autonomy/runs/
 .agent/autonomy/latest.json
 .agent/autonomy/results.tsv

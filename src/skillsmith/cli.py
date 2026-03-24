@@ -32,6 +32,8 @@ from .commands import (
     trust_service_command,
     safety_command,
 )
+from .commands.ready import ready_command
+from .commands.start import start_command
 
 @click.group()
 @click.version_option(version=__version__, prog_name="skillsmith")
@@ -66,6 +68,8 @@ main.add_command(assets_command, name="assets")
 main.add_command(autonomous_command, name="autonomous")
 main.add_command(context_index_command, name="context-index")
 main.add_command(context_index_command, name="context")
+main.add_command(start_command, name="start")
+main.add_command(ready_command, name="ready")
 main.add_command(registry_command, name="registry")
 main.add_command(registry_service_command, name="registry-service")
 main.add_command(trust_service_command, name="trust-service")

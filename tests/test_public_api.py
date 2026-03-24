@@ -44,6 +44,13 @@ class PublicApiTests(unittest.TestCase):
                 self.assertTrue(hasattr(skillsmith, name), f"skillsmith.{name} is missing")
                 self.assertTrue(callable(getattr(skillsmith, name)), f"skillsmith.{name} is not callable")
 
+    def test_repo_bootstrap_artifacts_are_checked_in(self):
+        self.assertTrue((ROOT / ".agent" / "project_profile.yaml").exists(), "repo project profile is missing")
+        self.assertTrue(
+            (ROOT / ".agent" / "context" / "project-context.md").exists(),
+            "repo project context is missing",
+        )
+
     def test_init_project_smoke_writes_bootstrap_artifacts(self):
         with self.temp_project() as cwd:
             result = skillsmith.init_project(".")
@@ -84,8 +91,11 @@ class PublicApiTests(unittest.TestCase):
             self.assertIsInstance(result, dict)
             self.assertIn("ok", result)
             self.assertIn("checks", result)
+            self.assertIn("readiness_score", result)
+            self.assertIn("readiness_checklist", result)
             self.assertIn("strict_failed", result)
             self.assertTrue(result["ok"])
+            self.assertEqual(result["readiness_score"], 100)
             self.assertFalse(result["strict_failed"])
             self.assertTrue(result["checks"])
 

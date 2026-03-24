@@ -26,21 +26,32 @@ If `skillsmith` is not found, use module mode:
 python -m skillsmith --help
 ```
 
-## 2) 60-Second Start
+## 2) Start Here: Core 10-Minute Path
 
 Run this inside your project folder:
 
 ```bash
-skillsmith init --guided
-skillsmith doctor
-skillsmith compose "build a project summary"
+skillsmith start
+skillsmith report --artifact-dir .agent/reports/readiness
 ```
 
 What each command does in plain language:
 
-- `init --guided`: asks simple setup questions and prepares files.
-- `doctor`: checks if setup is healthy.
-- `compose`: gives you a clear step-by-step plan for your goal.
+- `start`: runs the default bootstrap + readiness wedge path in one command.
+- `report --artifact-dir`: writes CI-friendly readiness artifacts.
+
+### Default Readiness Check
+
+This is the same default path split into explicit gate and artifact steps:
+
+```bash
+skillsmith ready
+skillsmith report --artifact-dir .agent/reports/readiness
+```
+
+- `skillsmith ready` fails fast when blockers remain.
+- `skillsmith report --artifact-dir` writes readiness artifacts into the directory you choose.
+- This is the default merge/release path for most repos. You do not need the advanced/admin commands to use it.
 
 ### `init` Command Options (Exact Usage)
 
@@ -69,15 +80,14 @@ If this is your first time, run these exact commands and stop there:
 
 ```bash
 pip install skillsmith
-skillsmith init --guided
-skillsmith doctor
-skillsmith compose "help me plan my next change"
+skillsmith start
+skillsmith report --artifact-dir .agent/reports/readiness
 ```
 
 Expected result:
 
-- `doctor` should show setup checks as OK.
-- `compose` should print a structured plan you can follow.
+- `start` should complete with readiness status.
+- `report --artifact-dir` should write readiness artifacts for CI and PR summaries.
 
 ## 3) What You Get
 
@@ -122,16 +132,75 @@ skillsmith context-index query "<query>"
 skillsmith compose "<goal>"
 ```
 
-## 4) Command Reference (Simple)
+## 4) Command Reference (Core vs Advanced/Admin)
 
-If you are non-technical, start with only these 6 commands:
+If you are non-technical, start with only these core commands:
 
 - `skillsmith init --guided`
 - `skillsmith doctor`
 - `skillsmith compose "<goal>"`
+- `skillsmith ready`
 - `skillsmith sync`
 - `skillsmith report`
 - `skillsmith suggest`
+
+### Core Daily Commands
+
+These are the normal commands for an individual repo using the default path:
+
+- `skillsmith init --guided`: create the workspace with guided setup.
+- `skillsmith doctor`: check whether setup is healthy.
+- `skillsmith compose "<goal>"`: generate a step-by-step workflow for one goal.
+- `skillsmith ready`: run the readiness path and fail fast on blockers.
+- `skillsmith report`: summarize the current project state.
+- `skillsmith report --artifact-dir .agent/reports/readiness`: write CI-friendly readiness artifacts.
+- `skillsmith sync`: refresh inferred project state and generated files.
+- `skillsmith suggest`: recommend the next 1-3 commands based on repo state.
+
+### Advanced and Admin Commands
+
+Use these only when you need stricter controls, automation internals, or team/operator features:
+
+- Advanced project and skill management: `align`, `recommend`, `profile`, `discover`, `list`, `add`, `lint`, `update`, `rebuild`, `roles`, `assets`
+- Advanced verification and automation: `audit`, `eval`, `budget`, `autonomous`, `context-index`, `context`, `snapshot`, `watch`, `safety`
+- Admin and service operations: `serve`, `registry`, `registry-service`, `trust-service`
+
+### Stable Top-Level CLI Surface
+
+Use `skillsmith <command> --help` for details on each top-level command.
+
+- `skillsmith init`
+- `skillsmith align`
+- `skillsmith sync`
+- `skillsmith recommend`
+- `skillsmith report`
+- `skillsmith profile`
+- `skillsmith discover`
+- `skillsmith list`
+- `skillsmith add`
+- `skillsmith lint`
+- `skillsmith compose`
+- `skillsmith audit`
+- `skillsmith doctor`
+- `skillsmith eval`
+- `skillsmith budget`
+- `skillsmith update`
+- `skillsmith rebuild`
+- `skillsmith serve`
+- `skillsmith snapshot`
+- `skillsmith watch`
+- `skillsmith suggest`
+- `skillsmith roles`
+- `skillsmith assets`
+- `skillsmith autonomous`
+- `skillsmith context-index`
+- `skillsmith context`
+- `skillsmith start`
+- `skillsmith ready`
+- `skillsmith registry`
+- `skillsmith registry-service`
+- `skillsmith trust-service`
+- `skillsmith safety`
 
 ### Project Setup
 
@@ -139,6 +208,7 @@ If you are non-technical, start with only these 6 commands:
 - `skillsmith init --minimal`: Create only core project files with minimal setup.
 - `skillsmith init --guided`: Run interactive setup prompts and configure project profile/context.
 - `skillsmith init --all`: Install all available skills (this can be large and slower).
+- `skillsmith start`: Run the default one-command wedge path (bootstrap + readiness checks).
 - `skillsmith sync`: Re-scan your project and refresh generated files.
 - `skillsmith align`: Re-render managed files from your saved profile.
 - `skillsmith suggest`: Recommend the next 1-3 high-leverage commands based on current project state.
@@ -162,6 +232,7 @@ If you are non-technical, start with only these 6 commands:
 ### Workflow and Evaluation
 
 - `skillsmith compose "<goal>"`: Generate a step-by-step workflow for a goal.
+- `skillsmith ready`: Run the default readiness path for this repo and fail fast on blockers.
 - `skillsmith safety ...`: Manage local safety modes (`status`, `careful`, `freeze`, `guard`, `unfreeze`).
 - `skillsmith autonomous run`: Start the autonomous workflow loop.
 - `skillsmith autonomous status`: Show the current autonomous workflow state.
@@ -243,18 +314,26 @@ skillsmith align
 skillsmith compose "build <your-goal>"
 ```
 
-### C) Before merge/release
+### C) Before merge/release (default path)
+
+```bash
+skillsmith ready
+skillsmith report --artifact-dir .agent/reports/readiness
+```
+
+### D) Stricter admin gate
+
+Use this only when you want deeper policy/integrity checks in addition to the default readiness path:
 
 ```bash
 skillsmith eval
 skillsmith audit --strict
-skillsmith report
 ```
 
 ### Production Recipes
 
 - Local bootstrap: [docs/recipes/local-bootstrap.md](docs/recipes/local-bootstrap.md)
-- CI gate flow (`doctor` + `eval`): [docs/recipes/ci-gate-flow.md](docs/recipes/ci-gate-flow.md)
+- CI gate flow (`ready` + `report --artifact-dir`): [docs/recipes/ci-gate-flow.md](docs/recipes/ci-gate-flow.md)
 - Team onboarding (minimal config): [docs/recipes/team-onboarding.md](docs/recipes/team-onboarding.md)
 
 ## 6) Failure Recovery
@@ -379,7 +458,7 @@ uv run --group dev python -m build
 
 ## 11) Current Version
 
-- Package version: `0.6.8`
+- Package version: `0.6.9`
 
 ## License
 

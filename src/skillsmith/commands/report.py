@@ -13,6 +13,7 @@ from .lockfile import LOCKFILE_NAME, load_lockfile, load_trust_health, verify_lo
 from .registry import _load_registry
 from .providers import curated_pack_candidates, curated_pack_label, explain_candidate, install_policy_for_profile
 from .rendering import load_project_profile, managed_file_map, selected_tools
+from ..readiness_artifacts import render_readiness_pr, write_readiness_artifacts
 
 
 def _stringify(value) -> str:
@@ -109,6 +110,156 @@ def _format_threshold_summary(thresholds: dict[str, object]) -> str:
         f"{key}={_stringify(thresholds.get(key))}"
         for key in ["min_tacr_delta", "max_latency_increase_ms", "max_cost_increase_usd"]
     )
+
+
+def _lockfile_status(cwd: Path) -> dict[str, object]:
+    path = cwd / LOCKFILE_NAME
+    summary: dict[str, object] = {
+        "present": path.exists(),
+        "skill_count": 0,
+        "signature": {"state": "missing", "valid": False, "message": "skills.lock.json not found"},
+        "issues": [],
+    }
+    if not path.exists():
+        return summary
+
+    try:
+        payload = load_lockfile(cwd)
+    except Exception as exc:
+        message = f"failed to read {LOCKFILE_NAME}: {exc}"
+        summary["issues"] = [message]
+        summary["signature"] = {"state": "invalid", "valid": False, "message": message}
+        return summary
+
+    skills = payload.get("skills", []) if isinstance(payload, dict) else []
+    summary["skill_count"] = len([item for item in skills if isinstance(item, dict)])
+    signature_status = verify_lockfile_signature(payload)
+    summary["signature"] = signature_status
+    if not signature_status.get("valid", False):
+        summary["issues"] = [str(signature_status.get("message", ""))]
+    return summary
+
+
+def _snapshot_drift_status(cwd: Path, snapshot_files: dict[str, str]) -> dict[str, object]:
+    summary: dict[str, object] = {
+        "checked": 0,
+        "missing": [],
+        "out_of_sync": [],
+        "issues": [],
+        "ok": True,
+    }
+    for rel_path, expected in sorted(snapshot_files.items()):
+        summary["checked"] += 1
+        path = cwd / rel_path
+        if not path.exists():
+            summary["missing"].append(rel_path)
+            summary["issues"].append(f"{rel_path} missing")
+            summary["ok"] = False
+            continue
+        try:
+            actual = path.read_text(encoding="utf-8", errors="ignore").strip()
+        except Exception as exc:
+            summary["out_of_sync"].append(rel_path)
+            summary["issues"].append(f"{rel_path} could not be read: {exc}")
+            summary["ok"] = False
+            continue
+        if actual != expected.strip():
+            summary["out_of_sync"].append(rel_path)
+            summary["issues"].append(f"{rel_path} is out of sync")
+            summary["ok"] = False
+    return summary
+
+
+def _readiness_summary(
+    cwd: Path,
+    *,
+    profile_source: str,
+    context_index: dict,
+    registry_governance: dict,
+    trust_health: dict,
+    eval_policy: dict,
+    snapshot_files: dict[str, str],
+) -> dict[str, object]:
+    lockfile = _lockfile_status(cwd)
+    drift = _snapshot_drift_status(cwd, snapshot_files)
+
+    score = 100
+    blockers: list[str] = []
+    warnings: list[str] = []
+
+    if profile_source != "saved":
+        score -= 5
+        warnings.append(f"profile source is {profile_source}")
+
+    if not lockfile["present"]:
+        score -= 10
+        warnings.append(f"{LOCKFILE_NAME} is missing")
+    elif not lockfile["signature"].get("valid", False):
+        score -= 20
+        blockers.append(str(lockfile["signature"].get("message", "lockfile signature invalid")))
+
+    if not context_index.get("present", False):
+        score -= 20
+        blockers.append("context index is missing")
+    elif not context_index.get("valid", False):
+        score -= 20
+        blockers.append("context index is invalid")
+    elif int(context_index.get("stale_count", 0) or 0) > 0:
+        stale_count = int(context_index.get("stale_count", 0) or 0)
+        score -= min(10, stale_count * 2)
+        warnings.append(f"context index has {stale_count} stale file(s)")
+
+    revocations = trust_health.get("revocations", {})
+    transparency_log = trust_health.get("transparency_log", {})
+    if not revocations.get("valid", False):
+        score -= 10
+        blockers.append("publisher revocations are invalid")
+    elif revocations.get("revoked_trusted_key_ids"):
+        score -= 10
+        blockers.append(
+            "trusted publisher key(s) revoked: "
+            + _stringify(sorted(revocations.get("revoked_trusted_key_ids", [])))
+        )
+    if not transparency_log.get("valid", False):
+        score -= 10
+        blockers.append("trust transparency log is invalid")
+
+    if not drift["ok"]:
+        drift_issues = [str(item) for item in drift.get("issues", [])]
+        score -= min(20, 5 * len(drift_issues))
+        blockers.extend(drift_issues)
+
+    approval_pending_count = int(registry_governance.get("approval_pending_count", 0) or 0)
+    if approval_pending_count:
+        score -= min(10, approval_pending_count * 2)
+        warnings.append(f"{approval_pending_count} registry item(s) pending approval")
+    deprecated_count = int(registry_governance.get("deprecated_count", 0) or 0)
+    if deprecated_count:
+        score -= min(10, deprecated_count * 2)
+        warnings.append(f"{deprecated_count} deprecated registry item(s)")
+
+    if not eval_policy.get("gate_enabled", False):
+        score -= 5
+        warnings.append("eval gate is disabled")
+    if not eval_policy.get("ci_enforced", False):
+        score -= 5
+        warnings.append("CI enforcement is disabled")
+    if eval_policy.get("ci_opt_out", False):
+        score -= 5
+        warnings.append("CI opt-out is enabled")
+
+    score = max(0, min(100, score))
+    ready = not blockers and score >= 80
+    status = "ready" if ready else "needs_attention"
+    summary = f"{status.replace('_', ' ')} ({score}/100)"
+    return {
+        "ready": ready,
+        "status": status,
+        "score": score,
+        "summary": summary,
+        "blockers": blockers,
+        "warnings": warnings,
+    }
 
 
 def _eval_policy_summary(cwd: Path, profile: dict) -> dict:
@@ -254,7 +405,7 @@ def _build_report(cwd: Path) -> dict:
         for path in _tool_snapshot_paths(cwd, profile)
         if path in expected_files
     }
-    return {
+    report = {
         "profile_source": profile_source,
         "profile": profile,
         "query": query,
@@ -275,6 +426,16 @@ def _build_report(cwd: Path) -> dict:
         "registry_governance": _registry_governance_summary(cwd),
         "snapshot_files": {path.relative_to(cwd).as_posix(): expected_files[path] for path in snapshot_files},
     }
+    report["readiness_summary"] = _readiness_summary(
+        cwd,
+        profile_source=profile_source,
+        context_index=report["context_index_freshness"],
+        registry_governance=report["registry_governance"],
+        trust_health=report["trust_health"],
+        eval_policy=report["eval_policy"],
+        snapshot_files=report["snapshot_files"],
+    )
+    return report
 
 
 def _format_log_entry(entry: dict | None) -> str:
@@ -290,15 +451,31 @@ def _format_log_entry(entry: dict | None) -> str:
     return " / ".join(parts)
 
 
+def _render_pr_snippet(result: dict) -> str:
+    return render_readiness_pr(result)
+
+
 @click.command()
 @click.option("--json", "as_json", is_flag=True, help="Emit machine-readable report results")
-def report_command(as_json: bool):
+@click.option("--pr-snippet", is_flag=True, help="Emit a PR-ready markdown readiness snippet")
+@click.option(
+    "--artifact-dir",
+    type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
+    default=None,
+    help="Write report.json, readiness_pr.md, and scorecard.json into the given directory.",
+)
+def report_command(as_json: bool, pr_snippet: bool, artifact_dir: Path | None):
     """Summarize the current profile, installs, trust policy, and drift."""
     cwd = Path.cwd()
     result = sanitize_json(_build_report(cwd))
+    if artifact_dir is not None:
+        write_readiness_artifacts(artifact_dir, result)
 
     if as_json:
         click.echo(json.dumps(result, indent=2, sort_keys=True))
+        return
+    if pr_snippet:
+        click.echo(_render_pr_snippet(result))
         return
 
     profile = result["profile"]
