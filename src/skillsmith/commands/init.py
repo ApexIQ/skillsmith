@@ -566,10 +566,10 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
                 readme.write_text(f"# .agent/{folder_name}\n\nThis directory contains project-specific {folder_name} for AI agents.\n", encoding="utf-8")
             console.print(f"[green][OK][/green] Scaffolded {folder_name}/ (advanced layer)")
 
-    # Sovereign Siphon Logic (v1.0.2 - Pure Python Distribution)
-    # 1. First, attempt to siphon advanced contents from the sovereign registry if requested
+    # Ghost Branch Siphon Logic (v1.0.3 - Thin Core, Deep Content)
+    # 1. First, attempt to siphon advanced contents from our sovereign Ghost Branch if requested
     if all_skills or bundle or (category and category not in ["core", "essentials"]):
-        _siphon_from_registry(agents_dir, bundle, category, tag)
+        _siphon_from_ghost_branch(agents_dir, bundle, category, tag)
     
     # 2. Local Fallback/Primary Core
     src_skills_dir = TEMPLATE_DIR / ".agent" / "skills"
@@ -578,54 +578,39 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
     else:
         console.print("[dim][INFO][/dim] Local template skills not found. Using Siphon Hub fallback.")
 
-def _siphon_from_registry(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
-    """Pure-Python Siphon: Downloads skills from the ApexIQ Sovereign Registry."""
-    # Sovereign Registry Configuration
-    REGISTRY_URL = "https://github.com/benjaminasterA/antigravity-awesome-skills.git"
-    ZIPBALL_URL = "https://github.com/benjaminasterA/antigravity-awesome-skills/archive/refs/heads/main.zip"
+def _siphon_from_ghost_branch(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
+    """The Ghost Branch Siphon: Downloads 889+ skills from the sovereign 'ghost-content' branch."""
+    # Sovereign Ghost Registry Configuration
+    REPO_URL = "https://github.com/ApexIQ/skillsmith"
+    GHOST_ZIP_URL = f"{REPO_URL}/archive/refs/heads/ghost-content.zip"
     
     target_dir = agents_dir / "skills"
     target_dir.mkdir(parents=True, exist_ok=True)
     
     try:
-        # Tier 1: Git Siphon (High Velocity Delta Sync)
-        import subprocess
-        result = subprocess.run(["git", "version"], capture_output=True, text=True)
-        if result.returncode == 0:
-            console.print(f"[blue][INFO][/blue] Siphoning from Sovereign Registry via Git...")
-            # Use a temporary clone to avoid corrupting existing instructions
-            tmp_clone = agents_dir / ".siphon_tmp"
-            if tmp_clone.exists():
-                shutil.rmtree(tmp_clone)
-            
-            subprocess.run(["git", "clone", "--depth", "1", REGISTRY_URL, str(tmp_clone)], check=True, capture_output=True)
-            
-            # Siphon files into the local index
-            _merge_siphoned_skills(tmp_clone, target_dir)
-            shutil.rmtree(tmp_clone)
-            console.print("[green][OK][/green] Sovereign siphon complete.")
-            return
-
-    except Exception as git_err:
-        console.print(f"[dim][SKIP][/dim] Git siphon unavailable: {git_err}")
-
-    try:
-        # Tier 2: Zipball Siphon (Zero Dependency Fallback)
-        console.print(f"[blue][INFO][/blue] Siphoning from Sovereign Registry via Zipball...")
+        # Tier 1: Thin Siphon (Zipball from Ghost Branch)
         import requests
         import zipfile
         import io
         
-        response = requests.get(ZIPBALL_URL, timeout=30)
+        if bundle:
+            console.print(f"[blue][INFO][/blue] Siphoning [bold]{bundle}[/bold] bundle from Ghost Branch...")
+        else:
+            console.print(f"[blue][INFO][/blue] Siphoning expert intelligence from Ghost Branch...")
+            
+        response = requests.get(GHOST_ZIP_URL, timeout=30)
         response.raise_for_status()
         
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-            # ZIPs from GitHub have a top-level dir like 'repo-main/'
+            # Ghost ZIPs have a top-level dir like 'skillsmith-ghost-content/'
             top_level = z.namelist()[0].split('/')[0]
+            count = 0
             for member in z.namelist():
+                # We expect the 'ghost-content' branch to have a 'skills/' folder at the root
                 if not member.startswith(f"{top_level}/skills/"):
                     continue
-                # Extract to target
+                
+                # Extract to project path
                 rel_path = member.replace(f"{top_level}/skills/", "")
                 if not rel_path: continue
                 
@@ -636,11 +621,12 @@ def _siphon_from_registry(agents_dir: Path, bundle: str | None, category: str | 
                     dest.parent.mkdir(parents=True, exist_ok=True)
                     with z.open(member) as src, open(dest, "wb") as dst:
                         dst.write(src.read())
+                    count += 1
         
-        console.print("[green][OK][/green] Zipball siphon complete.")
+        console.print(f"[green][OK][/green] Ghost siphon complete ({count} skills synchronized).")
     except Exception as e:
-        console.print(f"[yellow][WARN][/yellow] Sovereign siphon failed: {e}")
-        console.print("[dim]Falling back to local core templates...[/dim]")
+        console.print(f"[yellow][WARN][/yellow] Ghost siphon unavailable: {e}")
+        console.print("[dim]Falling back to local package templates...[/dim]")
 
 def _merge_siphoned_skills(src: Path, dst: Path) -> None:
     """Transfers siphoned content into the active project structure."""
