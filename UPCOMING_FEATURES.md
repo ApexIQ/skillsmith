@@ -44,6 +44,7 @@ Shared skill evolution across teams, governance, CI gates, compliance audit trai
 ### 2.1 The Awesome Skills Siphon (Week 1)
 
 Instead of building individual skills, we'll implement **Native Integration** with the global skill library:
+- [x] **ZIP Method Elimination**: Replaced static `skills.zip` with high-velocity **Live Siphon** architecture for 1.0.1.
 - **`skillsmith add --remote awesome`**: Install any skill directly from the `antigravity-awesome-skills` repository.
 - **`npx` Integration**: Unified installer that pre-scaffolds `.agent/skills/` using the awesome library's DNA.
 - **Trust-Verified Catalogs**: Pre-sign the top 100 most used skills from the awesome library for instant **Zero-Configuration Trust**.

@@ -528,7 +528,7 @@ def _copy_platform_files(cwd: Path) -> None:
         console.print(f"[green][OK][/green] Created {paths['dest']} ({platform_name})")
 
 
-def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: str | None, tag: str | None) -> None:
+def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: str | None, tag: str | None, bundle: str | None = None) -> None:
     agents_dir = cwd / ".agent"
     agents_dir.mkdir(exist_ok=True)
     template_agents_dir = TEMPLATE_DIR / ".agent"
@@ -566,59 +566,71 @@ def _copy_agent_templates(cwd: Path, minimal: bool, all_skills: bool, category: 
                 readme.write_text(f"# .agent/{folder_name}\n\nThis directory contains project-specific {folder_name} for AI agents.\n", encoding="utf-8")
             console.print(f"[green][OK][/green] Scaffolded {folder_name}/ (advanced layer)")
 
-    src_skills_zip = resolve_runtime_asset(".agent/skills.zip", required=False)
-    if not src_skills_zip or not src_skills_zip.exists():
-        console.print(
-            "[yellow][WARN][/yellow] skills.zip is not available. "
-            "Run `skillsmith assets bootstrap` to enable bundled skill installs."
-        )
-        return
+    # Ecosystem Siphon Logic (v1.0.1)
+    # 1. First, attempt to siphon advanced contents from the ecosystem if requested
+    if all_skills or bundle or (category and category not in ["core", "essentials"]):
+        _siphon_from_ecosystem(agents_dir, bundle, category, tag)
+    
+    # 2. Local Fallback/Primary Core
+    src_skills_dir = TEMPLATE_DIR / ".agent" / "skills"
+    if src_skills_dir.exists():
+        _copy_local_skills(agents_dir, src_skills_dir, minimal, all_skills, category, tag, bundle)
+    else:
+        console.print("[dim][INFO][/dim] Local template skills not found. Using Siphon Hub fallback.")
 
+def _siphon_from_ecosystem(agents_dir: Path, bundle: str | None, category: str | None, tag: str | None) -> None:
+    """Delegates content acquisition to the Antigravity Awesome Skills ecosystem (npx)."""
+    try:
+        cmd = ["npx", "-y", "antigravity-awesome-skills@latest", "--path", str(agents_dir / "skills")]
+        
+        # Mapping bundle/category/tag to npx args if ecosystem supports them
+        # Note: awesome-skills CLI currently takes --tag for versions, but we can pass names.
+        if bundle:
+            console.print(f"[blue][INFO][/blue] Siphoning bundle: [bold]{bundle}[/bold] from ecosystem...")
+        elif category:
+            console.print(f"[blue][INFO][/blue] Siphoning category: [bold]{category}[/bold] from ecosystem...")
+            
+        # We run it synchronously to ensure skills are present before finishing init
+        import subprocess
+        subprocess.run(cmd, check=True, capture_output=True)
+        console.print("[green][OK][/green] Ecosystem siphon complete.")
+    except Exception as e:
+        console.print(f"[yellow][WARN][/yellow] Ecosystem siphon failed: {e}")
+        console.print("[dim]Falling back to local core templates...[/dim]")
+
+def _copy_local_skills(agents_dir: Path, src_skills_dir: Path, minimal: bool, all_skills: bool, category: str | None, tag: str | None, bundle: str | None = None) -> None:
+    """Directly copy skills from local template directory."""
     catalog = load_catalog()
     catalog_map = {item["name"]: item for item in catalog if "name" in item} if catalog else {}
+    
+    installed_count = 0
+    for skill_path in src_skills_dir.iterdir():
+        if not skill_path.is_dir():
+            continue
+            
+        skill_name = skill_path.name
+        should_include = False
+        
+        if not all_skills and not category and not tag:
+            should_include = skill_name in CORE_SKILLS
+        elif all_skills:
+            should_include = True
+        elif category:
+            skill_data = catalog_map.get(skill_name)
+            should_include = bool(skill_data and skill_data.get("category") == category)
+        elif tag:
+            skill_data = catalog_map.get(skill_name)
+            should_include = bool(skill_data and tag.lower() in [item.lower() for item in skill_data.get("tags", [])])
 
-    with zipfile.ZipFile(src_skills_zip, "r") as archive:
-        files_to_extract = []
-        extracted_skills = set()
-        skill_files = []
+        if should_include:
+            dest_skill_dir = agents_dir / "skills" / skill_name
+            if not dest_skill_dir.exists():
+                shutil.copytree(skill_path, dest_skill_dir)
+                console.print(f"[blue][INFO][/blue] Added local skill: {skill_name}")
+                installed_count += 1
 
-        for file_path in archive.namelist():
-            normalized = file_path.replace("\\", "/")
-            parts = [part for part in normalized.split("/") if part]
-            if len(parts) < 3 or parts[0] != "skills" or parts[-1] != "SKILL.md":
-                continue
-            skill_files.append((file_path, parts[-2]))
-
-        default_mode = not all_skills and not category and not tag
-        has_core_skills = any(name in CORE_SKILLS for _, name in skill_files)
-
-        for file_path, skill_name in skill_files:
-            should_include = False
-            if default_mode:
-                should_include = skill_name in CORE_SKILLS or not has_core_skills
-            elif all_skills:
-                should_include = True
-            elif category:
-                skill_data = catalog_map.get(skill_name)
-                should_include = bool(skill_data and skill_data.get("category") == category)
-            elif tag:
-                skill_data = catalog_map.get(skill_name)
-                should_include = bool(skill_data and tag.lower() in [item.lower() for item in skill_data.get("tags", [])])
-
-            if should_include:
-                files_to_extract.append(file_path)
-                extracted_skills.add(skill_name)
-
-        for member in files_to_extract:
-            normalized = member.replace("\\", "/")
-            parts = [part for part in normalized.split("/") if part]
-            dest_path = agents_dir.joinpath(*parts)
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            with archive.open(member) as src, open(dest_path, "wb") as dst:
-                dst.write(src.read())
-
-        for skill_name in sorted(extracted_skills):
-            console.print(f"[blue][INFO][/blue] Added skill: {skill_name}")
+    if installed_count == 0 and not minimal:
+        console.print("[dim]No matching local skills found for current filters.[/dim]")
 
 
 def _install_recommended_skills(cwd: Path, profile: dict, limit: int = 3) -> list[dict]:
@@ -680,10 +692,11 @@ def _install_recommended_skills(cwd: Path, profile: dict, limit: int = 3) -> lis
 @click.option("--agents-md-only", is_flag=True, help="Only create AGENTS.md")
 @click.option("--all", "all_skills", is_flag=True, help="Install ALL available skills (warning: large)")
 @click.option("--category", help="Install all skills from a specific category (e.g., 'data-ai')")
+@click.option("--bundle", help="Target a specific ecosystem bundle (e.g. 'python-pro', 'web-wizard').")
 @click.option("--template", help="Initialize from a high-performance project template (e.g., 'fastapi-pro', 'nextjs-pro')")
-@click.option("--tag", help="Install all skills with a specific tag (e.g., 'python')")
+@click.option("--tag", help="Install all all skills with a specific tag (e.g., 'python')")
 @click.argument("directory", required=False, type=click.Path(file_okay=False, dir_okay=True, path_type=Path), default=".")
-def init_command(minimal, guided, auto_install, agents_md_only, all_skills, category, tag, template, directory):
+def init_command(minimal, guided, auto_install, agents_md_only, all_skills, category, bundle, tag, template, directory):
     """Initialize .agent and tool-native instruction structure."""
     cwd = directory.resolve() if directory else Path.cwd()
     cwd.mkdir(parents=True, exist_ok=True)
@@ -722,7 +735,7 @@ def init_command(minimal, guided, auto_install, agents_md_only, all_skills, cate
     if agents_md_only:
         return
 
-    _copy_agent_templates(cwd, minimal, all_skills, category, tag)
+    _copy_agent_templates(cwd, minimal, all_skills, category, tag, bundle)
     agents_dir = cwd / ".agent"
     profile = _collect_guided_profile(cwd) if guided else _infer_project_profile(cwd)
     _write_project_artifacts(cwd, agents_dir, profile)

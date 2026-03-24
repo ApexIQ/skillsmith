@@ -48,9 +48,11 @@ When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR
 pip install skillsmith
 ```
 
-### 2. Initialize (Deep Repo Sensing)
+### 2. Initialize (Ecosystem Synergy)
 ```bash
-# Skillsmith scans your DNA, infers your stack, and recommendations a persona-set.
+# Siphon specialized skill packs directly from the 889+ ecosystem.
+skillsmith init --bundle python-pro
+# or guided setup with profile inference
 skillsmith init --guided
 ```
 
