@@ -36,14 +36,26 @@ Shared skill evolution across teams, governance, CI gates, compliance audit trai
 
 ---
 
-## 2) Phase 1: Content Dominance (Weeks 1-3)
+## 2) Phase 1: Ecosystem Dominance (Weeks 1-3)
 
-**Goal:** Match ECC's content depth while maintaining architectural superiority.
-**Success metric:** 500+ GitHub stars, 1000+ PyPI weekly downloads.
+**Goal:** Integrate the **Antigravity Awesome Skills (889+)** as the primary knowledge upstream.
+**Success metric:** 50,000+ GitHub stars (Combined Ecosystem), 10,000+ PyPI downloads.
 
-### 2.1 Core Subagent Skills Library (Week 1)
+### 2.1 The Awesome Skills Siphon (Week 1)
 
-Create 15 production-grade agent persona skills in `.agent/skills/`:
+Instead of building individual skills, we'll implement **Native Integration** with the global skill library:
+- **`skillsmith add --remote awesome`**: Install any skill directly from the `antigravity-awesome-skills` repository.
+- **`npx` Integration**: Unified installer that pre-scaffolds `.agent/skills/` using the awesome library's DNA.
+- **Trust-Verified Catalogs**: Pre-sign the top 100 most used skills from the awesome library for instant **Zero-Configuration Trust**.
+
+### 2.2 Siphon & Evolve (XSkill v1.5) (Week 1-2)
+
+Leverage our **Autonomous Evolution Engine** on the massive 889+ skill pool:
+- **DNA Extraction**: Use `evolve unlabeled` to reverse-engineer the most complex skills in the awesome library.
+- **Benchmark Routing**: Automatically determine which models (Claude 3.5, Gemini 2.0, Deepseek v3) handle specific awesome-skills best.
+- **Persona Swarms**: Group the 889+ skills into specialized **Swarm Persona Packs** (e.g., "Full-Stack Security Team", "Kubernetes Reliability Squad").
+
+### 2.3 Real-World Project Templates (Week 2)
 
 | Skill | Purpose | Inspired By |
 |-------|---------|-------------|
