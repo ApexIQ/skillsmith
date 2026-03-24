@@ -159,8 +159,10 @@ zip_library.py
 "# MCP Python SDK.txt"
 .agent/snapshots/
 .agent/temp/
+.agent/evals/
 temp_skills/
 temp_full_skills/
+temp_ext/
 .agent/autonomy_snapshots/
 
 # Local runtime/index caches and traces
