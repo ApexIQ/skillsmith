@@ -56,6 +56,10 @@ When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR
 
 ### 1. Install
 ```bash
+# Standard installation
+pip install skillsmith
+
+# Or with full MCP support (for Claude/Cursor integration)
 pip install "skillsmith[mcp]"
 ```
 
