@@ -111,10 +111,10 @@ skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"
 
 Skillsmith injects a specialized command surface into your AI tools:
 
-- `/swarm` — Decompose massive goals into parallelized agent graphs.
-- `/team-exec` — Execute missions with structured roles (O-R-I-R).
+- `/swarm` — Decompose massive goals into parallelized agent graphs with integrated Thinking Tree artifacts in `.agent/TREE.md`.
+- `/team-exec` — Execute missions with structured roles (O-R-I-R) and stateful `MISSION.md` updates.
 - `/evolve` — Capture structural engineering patterns from experience.
-- `/tree` — Strategic recursive reasoning for deep goal resolution.
+- `/tree` — Strategic recursive reasoning for deep goal resolution; now supports `--output` for sharing strategic paths.
 - `/ready` — High-speed pre-release sanity check (Git, Profile, Index).
 
 ---
