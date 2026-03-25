@@ -190,6 +190,8 @@ lab_test*/
 ghost_test_lab/
 error.txt
 .uv-cache/
+lab/
+skills-test-lab/
 
 # Essential Library Assets (Explicitly allow for packaging)
 !AGENTS.md

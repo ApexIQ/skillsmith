@@ -1,0 +1,183 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://skillsmith.sh",
+  "elements": [
+    {
+      "id": "node1",
+      "type": "rectangle",
+      "x": 100,
+      "y": 100,
+      "width": 250,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roundness": { "type": 3 }
+    },
+    {
+      "id": "text1",
+      "type": "text",
+      "x": 125,
+      "y": 140,
+      "width": 200,
+      "height": 20,
+      "text": "LEVEL 1: INDUCTION",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "center"
+    },
+    {
+      "id": "node2",
+      "type": "rectangle",
+      "x": 400,
+      "y": 100,
+      "width": 250,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#c9ffeb",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roundness": { "type": 3 }
+    },
+    {
+      "id": "text2",
+      "type": "text",
+      "x": 425,
+      "y": 140,
+      "width": 200,
+      "height": 20,
+      "text": "LEVEL 2: INTELLIGENCE",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "center"
+    },
+    {
+      "id": "node3",
+      "type": "rectangle",
+      "x": 700,
+      "y": 100,
+      "width": 250,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ebc9ff",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roundness": { "type": 3 }
+    },
+    {
+      "id": "text3",
+      "type": "text",
+      "x": 725,
+      "y": 140,
+      "width": 200,
+      "height": 20,
+      "text": "LEVEL 3: ACQUISITION",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "center"
+    },
+    {
+      "id": "node4",
+      "type": "rectangle",
+      "x": 700,
+      "y": 300,
+      "width": 250,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#c9e3ff",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roundness": { "type": 3 }
+    },
+    {
+      "id": "text4",
+      "type": "text",
+      "x": 725,
+      "y": 340,
+      "width": 200,
+      "height": 20,
+      "text": "LEVEL 4: EXECUTION",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "center"
+    },
+    {
+      "id": "node6",
+      "type": "rectangle",
+      "x": 400,
+      "y": 300,
+      "width": 250,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffdada",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roundness": { "type": 3 }
+    },
+    {
+      "id": "text6",
+      "type": "text",
+      "x": 425,
+      "y": 340,
+      "width": 200,
+      "height": 20,
+      "text": "LEVEL 5: CMD CENTER",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "center"
+    },
+    {
+      "id": "node5",
+      "type": "rectangle",
+      "x": 100,
+      "y": 300,
+      "width": 250,
+      "height": 100,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff0c9",
+      "fillStyle": "hachure",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roundness": { "type": 3 }
+    },
+    {
+      "id": "text5",
+      "type": "text",
+      "x": 125,
+      "y": 340,
+      "width": 200,
+      "height": 20,
+      "text": "LEVEL 6: EVOLUTION",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "center"
+    },
+    {
+      "id": "arrow1", "type": "arrow", "x": 350, "y": 150, "width": 50, "height": 0, "points": [[0, 0], [50, 0]], "strokeColor": "#1e1e1e"
+    },
+    {
+      "id": "arrow2", "type": "arrow", "x": 650, "y": 150, "width": 50, "height": 0, "points": [[0, 0], [50, 0]], "strokeColor": "#1e1e1e"
+    },
+    {
+      "id": "arrow3", "type": "arrow", "x": 825, "y": 200, "width": 0, "height": 100, "points": [[0, 0], [0, 100]], "strokeColor": "#1e1e1e"
+    },
+    {
+      "id": "arrow4", "type": "arrow", "x": 700, "y": 350, "width": -50, "height": 0, "points": [[0, 0], [-50, 0]], "strokeColor": "#1e1e1e"
+    },
+    {
+      "id": "arrow5", "type": "arrow", "x": 400, "y": 350, "width": -50, "height": 0, "points": [[0, 0], [-50, 0]], "strokeColor": "#1e1e1e"
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": null
+  },
+  "files": {}
+}

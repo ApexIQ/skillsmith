@@ -274,4 +274,7 @@ from .safety import safety_command
 from .tree import tree_command
 from .swarm import swarm_command, team_exec_command
 from .search_cmd import search_command
+from .understand import understand_command
+from .commands_cmd import commands_command
+from .cookbook_cmd import cookbook_command
 

@@ -106,15 +106,26 @@ skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"
 
 ---
 
+## 🌍 Codebase Knowledge (CK) Bridge
+Skillsmith now integrates **Architectural Intelligence** through the CK Bridge. By running `skillsmith understand sync --deep`, the system builds a high-fidelity **Knowledge Graph** of your repository, enabling subagents to detect architectural hotspots and hotspots before they plan a mission.
+
+---
+
+## 🍱 Onboarding & Documentation
+For new users and teams, we have introduced a comprehensive learning path:
+
+1.  **[Bit-by-Bit Guide](docs/BIT_BY_BIT_GUIDE.md)**: A level-up journey from basic induction to autonomous evolution.
+2.  **[The Mission Cookbook](docs/COOKBOOK.md)**: 50+ real-world recipes (Goal/Tools/Recipe/Signal) for building complex software.
+3.  **[Command Registry](docs/BIT_BY_BIT_GUIDE.md#appendix-the-complete-command-registry)**: Full 77+ command map (CLI + Slash).
+
+---
+
 ## 🤖 Power Commands for Top-Tier Performance
 
-Skillsmith injects a specialized command surface into your AI tools:
-
-- `/swarm` — Decompose massive goals into parallelized agent graphs.
-- `/team-exec` — Execute missions with structured roles (O-R-I-R).
-- `/evolve` — Trigger self-healing or capture new patterns.
-- `/metrics` — Visualize skill reliability and degradation trends.
-- `/serve` — Start the MCP server for agentic tools.
+- `skillsmith start` — Bootstrap a new repo to readiness in one command.
+- `skillsmith commands` — Unified God-View of all 77+ terminal and chat commands.
+- `skillsmith cookbook` — Instant preview of mission recipes.
+- `skillsmith understand` — Sync architectural intelligence (CK).
 
 ---
 

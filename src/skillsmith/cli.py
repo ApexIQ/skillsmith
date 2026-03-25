@@ -37,14 +37,20 @@ from .commands import (
     swarm_command,
     team_exec_command,
     search_command,
+    understand_command,
 )
 from .commands.ready import ready_command
 from .commands.start import start_command
+from .commands import commands_command, cookbook_command
 
 @click.group()
 @click.version_option(version=__version__, prog_name="skillsmith")
 def main():
-    """Agentic Skills Library CLI"""
+    """Agentic Skills Library CLI.
+    
+    - 'skillsmith commands': List all Management (CLI) and Agentic (/) commands.
+    - 'skillsmith cookbook': Navigate 50+ Mission Recipes for your agent.
+    """
     pass
 
 # Wire the modular commands
@@ -86,6 +92,9 @@ main.add_command(tree_command, name="tree")
 main.add_command(swarm_command, name="swarm")
 main.add_command(team_exec_command, name="team-exec")
 main.add_command(search_command, name="search")
+main.add_command(understand_command, name="understand")
+main.add_command(commands_command, name="commands")
+main.add_command(cookbook_command, name="cookbook")
 
 if __name__ == "__main__":
     main()

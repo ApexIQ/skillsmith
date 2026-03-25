@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 try:
     from importlib.metadata import version as _package_version
@@ -11,9 +11,9 @@ if _package_version is not None:
     try:
         __version__ = _package_version("skillsmith")
     except Exception:
-        __version__ = "0.6.9"
+        __version__ = "1.1.1"
 else:
-    __version__ = "0.6.9"
+    __version__ = "1.1.1"
 
 __all__ = ["__version__", "compose_workflow", "doctor_summary", "init_project"]
 

@@ -41,20 +41,20 @@ Shared skill evolution across teams, governance, CI gates, compliance audit trai
 **Goal:** Integrate the **Antigravity Awesome Skills (889+)** as the primary knowledge upstream.
 **Success metric:** 50,000+ GitHub stars (Combined Ecosystem), 10,000+ PyPI downloads.
 
-### 2.1 The Ghost-Sync Engine (Week 1)
+### 2.1 The Ghost-Sync Engine (Week 1) [DONE]
 
 Instead of building individual skills, we'll implement **Native Integration** with the global skill library:
 - [x] **Ghost Branch Sync**: Sovereign Python-managed distribution of 889+ skills (👻 ghost-content) - v1.0.3.
-- **`skillsmith add --remote awesome`**: Install any skill directly from our sovereign ghost branch.
-- **Python-Native Integration**: Unified installer that pre-scaffolds `.agent/skills/` using the awesome library's DNA.
-- **Trust-Verified Catalogs**: Pre-sign the top 100 most used skills from the awesome library for instant **Zero-Configuration Trust**.
+- [x] **`skillsmith add --remote awesome`**: Install any skill directly from our sovereign ghost branch.
+- [x] **Python-Native Integration**: Unified installer that pre-scaffolds `.agent/skills/` using the awesome library's DNA.
+- [x] **Trust-Verified Catalogs**: Pre-sign the top 100 most used skills from the awesome library for instant **Zero-Configuration Trust**.
 
-### 2.2 Sync & Evolve (XSkill v1.5) (Week 1-2)
+### 2.2 Sync & Evolve (XSkill v1.5) (Week 1-2) [DONE]
 
 Leverage our **Autonomous Evolution Engine** on the massive 889+ skill pool:
-- **DNA Extraction**: Use `evolve unlabeled` to reverse-engineer the most complex skills in the awesome library.
-- **Benchmark Routing**: Automatically determine which models (Claude 3.5, Gemini 2.0, Deepseek v3) handle specific awesome-skills best.
-- **Persona Swarms**: Group the 889+ skills into specialized **Swarm Persona Packs** (e.g., "Full-Stack Security Team", "Kubernetes Reliability Squad").
+- [x] **DNA Extraction**: Use `evolve unlabeled` to reverse-engineer the most complex skills in the awesome library.
+- [x] **Benchmark Routing**: Automatically determine which models (Claude 3.5, Gemini 2.0, Deepseek v3) handle specific awesome-skills best.
+- [x] **Persona Swarms**: Group the 889+ skills into specialized **Swarm Persona Packs** (e.g., "Full-Stack Security Team", "Kubernetes Reliability Squad").
 
 ### 2.3 Real-World Project Templates (Week 2)
 
@@ -130,6 +130,27 @@ Expand `.agent/workflows/` command bundles from current set to 33+:
 - [x] `skillsmith add --remote awesome` support
 - [x] Dynamic `SKILL.md` path resolution
 
+### 2.6 Architectural Intelligence (CK Bridge - Codebase Knowledge) [DONE]
+
+Integrate the **CK** knowledge-graph pipeline (formerly UA) as the primary discovery engine:
+- [x] **`skillsmith understand sync --deep`**: Native ingestion of the CK `knowledge-graph.json`. Moving from simple file-scanning to multi-agent architectural relationship mapping.
+- [x] **Architectural Matchmaking**: Automatically recommend skills based on CK-discovered hotspots (e.g., "High-complexity dependency node detected in `auth/gateway.py`, recommending `security-audit` skill").
+- [x] **DNA Extraction (CK v2)**: Use CK natural language summaries as the base ground truth for synthesizing new `SKILL.md` files from raw source code.
+
+### 2.7 Command-by-Command Integration Map (CK Hooks) [DONE]
+
+To move from heuristic inference to architectural intelligence, we've implemented the **CK (Codebase Knowledge)** "Knowledge Hooks" into the core Skillsmith codebase:
+
+| Skillsmith Command | CK Integration Point (The Hook) | Implementation Benefit |
+| :--- | :--- | :--- |
+| **`init`** | `init_project` -> `_infer_project_profile` | **Intelligent Scaffolding**: Replaces basic glob-scanning with CK's structural analysis to correctly assign subagent personas. [DONE] |
+| **`sync`** | `sync_command` | **Deep Relationship Sync**: Ingests `ck/knowledge-graph.json` to detect architectural hotspots and recommend deep-context skill packs. [DONE] |
+| **`ready`** | `_run_ready_flow` | **Structural Gatekeeping**: Adds `CK_Impact_Audit`. Fails the gate if uncommitted changes violate defined layer boundaries (e.g., UI calling DB). [DONE] |
+| **`evolve`** | `prepare_repair_plan` | **Diagnostic Grounding**: Instead of generic "success rate" fixes, repair plans include architectural corrections (e.g., "Failure: Layer Violation"). [DONE] |
+| **`metrics`** | `mcp_server.py` and `metrics.py` | **The Visual HUD**: Feeds per-skill reliability/throughput data as a "Health Overlay" on CK's React codebase dashboard. [DONE] |
+| **`compose`** | `compose_workflow` | **Dependency Planning**: Calls CK-Chat during "Discover" to clarify code dependencies before generating the executable task graph. [DONE] |
+| **`understand`** | `understand_command` | **Automated Insight**: Triggers the CK scanner and fallbacks to a structural baseline if the knowledge graph is missing. [DONE] |
+
 ---
 
 ## Phase 3: Frontiers of Scaling (Week 4-6) [ACTIVE]
@@ -139,23 +160,23 @@ Expand `.agent/workflows/` command bundles from current set to 33+:
 - [x] Ghost sync from sovereign branch
 - [x] Logic for `ghost-content` integrity
 
-### 3.2 Recursive Reasoning (Thinking Trees) [PLANNING]
-- Refine AND/OR logic for complex migrations.
-- Link Thinking Tree to Swarm Orchestration.
+### 3.2 Recursive Reasoning (Thinking Trees) [DONE]
+- [x] Refine AND/OR logic for complex migrations (`_is_complex_goal` + `Strategic OR branches`).
+- [x] Link Thinking Tree to Swarm Orchestration (`swarm plan` integrated with `workflow_engine`).
 
 ---
 
 ## Phase 4: Workflow Swarms (Week 7-9) [ACTIVE]
 
-### 4.1 Swarm Orchestration (`/swarm`) [INITIALIZED]
+### 4.1 Swarm Orchestration (`/swarm`) [DONE]
 - [x] CLI command `skillsmith swarm plan`
-- [x] Swarm assignments logic (simulated)
+- [x] Swarm assignments logic (simulated/agentic)
 - [x] Specialized role mapping (Orchestrator, Researcher, etc.)
 
-### 4.2 Team Execution (`/team-exec`) [INITIALIZED]
+### 4.2 Team Execution (`/team-exec`) [DONE]
 - [x] CLI command `skillsmith team-exec`
 - [x] Initial handoff logic skeleton
-- [ ] Integration with .agent/MISSION.md for real state handoffs
+- [x] Integration with .agent/MISSION.md for real state handoffs
 
 **Finding:** The upstream repository `benjaminasterA/antigravity-awesome-skills` contains an extremely structured `skills_index.json` and `CATALOG.md` that categorizes thousands of skills, tags, and AI commands (like `/plan`, `/implement`). Right now, developers manually hunt for categories in this external repo.
 
@@ -171,7 +192,7 @@ Expand `.agent/workflows/` command bundles from current set to 33+:
 **Goal:** Build the skill evolution engine that makes skillsmith the only tool where skills get smarter over time — with trust guarantees.
 **Success metric:** Measurable skill quality improvement after 100+ task executions.
 
-### 3.1 Skill Quality Metrics System (Week 4)
+### 3.1 Skill Quality Metrics System (Week 4) [DONE]
 
 Add per-skill execution telemetry to `skills.lock.json`:
 
@@ -195,9 +216,9 @@ Add per-skill execution telemetry to `skills.lock.json`:
 ```
 
 **New commands:**
-- `skillsmith metrics` — Show quality dashboard for all installed skills
-- `skillsmith metrics <skill>` — Deep dive on one skill's performance
-- `skillsmith metrics --export` — Export metrics for CI/analytics
+- [x] `skillsmith metrics` — Show quality dashboard for all installed skills
+- [x] `skillsmith metrics <skill>` — Deep dive on one skill's performance
+- [x] `skillsmith metrics --export` — Export metrics for CI/analytics
 
 ### 3.2 Evolution Engine Core (Week 4-5) [DONE]
 
@@ -237,6 +258,13 @@ skillsmith evolve --mode capture
 - Anti-loop guards cap evolution frequency (max 3 per skill per day)
 - Validation against existing test cases before replacing predecessors
 - Full diff history in `.agent/skills/<name>/versions/` with version DAG
+
+### 3.6 Impact-Aware Evolution (CK Validator) [DONE]
+
+Leverage CK's **Diff Impact Analysis** to safeguard the self-healing loop:
+- [x] **Pre-Repair Validation**: Before `skillsmith evolve --mode fix` applies a patch, call CK's codebase-analyzer to verify the repair doesn't break architectural invariants.
+- [x] **Visual Evolution (The HUD)**: Integrate Skillsmith metrics directly into the CK web dashboard. Node overlays will show "Skill Health" and "Last Evolved" data over architectural components.
+- [x] **Onboarding Swarms**: Convert CK's `/understand-onboard` guides into stateful Skillsmith `workflows` for team execution.
 
 ### 3.3 Version DAG & Lineage Tracking (Week 5) [DONE]
 
@@ -537,13 +565,13 @@ skillsmith compose "explore new API" --mode research
 - [x] Complete Phase 1 content library (15 subagent skills)
 - [x] Language-specific starter packs (8 packs)
 - [x] Real-world project templates (8 templates)
-- [ ] Slash command expansion (25+ commands)
+- [x] Slash command expansion (47+ commands)
 
 ### Do Next (Next Sprint)
-- [ ] Skill quality metrics system
-- [ ] Evolution engine core (FIX/DERIVE/CAPTURE)
-- [ ] Version DAG & lineage tracking
-- [ ] Post-execution analysis hook
+- [x] Skill quality metrics system
+- [x] Evolution engine core (FIX/DERIVE/CAPTURE)
+- [x] Version DAG & lineage tracking
+- [x] Post-execution analysis hook
 
 ### Do After PMF Signal
 - [ ] Team skill marketplace

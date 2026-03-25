@@ -204,12 +204,15 @@ def _detect_priorities(cwd: Path, app_type: str) -> list[str]:
 
 
 def _infer_project_profile(cwd: Path) -> dict:
+    from ..services.graph_bridge import GraphBridge
+
     languages = _detect_languages(cwd)
     frameworks = _detect_frameworks(cwd)
     package_manager = _detect_package_manager(cwd)
     build_commands, test_commands = _detect_commands(cwd, package_manager)
     app_type = _detect_app_type(cwd, frameworks, languages)
-    return {
+    
+    profile = {
         "idea": "Project using skillsmith",
         "project_stage": _detect_project_stage(cwd),
         "app_type": app_type,
@@ -236,6 +239,13 @@ def _infer_project_profile(cwd: Path) -> dict:
         "build_commands": build_commands,
         "test_commands": test_commands,
     }
+
+    # Intelligent Scaffolding: Ingest CK Knowledge Graph if available
+    bridge = GraphBridge(cwd)
+    if bridge.has_knowledge_graph():
+        profile = bridge.sync_to_profile(profile)
+
+    return profile
 
 
 def _merge_profile(existing: dict, inferred: dict) -> dict:
@@ -665,35 +675,59 @@ def _merge_ghost_skills(src: Path, dst: Path) -> None:
         else:
             shutil.copy2(item, target)
 
+class _LocalSkillCandidate:
+    def __init__(self, name, version="1.0.0", category="core", tags=None, metadata=None):
+        self.name = name
+        self.source = "local"
+        self.version = version
+        self.install_ref = "."
+        self.trust_score = 100
+        self.category = category
+        self.tags = tags or []
+        self.metadata = metadata or {}
+
+
 def _copy_local_skills(agents_dir: Path, src_skills_dir: Path, minimal: bool, all_skills: bool, category: str | None, tag: str | None, bundle: str | None = None) -> None:
     """Directly copy skills from local template directory."""
+    cwd = agents_dir.parent
     catalog = load_catalog()
     catalog_map = {item["name"]: item for item in catalog if "name" in item} if catalog else {}
-    
+
     installed_count = 0
     for skill_path in src_skills_dir.iterdir():
         if not skill_path.is_dir():
             continue
-            
+
         skill_name = skill_path.name
         should_include = False
-        
+
+        skill_data = catalog_map.get(skill_name) or {}
+
         if not all_skills and not category and not tag:
             should_include = skill_name in CORE_SKILLS
         elif all_skills:
             should_include = True
         elif category:
-            skill_data = catalog_map.get(skill_name)
-            should_include = bool(skill_data and skill_data.get("category") == category)
+            should_include = bool(skill_data.get("category") == category)
         elif tag:
-            skill_data = catalog_map.get(skill_name)
-            should_include = bool(skill_data and tag.lower() in [item.lower() for item in skill_data.get("tags", [])])
+            should_include = bool(tag.lower() in [item.lower() for item in skill_data.get("tags", [])])
 
         if should_include:
             dest_skill_dir = agents_dir / "skills" / skill_name
             if not dest_skill_dir.exists():
                 shutil.copytree(skill_path, dest_skill_dir)
                 console.print(f"[blue][INFO][/blue] Added local skill: {skill_name}")
+
+                # Record in lockfile (Fixes empty lockfile issue)
+                candidate = _LocalSkillCandidate(
+                    name=skill_name,
+                    version=skill_data.get("version", "1.0.0"),
+                    category=skill_data.get("category", "core"),
+                    tags=skill_data.get("tags", []),
+                    metadata=skill_data.get("metadata", {})
+                )
+                record_skill_install(cwd, candidate, dest_skill_dir)
+
                 installed_count += 1
 
     if installed_count == 0 and not minimal:
