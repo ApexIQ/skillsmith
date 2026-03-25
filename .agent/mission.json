@@ -1,0 +1,157 @@
+{
+  "kind": "swarm-mission",
+  "swarm_id": "54ff7eac",
+  "goal": "Refactor the entire core engine architecture to use async/await",
+  "status": "ACTIVE",
+  "created_at": "e2d6906e-8230-4e26-a1c1-962a477601c5",
+  "assignments": [
+    {
+      "step_id": 1,
+      "task": "DISCOVER: Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.",
+      "stage": "discover",
+      "node_type": "AND",
+      "role": "Orchestrator",
+      "persona_skill": "agent_collaboration",
+      "assigned_agent": "Orchestrator-1",
+      "dependencies": [],
+      "status": "pending",
+      "artifacts": []
+    },
+    {
+      "step_id": 2,
+      "task": "PLAN: Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+      "stage": "plan",
+      "node_type": "OR",
+      "role": "Researcher",
+      "persona_skill": "how_to_research",
+      "assigned_agent": "Researcher-1",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "artifacts": [],
+      "strategies": [
+        {
+          "id": "strategy_a",
+          "name": "Standard Recursive Approach",
+          "objectives": [
+            "Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+            "Name the touched files or subsystems before any edit is made.",
+            "Record the chosen execution mode and retry budget for the run."
+          ],
+          "node_type": "AND"
+        },
+        {
+          "id": "strategy_b",
+          "name": "Iterative Decomposition",
+          "objectives": [
+            "Fallback: Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+            "Fallback: Name the touched files or subsystems before any edit is made.",
+            "Fallback: Record the chosen execution mode and retry budget for the run."
+          ],
+          "node_type": "AND",
+          "recovery_trigger": "If Strategy A enters 'Failed' state due to depth or complexity limits."
+        }
+      ]
+    },
+    {
+      "step_id": 3,
+      "task": "BUILD: Implement the smallest coherent change needed for the goal.",
+      "stage": "build",
+      "node_type": "OR",
+      "role": "Implementer",
+      "persona_skill": "software_lifecycle",
+      "assigned_agent": "Implementer-1",
+      "dependencies": [
+        2
+      ],
+      "status": "pending",
+      "artifacts": [],
+      "strategies": [
+        {
+          "id": "strategy_a",
+          "name": "Direct Implementation",
+          "objectives": [
+            "Implement the smallest coherent change needed for the goal.",
+            "Keep edits scoped to the selected files and avoid unrelated refactors.",
+            "For debug goals, reproduce the issue and capture the failing behavior.",
+            "For brainstorm goals, compare the candidate approaches and choose the recommended path."
+          ],
+          "node_type": "AND"
+        },
+        {
+          "id": "strategy_b",
+          "name": "Isolated Module Prototype",
+          "objectives": [
+            "Fallback: Implement the smallest coherent change needed for the goal.",
+            "Fallback: Keep edits scoped to the selected files and avoid unrelated refactors.",
+            "Fallback: For debug goals, reproduce the issue and capture the failing behavior.",
+            "Fallback: For brainstorm goals, compare the candidate approaches and choose the recommended path."
+          ],
+          "node_type": "AND",
+          "recovery_trigger": "If Strategy A enters 'Failed' state due to depth or complexity limits."
+        }
+      ]
+    },
+    {
+      "step_id": 4,
+      "task": "REVIEW: Inspect the changed files for correctness, regressions, and missing coverage.",
+      "stage": "review",
+      "node_type": "AND",
+      "role": "Reviewer",
+      "persona_skill": "code_review",
+      "assigned_agent": "Reviewer-1",
+      "dependencies": [
+        3
+      ],
+      "status": "pending",
+      "artifacts": []
+    },
+    {
+      "step_id": 5,
+      "task": "TEST: Run the relevant automated tests for the changed workflow behavior.",
+      "stage": "test",
+      "node_type": "AND",
+      "role": "Orchestrator",
+      "persona_skill": "agent_collaboration",
+      "assigned_agent": "Orchestrator-2",
+      "dependencies": [
+        4
+      ],
+      "status": "pending",
+      "artifacts": []
+    },
+    {
+      "step_id": 6,
+      "task": "SHIP: Make the workflow output usable as a release-grade handoff artifact.",
+      "stage": "ship",
+      "node_type": "AND",
+      "role": "Researcher",
+      "persona_skill": "how_to_research",
+      "assigned_agent": "Researcher-2",
+      "dependencies": [
+        5
+      ],
+      "status": "pending",
+      "artifacts": []
+    },
+    {
+      "step_id": 7,
+      "task": "REFLECT: Summarize what the evidence says about the current run.",
+      "stage": "reflect",
+      "node_type": "AND",
+      "role": "Implementer",
+      "persona_skill": "software_lifecycle",
+      "assigned_agent": "Implementer-2",
+      "dependencies": [
+        6
+      ],
+      "status": "pending",
+      "artifacts": []
+    }
+  ],
+  "tree_metadata": {
+    "execution_mode": "standard",
+    "reflection_max_retries": 0
+  }
+}

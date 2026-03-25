@@ -1,0 +1,11 @@
+{
+  "name": "regression_test_pack",
+  "tasks": [
+    {
+      "id": "task_1",
+      "title": "Regression Test Task",
+      "goal": "Test skill repair in autonomous loop",
+      "expected_skills": ["test_repair_skill"]
+    }
+  ]
+}

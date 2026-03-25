@@ -938,6 +938,12 @@ def _artifact_summary_rows(output_dir: Path) -> tuple[list[dict], dict]:
     default=False,
     help="Disable automatic CI policy enforcement even when CI=true.",
 )
+@click.option(
+    "--auto-evolve",
+    is_flag=True,
+    default=False,
+    help="Trigger skill repair analysis on evaluation regression.",
+)
 def eval_command(
     input_path: str,
     pack: str | None,
@@ -947,6 +953,7 @@ def eval_command(
     max_latency_increase_ms: float | None,
     max_cost_increase_usd: float | None,
     no_ci_policy: bool,
+    auto_evolve: bool,
 ):
     """Summarize run metrics and persist an eval artifact."""
     ctx = click.get_current_context()
@@ -961,6 +968,7 @@ def eval_command(
         max_latency_increase_ms=max_latency_increase_ms,
         max_cost_increase_usd=max_cost_increase_usd,
         no_ci_policy=no_ci_policy,
+        auto_evolve=auto_evolve,
     )
 
 
@@ -974,6 +982,7 @@ def _run_eval(
     max_latency_increase_ms: float | None = None,
     max_cost_increase_usd: float | None = None,
     no_ci_policy: bool = False,
+    auto_evolve: bool = False,
 ):
     """Internal run implementation used by top-level and subcommand modes."""
     cwd = Path.cwd()
@@ -1050,7 +1059,28 @@ def _run_eval(
     if gate.get("enabled"):
         passed = _print_gate_status(trend, gate)
         if not passed:
+            # TRIGGER: Eval-to-Evolve Bridge (Phase 3.5)
+            if auto_evolve:
+                _trigger_auto_evolution(cwd, summary, pack_payload)
+            
             click.get_current_context().exit(1)
+
+
+def _trigger_auto_evolution(cwd: Path, summary: dict, pack_payload: dict | None) -> None:
+    """Invokes the Evolution Engine to propose repairs for degraded skills."""
+    from ..services.evolution import EvolutionEngine
+    
+    console.print("\n[bold yellow]Eval-to-Evolve Bridge:[/bold yellow] Regression detected. Analyzing skills for repair...")
+    engine = EvolutionEngine(cwd)
+    
+    # Use centralized trigger logic
+    packets = engine.trigger_evolution_from_metrics(summary)
+    
+    if not packets:
+        console.print("[dim]No specific skill degradation patterns identified for auto-repair.[/dim]")
+    else:
+        for packet in packets:
+            console.print(f"  [cyan][EVOLVE][/cyan] Repair packet generated: {packet.name}")
 
 
 def _get_output_dir_from_context(default: str) -> str:
@@ -1111,6 +1141,12 @@ def _get_output_dir_from_context(default: str) -> str:
     default=False,
     help="Disable automatic CI policy enforcement even when CI=true.",
 )
+@click.option(
+    "--auto-evolve",
+    is_flag=True,
+    default=False,
+    help="Trigger skill repair analysis on evaluation regression.",
+)
 def eval_run_command(
     input_path: str,
     pack: str | None,
@@ -1120,6 +1156,7 @@ def eval_run_command(
     max_latency_increase_ms: float | None,
     max_cost_increase_usd: float | None,
     no_ci_policy: bool,
+    auto_evolve: bool,
 ):
     """Run evaluation and write an artifact."""
     _run_eval(
@@ -1131,6 +1168,7 @@ def eval_run_command(
         max_latency_increase_ms=max_latency_increase_ms,
         max_cost_increase_usd=max_cost_increase_usd,
         no_ci_policy=no_ci_policy,
+        auto_evolve=auto_evolve,
     )
 
 
@@ -1248,6 +1286,12 @@ def eval_dashboard_command():
     default=False,
     help="Disable automatic CI policy enforcement even when CI=true.",
 )
+@click.option(
+    "--auto-evolve",
+    is_flag=True,
+    default=False,
+    help="Trigger skill repair analysis on evaluation regression.",
+)
 def eval_compare_command(
     baseline_path: str,
     candidate_path: str,
@@ -1255,6 +1299,7 @@ def eval_compare_command(
     max_latency_increase_ms: float | None,
     max_cost_increase_usd: float | None,
     no_ci_policy: bool,
+    auto_evolve: bool,
 ):
     """Compare two eval artifacts and print deltas."""
     baseline_file = Path(baseline_path)

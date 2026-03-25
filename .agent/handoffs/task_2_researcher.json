@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 2,
+  "role": "Researcher",
+  "assigned_skill": ".agent/skills/how_to_research/SKILL.md",
+  "objective": "Confirm the requested goal against the current project stage and target tools.",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      1
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "3f11cb61-f15c-4358-9be3-37e8725013c0"
+}

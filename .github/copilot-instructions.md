@@ -8,6 +8,7 @@
 ## Required Context
 - `AGENTS.md`
 - `.agent/STATE.md`
+- `.agent/lessons.md`
 - `.agent/project_profile.yaml`
 - `.agent/context/project-context.md`
 - Trusted publisher public keys: none

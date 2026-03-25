@@ -6,7 +6,7 @@
 
 ## Prime Directives
 
-1. Read `AGENTS.md` and `.agent/STATE.md` first.
+1. Read `AGENTS.md`, `.agent/STATE.md`, and `.agent/lessons.md` first.
 2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
 3. Read `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
 4. Search `.agent/skills/` before implementation.
@@ -38,14 +38,13 @@
 
 ## Memory and Cost Policy
 
-- Preserve a library-first default path; no mandatory hosted infra for core usage.
-- Prefer retrieval reuse and cheap context operations before model-heavy loops.
-- Use the five-layer memory reliability pattern:
-  1. observer capture
-  2. reflector compaction
-  3. session recovery
-  4. reactive watcher refresh
-  5. pre-compaction safeguard
+- Library-First: `skillsmith` is the source of truth for memory.
+- **Mandatory Memory Protocol**:
+  - Read `.agent/lessons.md` (Layer 2) for long-term project memory and past mistakes.
+  - Log tactical events to `.agent/logs/raw_events.jsonl` (Layer 1).
+- **Autonomous Evolution**:
+  - Run `skillsmith evolve reflect` after multi-step missions to distill logs into lessons.
+- Use the five-layer pattern: observer, reflector, recovery, watcher, safeguard.
 - Cache reuse must be guarded by TTL and context/policy fingerprints.
 
 ## Role Use
@@ -66,6 +65,7 @@
 @.agent/PROJECT.md
 @.agent/STATE.md
 @.agent/ROADMAP.md
+@.agent/lessons.md
 @.agent/project_profile.yaml
 @.agent/context/project-context.md
 

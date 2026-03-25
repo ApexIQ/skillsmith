@@ -3,7 +3,7 @@
 <img src="skillsmith_hero_banner_1774380976071.png" width="100%" alt="Skillsmith Hero Banner">
 
 # ⚡ Skillsmith: The Agentic OS
-### The $100M Infrastructure Layer for AI-Assisted Engineering
+### The Infrastructure Layer for AI-Assisted Engineering
 
 [![PyPI version](https://img.shields.io/pypi/v/skillsmith.svg?color=blue&style=flat-square)](https://pypi.org/project/skillsmith/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -36,9 +36,17 @@ Stop hunting for prompts. Use `skillsmith search` to query the sovereign **Ghost
 ### 🐝 Multi-Agent Swarm Orchestration
 Stop running in single-agent loops. Skillsmith can decompose massive goals into **Parallelized Task Graphs** (`skillsmith swarm plan`), assigning specialized roles (**Orchestrator, Researcher, Implementer, Reviewer**) to coordinate complex missions across multiple agent threads via `skillsmith team-exec`.
 
-### 🧬 Autonomous Evolution (XSkill)
-Your project instructions should learn from your wins. Use `skillsmith evolve` to capture structural engineering patterns from your Git history or raw source code. Skillsmith translates developer experience into repeatable, benchmarked agent skills automatically.
+### 🧬 Autonomous Self-Healing (v1.1.0+)
+Skillsmith now autonomously detects performance regressions. If a benchmark score falls below threshold, the **Self-Correction Loop** automatically generates repair packets and applies logic patches to your `SKILL.md` library.
 
+### 🔌 MCP Native Support (Zero Context Bloat)
+Expose your entire skill library to any AI tool (Claude Desktop, Cursor, Gemini) via the **Skillsmith MCP Server**.
+```bash
+# Start the MCP server (stdio for local agents)
+skillsmith serve
+```
+
+---
 ### 🌲 Recursive Thinking Trees
 When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR Thinking Trees** (`skillsmith tree`) to resolve goals, exploring multiple implementation paths and strategy fallbacks before a single line of bad code is written.
 
@@ -48,39 +56,30 @@ When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR
 
 ### 1. Install
 ```bash
-pip install skillsmith
+pip install "skillsmith[mcp]"
 ```
 
 ### 2. Initialize (Sovereign Ghost-Sync)
 ```bash
-# Sync 889+ expert skill packs natively (No Node/NPX required!)
+# Sync 889+ expert skill packs natively
 skillsmith init --bundle python-pro
-# or guided setup with structural profiling
-skillsmith init --guided
 ```
 
-### 3. Search & Install (Global Ecosystem) 🌍
-Explore 889+ expert skills archived in our sovereign ghost-content branch.
+### 3. Evolve & Self-Heal (v1.1.0) 🌌🧪
+Skillsmith now monitors its own accuracy.
 ```bash
-# Search for skills (v1.0.8+)
-skillsmith search --categories
-skillsmith search "authentication" --limit 5
+# Run benchmark and auto-repair degraded skills
+skillsmith eval --auto-evolve
 
-# Install directly from the sovereign index
-skillsmith add --remote awesome next-js-expert
+# Manually trigger a fix for a specific skill
+skillsmith evolve --mode fix --name python-expert
 ```
 
-### 4. Evolve & Evaluate (Phase 2.2) 🌌🧪
-Skillsmith isn't static. It autonomously captures patterns from your Git history and **scores** your entire skill library (including Ghost Skills) against industry standards.
-
+### 4. Serve your Library (MCP) 🔌
+Expose your skills to external agents with on-demand retrieval.
 ```bash
-# Capture new patterns from recent Git history
-skillsmith evolve capture --limit 50
-
-# Benchmark and score your expert library
-skillsmith evolve evaluate
+skillsmith serve --transport http --port 3333
 ```
-This generates a **Skill Leaderboard** and detailed compatibility report in `.agent/evals/`.
 
 ### 4. Align & Certify
 ```bash
@@ -111,19 +110,19 @@ skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"
 
 Skillsmith injects a specialized command surface into your AI tools:
 
-- `/swarm` — Decompose massive goals into parallelized agent graphs with integrated Thinking Tree artifacts in `.agent/TREE.md`.
-- `/team-exec` — Execute missions with structured roles (O-R-I-R) and stateful `MISSION.md` updates.
-- `/evolve` — Capture structural engineering patterns from experience.
-- `/tree` — Strategic recursive reasoning for deep goal resolution; now supports `--output` for sharing strategic paths.
-- `/ready` — High-speed pre-release sanity check (Git, Profile, Index).
+- `/swarm` — Decompose massive goals into parallelized agent graphs.
+- `/team-exec` — Execute missions with structured roles (O-R-I-R).
+- `/evolve` — Trigger self-healing or capture new patterns.
+- `/metrics` — Visualize skill reliability and degradation trends.
+- `/serve` — Start the MCP server for agentic tools.
 
 ---
 
 ## 📈 Roadmap: The Path to v2.0
 
-- [x] **v0.7**: Content Gravity & 33+ Workflows
 - [x] **v0.9**: Autonomous Evolution (XSkill Phase 1)
-- [x] **v1.0**: **Competitive Evolution (Swarms & Thinking Trees)**
+- [x] **v1.0**: Competitive Evolution (Swarms & Thinking Trees)
+- [x] **v1.1**: **Self-Healing Skills & MCP Integration**
 - [ ] **v2.0**: **The Collective** — Decentralized skill sharing & autonomous agent economies.
 
 ---
@@ -134,3 +133,5 @@ MIT © ApexIQ
 <div align="center">
 Built by the Google Deepmind team for those who engineer at the speed of thought.
 </div>
+
+

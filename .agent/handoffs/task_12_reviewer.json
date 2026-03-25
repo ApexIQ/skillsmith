@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 12,
+  "role": "Reviewer",
+  "assigned_skill": ".agent/skills/code_review/SKILL.md",
+  "objective": "Run the most relevant test or validation command before completion.",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      11
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "77a9673b-26cf-4aa4-a5c4-b0fb5c084e01"
+}

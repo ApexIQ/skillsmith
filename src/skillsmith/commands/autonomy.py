@@ -42,6 +42,7 @@ def autonomous_command():
 @click.option("--score-gate", default=60.0, type=float, show_default=True)
 @click.option("--recommendation-limit", default=5, type=int, show_default=True)
 @click.option("--strict-gate/--no-strict-gate", default=True, show_default=True)
+@click.option("--auto-evolve", is_flag=True, default=False, help="Trigger skill repair on benchmark regressions.")
 @click.option("--json-output", "json_output", is_flag=True, help="Emit JSON output.")
 def autonomous_run_command(
     domain: str,
@@ -52,6 +53,7 @@ def autonomous_run_command(
     score_gate: float,
     recommendation_limit: int,
     strict_gate: bool,
+    auto_evolve: bool,
     json_output: bool,
 ):
     """Run an autonomous optimization session."""
@@ -65,6 +67,7 @@ def autonomous_run_command(
         score_gate=score_gate,
         recommendation_limit=recommendation_limit,
         strict_gate=strict_gate,
+        auto_evolve=auto_evolve,
     )
     summary = summarize_session(session)
     if json_output:

@@ -148,6 +148,12 @@ cython_debug/
 # OS X
 .DS_Store
 
+# Temporary directories
+tmp/
+.tmp*/
+.test-*/
+temp*/
+
 # Skillsmith Diagnostics & Temp (Ignored)
 debug_cli.py
 fix_list_command.py
@@ -181,25 +187,13 @@ test_lab/
 test_lab_v*/
 lab_gemini*/
 lab_test*/
-tmp*/
-.tmp*/
-.test-*/
-.tmp-probe*/
-.tmp-unittest-global/
-.tmp-tests-run/
-.tmp-build/
 ghost_test_lab/
 error.txt
 .uv-cache/
 
 # Essential Library Assets (Explicitly allow for packaging)
 !AGENTS.md
-!GEMINI.md
-!CLAUDE.md
-!ROADMAP.md
 !.agent/
 !.github/
 !.cursor/
 !.windsurf/
-!UPCOMING_FEATURES.md
-!my_Referce.md

@@ -54,7 +54,26 @@ Starts a bounded autonomous loop that executes benchmark-driven tasks with safet
 ### `skillsmith evolve`
 The "Learning Engine". Transforms repository history or raw source code into reusable Agentic Skills.
 - **Subcommand `capture`**: Analyzes Git history to extract structural engineering patterns.
-- **Subcommand `unlabeled`**: (Phase 2.5) Performs unsupervised structural analysis on raw directories to discover "intelligence-rich" patterns (XSkill).
+- **Subcommand `fix`**: (v1.1.0) Autonomous self-repair. Analyzes performance regressions and generates logic patches for degraded skills.
+- **Subcommand `unlabeled`**: Performs unsupervised structural analysis on raw directories to discover "intelligence-rich" patterns (XSkill).
+
+### `skillsmith metrics`
+The "ROI Dashboard". Displays performance metrics for your installed skill library, including success rates, application counts, and degradation trends.
+- **Flag `--export`**: Export metrics as JSON for CI/CD analytics.
+
+---
+
+## 🔌 External Integration (MCP)
+
+### `skillsmith serve`
+Starts the **Skillsmith MCP Server**. This exposes your local skill library as an on-demand "Agentic Tool" for Claude Desktop, Cursor, and Gemini.
+- **Transport `stdio`**: Default for local agents like Claude Code.
+- **Transport `http`**: Expose as a network service on a specific port.
+- **Flag `--port`**: Set a custom HTTP port (default 47731).
+
+---
+
+## 🌲 Reasoning & Swarms
 
 ### `skillsmith tree`
 The "Reasoning Engine". Generates a recursive **AND/OR Thinking Tree** to resolve complex goals with multiple fallback strategies.

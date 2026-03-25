@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 8,
+  "role": "Reviewer",
+  "assigned_skill": ".agent/skills/code_review/SKILL.md",
+  "objective": "[AND] Ship stage: Make the workflow output usable as a release-grade handoff artifact. Acceptance: The generated workflow includes both stage structure and the legacy `steps` list.; Compose output remains stable across repeated runs with the same inputs..",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      7
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "e60a3bfb-16c5-4ef2-be21-f0a18fff5e73"
+}

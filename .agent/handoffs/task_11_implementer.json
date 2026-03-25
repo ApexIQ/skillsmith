@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 11,
+  "role": "Implementer",
+  "assigned_skill": ".agent/skills/software_lifecycle/SKILL.md",
+  "objective": "Verification loop: run 1 verification pass before completion.",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      10
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "3c3023c2-24da-41fb-900b-094060437ed1"
+}

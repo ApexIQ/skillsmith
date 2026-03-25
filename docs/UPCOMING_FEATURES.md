@@ -199,7 +199,7 @@ Add per-skill execution telemetry to `skills.lock.json`:
 - `skillsmith metrics <skill>` — Deep dive on one skill's performance
 - `skillsmith metrics --export` — Export metrics for CI/analytics
 
-### 3.2 Evolution Engine Core (Week 4-5)
+### 3.2 Evolution Engine Core (Week 4-5) [DONE]
 
 `skillsmith evolve` — Three evolution modes inspired by OpenSpace:
 
@@ -238,7 +238,7 @@ skillsmith evolve --mode capture
 - Validation against existing test cases before replacing predecessors
 - Full diff history in `.agent/skills/<name>/versions/` with version DAG
 
-### 3.3 Version DAG & Lineage Tracking (Week 5)
+### 3.3 Version DAG & Lineage Tracking (Week 5) [DONE]
 
 Every skill maintains a version history with full lineage:
 
@@ -264,7 +264,7 @@ Every skill maintains a version history with full lineage:
 }
 ```
 
-### 3.4 Post-Execution Analysis Hook (Week 5-6)
+### 3.4 Post-Execution Analysis Hook (Week 5-6) [DONE]
 
 After every `compose` execution, auto-analyze outcomes:
 

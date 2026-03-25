@@ -6,14 +6,36 @@ from .lockfile import load_lockfile
 
 @click.command()
 @click.argument("path", type=click.Path(exists=True, file_okay=False), default=".")
-def metrics_command(path):
+@click.option("--export", type=click.Path(), help="Export metrics as JSON to the specified file path.")
+def metrics_command(path, export):
     """Show skill quality and usage metrics from the current project."""
+    import json
     cwd = Path(path).resolve()
     payload = load_lockfile(cwd)
     skills = payload.get("skills", [])
     
     if not skills:
         console.print("[yellow]No skills found in the current lockfile. Try 'skillsmith add' to installation skills.[/yellow]")
+        return
+
+    # Export Logic
+    if export:
+        export_path = Path(export)
+        from datetime import datetime
+        export_data = {
+            "project_name": cwd.name,
+            "timestamp": datetime.now().isoformat() + "Z",
+            "total_skills": len(skills),
+            "skills": [
+                {
+                    "name": s.get("name"),
+                    "version": s.get("version"),
+                    "metrics": s.get("metrics", {})
+                } for s in skills
+            ]
+        }
+        export_path.write_text(json.dumps(export_data, indent=2), encoding="utf-8")
+        console.print(f"[green][OK][/green] Metrics exported to: {export_path.name}")
         return
 
     table = Table(title=f"Skill Quality Metrics - {cwd.name}")

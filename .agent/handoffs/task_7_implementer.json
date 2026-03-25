@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 7,
+  "role": "Implementer",
+  "assigned_skill": ".agent/skills/software_lifecycle/SKILL.md",
+  "objective": "[AND] Test stage: Run the relevant automated tests for the changed workflow behavior. Acceptance: Targeted tests pass after the implementation change.; The failure mode is observable if the stage structure regresses..",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      6
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "8c6e52c3-6168-4289-bdc0-c2b821f3fdfa"
+}

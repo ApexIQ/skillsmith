@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 9,
+  "role": "Orchestrator",
+  "assigned_skill": ".agent/skills/agent_collaboration/SKILL.md",
+  "objective": "[AND] Reflect stage: Summarize what the evidence says about the current run. Acceptance: Reflection text is grounded in the run's actual feedback or retry state.; Any mode suggestion comes from the current evidence, not a dummy rule..",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      8
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "8a2f101b-8a0c-4d05-8a69-2d2c4674a6e5"
+}

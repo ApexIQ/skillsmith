@@ -6,7 +6,7 @@
 
 ## Prime Directives
 
-1. Read `AGENTS.md` and `.agent/STATE.md` first.
+1. Read `AGENTS.md`, `.agent/STATE.md`, and `.agent/lessons.md` first.
 2. Read `.agent/principles/CORE_PRINCIPLES.md` for project behavioral rules.
 3. Read `.agent/project_profile.yaml`, and `.agent/context/project-context.md`.
 4. Search `.agent/skills/` before implementation.
@@ -38,11 +38,14 @@
 
 ## Memory and Cost Policy
 
-- Keep the default path library-first: `pip install skillsmith` must remain sufficient.
-- Reuse cached retrieval context before expensive reasoning passes.
-- Follow five layers for memory reliability: observer, reflector, session recovery, reactive watcher, pre-compaction safeguard.
+- Use the library-first default path: `skillsmith` must remain sufficient.
+- **Mandatory Memory Protocol**:
+  - Read `.agent/lessons.md` (Layer 2) for long-term project memory and past mistakes.
+  - Log tactical events to `.agent/logs/raw_events.jsonl` (Layer 1) for historical context.
+- **Autonomous Evolution**:
+  - Run `skillsmith evolve reflect` after multi-step missions to distill logs into lessons.
+- Follow five layers: observer, reflector, recovery, watcher, safeguard.
 - Require cache TTL and fingerprint invalidation for context reuse.
-- Keep enterprise infrastructure optional, not required for core user workflows.
 
 ## Role Use
 

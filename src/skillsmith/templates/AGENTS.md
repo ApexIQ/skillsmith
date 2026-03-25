@@ -37,12 +37,12 @@
 
 - Optimize for `pip install skillsmith` local workflows first; external services must stay optional.
 - Prefer low-cost retrieval paths before expensive model loops.
-- Apply the five-layer memory approach in this order:
-  1. observer capture,
-  2. reflector compaction,
-  3. session recovery,
-  4. reactive watcher refresh,
-  5. pre-compaction safeguard.
+- **Mandatory Memory Consumption**:
+  - Read `.agent/lessons.md` (Layer 2) for long-term project memory and past mistakes.
+  - Read `.agent/logs/raw_events.jsonl` (Layer 1) for tactical history if returning to a task.
+- **Autonomous Evolution**:
+  - At the end of every non-trivial session or mission, run `skillsmith evolve reflect` to distill raw logs into permanent lessons.
+- Apply the five-layer memory pattern: 1. observer, 2. reflector, 3. recovery, 4. watcher, 5. safeguard.
 - Use TTL + fingerprint invalidation for recall caches to prevent stale context reuse.
 - Do not introduce mandatory infra (OIDC/KMS/hosted services) for core library success paths.
 

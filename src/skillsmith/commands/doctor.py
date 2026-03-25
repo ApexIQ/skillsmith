@@ -268,13 +268,19 @@ def doctor_command(fix, strict, as_json, directory):
     else:
         console.print("  [dim]-[/dim] unknown (project profile missing)")
 
-    console.print("\n[bold]Skills[/bold]")
-    skills_dir = cwd / ".agent" / "skills"
-    if skills_dir.exists():
-        valid = sum(1 for _ in iter_skill_dirs(skills_dir))
-        console.print(f"  [green][OK][/green] {valid} skills installed")
-    else:
-        console.print("  [yellow][!!][/yellow] .agent/skills/ not found")
+    console.print("\n[bold]Memory (Agentic)[/bold]")
+    lessons_path = cwd / ".agent" / "lessons.md"
+    logs_path = cwd / ".agent" / "logs" / "raw_events.jsonl"
+    
+    ok_lessons, msg_lessons = _check_path_status(lessons_path, ".agent/lessons.md [Permanent Brain]")
+    ok_logs, msg_logs = _check_path_status(logs_path, ".agent/logs/raw_events.jsonl [Observer Log]")
+    
+    console.print(msg_lessons)
+    if not ok_lessons:
+        console.print("    [dim]Tip: Run 'skillsmith evolve reflect' after missions to generate lessons.[/dim]")
+    
+    console.print(msg_logs)
+    all_ok &= ok_lessons # Lessons are critical for long-term health
 
     console.print("\n[bold]Lockfile[/bold]")
     lockfile_path = cwd / LOCKFILE_NAME

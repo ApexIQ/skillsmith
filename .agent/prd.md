@@ -1,58 +1,45 @@
-# [.agent/prd.md] / Self-Evolution Engine (Phase 2)
+# [.agent/prd.md] / Mission Control Protocol (Swarm Orchestration)
 
 ## 1. Overview
-The **Self-Evolution Engine** is the intelligence layer that transforms static Skillsmith skills into living, learning assets. By capturing execution telemetry and analyzing successful/failed agent workflows, Skillsmith can auto-repair degraded skills, derive specialized variants for specific frameworks, and capture entirely new skills from novel successful executions. This removes the manual maintenance burden of prompt engineering and ensures our AI agents never make the same mistake twice.
+Current `swarm` logic is a high-fidelity simulation but lacks deterministic state management and real agent handoff mechanisms. The **Mission Control Protocol (MCP)** provides the stateful layer required for specialized AI personas (Researcher, Implementer, Reviewer) to coordinate asynchronously through a shared `.agent/mission.json` contract.
 
 ## 2. Business & User Context
-- **Market Positioning**: Competitors (ECC, Cursor) use static instruction sets. Skillsmith will be the first tool to offer **"Skills with a Memory"**.
-- **User Needs**: Professional AI engineers need to trust that their instructions are improving over time, not drifting into irrelevance.
-- **Goal**: 100% automated skill improvement with human-in-the-loop trust verification.
+- **User Nees**: Developers need multi-agent coordination that isn't just "toy logic" but acts as a production-grade GSD (Get Stuff Done) engine.
+- **Differentiation**: Unlike LiteLLM/Agno which focus on the LLM call, Skillsmith focuses on the **Execution State** and **Trust Verification** between roles.
 
 ## 3. Functional Requirements
-### F1: Skill Telemetry (Metric Capture)
-- Capture `applied_count`, `success_rate`, `fallback_rate`, `token_cost`, and `execution_time`.
-- Persist telemetry in `skills.lock.json` with per-version granularity.
-### F2: Execution Analysis Hook
-- Add `--learn` to `skillsmith compose`.
-- Analyze execution traces (terminal outputs, file diffs, linter results).
-- Map outcomes back to the skills used.
-### F3: `skillsmith evolve` (Core Logic)
-- **FIX Mode**: Auto-patch SKILL.md based on frequency-of-failure patterns.
-- **DERIVE Mode**: Clone parent skills and specialize for specific contexts (e.g. `python-expert` -> `fastapi-expert`).
-- **CAPTURE Mode**: Create a brand new SKILL.md from a successful execution that used no pre-defined skill.
-### F4: Version DAG (Lineage)
-- Every evolution creates a new version entry in `.agent/skills/<name>/versions/`.
-- Maintain a `lineage.json` tracking the parent-child relationship and improvement metrics.
+- [x] **Stateful Schema**: Implement `.agent/mission.json` to track lifecycle (Pending, In Progress, Blocked, Completed, Verified). [DONE]
+- [x] **Handoff Packets**: Generate role-specific context packets (Goal + Context + Persona-Skill + Constraints). [DONE]
+- [x] **Reactive Sync**: Keep `.agent/MISSION.md` in sync with the JSON state for human observability. [DONE]
+- [x] **Phase 3.5: Eval-to-Evolve Bridge**: `eval --auto-evolve` triggers skill repair via `EvolutionEngine`. [DONE]
+- [ ] **Thinking Tree Integration**: Map mission steps directly to `workflow.json` OR/AND nodes. [PLAN]
+- [ ] **Verification Gates**: Prevent task completion until a `Reviewer` or `L4 Watcher` verifies the fingerprint/trust. [PLAN]
 
 ## 4. Non-Functional Requirements (NFR)
-- **Performance**: Analysis hooks must add <200ms of overhead to non-LLM operations.
-- **Privacy**: No PII or proprietary code snippets stored in telemetry without explicit `--learn` opt-in.
-- **Scalability**: Support projects with 100+ skills and 1000s of execution traces.
-- **Determinism**: Evolutions should be reproducible given the same trace data.
+- **Performance**: State transitions must be sub-50ms (local file ops).
+- **Scalability**: Support up to 50 concurrent task nodes in a Thinking Tree.
+- **Reliability**: No manual parsing of Markdown for state; JSON is the source of truth.
 
 ## 5. UX & Interaction Specs
-- **Command**: `skillsmith metrics` -> Dashboard view of skill health.
-- **Command**: `skillsmith evolve --interactive` -> Step-through evolution logic for human approval.
-- **Feedback**: After a successful task, the CLI suggests: *"Novel pattern detected! Run 'skillsmith evolve --mode capture' to create a new skill."*
+- `skillsmith swarm plan "Goal"` -> Creates JSON + MD + Tree.
+- `skillsmith swarm status` -> Visualizes progress via Rich tables.
+- `skillsmith swarm execute` -> The deterministic loop that emits handoffs.
 
 ## 6. AI / Model Expectations
-- Use LLMs (Claude-3.5-Sonnet/Gemini-2.0) for the `evolve` analysis pass.
-- **Evaluation Rubric**: Evolved skills must demonstrate a >10% improvement in `success_rate` across 5 test-harness runs before being promoted to `active`.
+- The agent (Implementer/Researcher) must receive a high-fidelity context packet that includes the **Assigned Persona Skill**.
+- Evaluation rubric: 100% of tasks must map to a verifiable artifact.
 
 ## 7. Risks & Mitigations
-- **Over-Evolution**: Skills might become too specialized or "overfit" to one session. *Mitigation: Cap evolution frequency (max 3 per day).*
-- **Hallucinated Fixes**: Evolutionary patches might introduce incorrect syntax. *Mitigation: Mandatory `skillsmith lint` pass after every evolution.*
-- **Context Rot**: Telemetry might become stale. *Mitigation: TTL-based metric weighting (newer runs weigh more).*
+- **State Drift**: JSON and MD getting out of sync. *Mitigation: Unidirectional sync (JSON -> MD).*
+- **Blocked Reasoning**: Agent gets stuck in a loop. *Mitigation: TTL and "Strategic OR" branch fallbacks.*
 
 ## 8. Success Metrics & KPIs
-- **Quantitative**: 20% reduction in `fallback_rate` for core skills across 100 sessions.
-- **Qualitative**: High user confidence in `evolve` suggestions (measured by approval rate).
-- **Metric**: Token cost-per-successful-task reduced by 15% through better skill precision.
+- 100% Deterministic state tracking.
+- Zero-logic simulation replaced by Handoff Protocol.
 
 ## 9. Dependencies
-- SQLite durable datastore (for local metric persistence).
-- Execution trace capture logic in `compose` and `autonomous`.
-- `skillsmith.lock.json` schema v3.
+- `workflow_engine.py` (Thinking Tree DNA).
+- `hashing.py` (Artifact integrity).
 
 ## 10. Revision History
-- **2026-03-25**: Initial Draft (Phase 2 Roadmap) by Antigravity.
+- 2026-03-25: Initial PRD for Mission Control Protocol.

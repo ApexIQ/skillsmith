@@ -1,0 +1,16 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 1,
+  "role": "Orchestrator",
+  "assigned_skill": ".agent/skills/agent_collaboration/SKILL.md",
+  "objective": "Read .agent/project_profile.yaml and .agent/context/project-context.md.",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": []
+  },
+  "artifacts_expected": [],
+  "generated_at": "6984355b-caf6-4b6c-a868-e9e97e4a2e80"
+}

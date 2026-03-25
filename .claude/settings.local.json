@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p docs/agents docs/commands)",
+      "Bash(rm -f tree.txt)",
+      "Read(//c/Users/vanam/Desktop/skillsmith-test-lab/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

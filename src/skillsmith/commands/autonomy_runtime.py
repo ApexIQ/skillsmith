@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import copy
 import csv
@@ -1141,6 +1141,7 @@ def run_autonomy_session(
     rollback_on_crash: bool = True,
     max_depth: int | None = None,
     replay_latest: bool = False,
+    auto_evolve: bool = False,
     task_executor: Callable[[dict, dict[str, Any]], dict[str, Any]] | None = None,
     now_fn: Callable[[], dt.datetime] | None = None,
 ) -> dict:
@@ -1265,6 +1266,8 @@ def run_autonomy_session(
     non_improving_streak = 0
     stop_reason = ''
     executor = task_executor
+    if executor is None and auto_evolve:
+        executor = default_evolution_executor
 
     for iteration in range(1, max_iterations + 1):
         if iteration > 1 and max_hours >= 0 and (time.monotonic() - started_monotonic) / 3600.0 >= max_hours:
@@ -1300,7 +1303,7 @@ def run_autonomy_session(
         )
         if executor is not None:
             try:
-                task_result = executor(benchmark, {'cwd': root, 'profile': profile, 'benchmark': benchmark, 'iteration': iteration, 'session_id': session_id}) or {}
+                task_result = executor(benchmark, {'cwd': root, 'profile': profile, 'benchmark': benchmark, 'iteration': iteration, 'session_id': session_id, 'benchmark_result': benchmark_result}) or {}
                 if isinstance(task_result, dict):
                     benchmark_result = {
                         'pack_name': benchmark.get('name', benchmark_result['pack_name']),
@@ -1346,6 +1349,15 @@ def run_autonomy_session(
         )
         rollback_result = {'restored': 0, 'errors': [], 'skipped': True}
         if decision == 'discard' and rollback_on_discard:
+            # TRIGGER: Self-Correction Loop (Phase 3.5)
+            # If we are discarding because it didn't improve, maybe we should evolve the skills
+            if auto_evolve:
+                from ..services.evolution import EvolutionEngine
+                # We update the lockfile metrics first so the engine sees the latest data
+                # Actually, EvolutionEngine.trigger_evolution_from_metrics can take the result directly
+                engine = EvolutionEngine(root)
+                engine.trigger_evolution_from_metrics({'tacr': current_score})
+
             rollback_result = _restore_mutation_snapshot(mutation_snapshot)
         elif decision == 'crash' and rollback_on_crash:
             rollback_result = _restore_mutation_snapshot(mutation_snapshot)
@@ -1500,3 +1512,41 @@ __all__ = ['run_autonomy_session', 'load_latest_session', 'summarize_session']
 
 
 
+def default_evolution_executor(benchmark: dict, context: dict[str, Any]) -> dict[str, Any]:
+    """Default executor for the autonomy loop that triggers skill repair.
+    
+    This executor analyzes the current benchmark result and, if scores are low,
+    invokes the EvolutionEngine to apply repairs to degraded skills.
+    """
+    from ..services.evolution import EvolutionEngine
+    from . import console
+    
+    root = Path(context['cwd'])
+    benchmark_result = context.get('benchmark_result', {})
+    score = _coerce_float(benchmark_result.get('score'), 0.0)
+    
+    # Only repair if we are below a reasonable sanity threshold (e.g. 85%)
+    if score < 85.0:
+        console.print(f"\n[bold yellow]Autonomy Self-Correction:[/bold yellow] Low benchmark score ({score}%). Triggering active repair...")
+        engine = EvolutionEngine(root)
+        packets = engine.trigger_evolution_from_metrics({'tacr': score})
+        
+        repairs_applied = 0
+        for packet_path in packets:
+            try:
+                packet_data = json.loads(packet_path.read_text(encoding="utf-8"))
+                skill_name = packet_data.get("skill_name")
+                if engine.apply_repair(skill_name, packet_data):
+                    console.print(f"  [cyan][REPAIR][/cyan] Applied active repair to skill: [bold]{skill_name}[/bold]")
+                    repairs_applied += 1
+            except Exception as exc:
+                console.print(f"  [red][ERROR][/red] Failed to apply repair from {packet_path.name}: {exc}")
+        
+        if repairs_applied > 0:
+            return {
+                'status': 'repaired',
+                'repairs': repairs_applied,
+                'score': score, # Executor didn't fix it yet, just staged it
+            }
+            
+    return {'status': 'skipped', 'score': score}

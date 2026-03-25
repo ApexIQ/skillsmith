@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 6,
+  "role": "Researcher",
+  "assigned_skill": ".agent/skills/how_to_research/SKILL.md",
+  "objective": "[AND] Review stage: Inspect the changed files for correctness, regressions, and missing coverage. Acceptance: The review names concrete risks or confirms the change is safe.; The review output is ordered and actionable for the next agent..",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      5
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "c92abe2a-426c-4427-a7ff-d3a125fa2853"
+}

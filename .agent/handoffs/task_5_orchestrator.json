@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 5,
+  "role": "Orchestrator",
+  "assigned_skill": ".agent/skills/agent_collaboration/SKILL.md",
+  "objective": "[OR] Build stage: Implement the smallest coherent change needed for the goal. Acceptance: The patch changes only the files needed for the requested goal.; The requested behavior is present in the generated workflow output..",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      4
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "19ccf304-584a-44b5-98df-fdb47031fc8f"
+}

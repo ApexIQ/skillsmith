@@ -1,0 +1,18 @@
+{
+  "kind": "handoff-packet",
+  "version": "1.0.0",
+  "mission_id": "ec8c6630",
+  "task_id": 10,
+  "role": "Researcher",
+  "assigned_skill": ".agent/skills/how_to_research/SKILL.md",
+  "objective": "Load the top relevant skills: python_expert.",
+  "context": {
+    "goal": "Build a new analytics module",
+    "status": "ACTIVE",
+    "dependencies": [
+      9
+    ]
+  },
+  "artifacts_expected": [],
+  "generated_at": "e30eed30-c82f-460b-9360-327c9561cd7f"
+}

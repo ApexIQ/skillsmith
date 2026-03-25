@@ -807,6 +807,19 @@ def init_command(minimal, guided, auto_install, agents_md_only, all_skills, cate
     profile = _collect_guided_profile(cwd) if guided else _infer_project_profile(cwd)
     _write_project_artifacts(cwd, agents_dir, profile)
     render_all(cwd, profile)
+
+    # Bootstrap Memory Layer (Five-Layer Reliability Pattern)
+    lessons_path = agents_dir / "lessons.md"
+    if not lessons_path.exists():
+        lessons_path.write_text(
+            "# Lessons\n\n> Long-term project memory. AI agents read this at session start.\n> Run `skillsmith evolve reflect` after missions to distill new lessons.\n",
+            encoding="utf-8",
+        )
+    logs_dir = agents_dir / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    raw_log = logs_dir / "raw_events.jsonl"
+    if not raw_log.exists():
+        raw_log.touch()
     installed = []
     if auto_install or guided:
         installed = _install_recommended_skills(cwd, profile)

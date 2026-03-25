@@ -296,6 +296,93 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
         return "\n".join(lines)
 
+    # ── Tool 5: get_skill_metrics ─────────────────────────────────────────────
+    @mcp.tool()
+    def get_skill_metrics(name: str) -> dict:
+        """Get performance metrics for a specific skill from the lockfile.
+
+        Args:
+            name: The name of the skill to query.
+
+        Returns:
+            A dictionary of metrics including success_rate, applied_count,
+            and degradation_trend.
+        """
+        from .commands.lockfile import load_lockfile
+        lockfile = load_lockfile(resolved_dir.parent)
+        for skill in lockfile.get("skills", []):
+            if skill.get("name") == name:
+                return skill.get("metrics", {})
+        return {"error": f"Skill '{name}' not found in lockfile."}
+
+    # ── Tool 6: trigger_skill_evolution ──────────────────────────────────────
+    @mcp.tool()
+    def trigger_skill_evolution(name: str, mode: str = "fix") -> dict:
+        """Trigger an autonomous evolution/repair for a specific skill.
+
+        Args:
+            name: The name of the skill to evolve.
+            mode: The evolution mode ('fix', 'derive', 'capture'). Default is 'fix'.
+
+        Returns:
+            The evolution result including details of the changes made.
+        """
+        from .services.evolution import EvolutionEngine, EvolutionMode
+        engine = EvolutionEngine(resolved_dir.parent)
+        
+        try:
+            # Map string mode to Enum
+            evo_mode = EvolutionMode(mode.lower())
+            
+            # For 'fix' mode, analyze the candidate first
+            candidates = engine.analyze_skills(threshold=0.8)
+            candidate = next((c for c in candidates if c.name == name), None)
+            
+            if not candidate and evo_mode == EvolutionMode.FIX:
+                 return {"status": "skipped", "reason": f"Skill '{name}' does not meet degradation threshold for FIX."}
+            
+            # Prepare and apply repair if it's a fix
+            if evo_mode == EvolutionMode.FIX:
+                result = engine.prepare_repair_plan(candidate)
+                if result.success:
+                    applied = engine.apply_repair(name, result.to_dict())
+                    return {
+                        "status": "repaired" if applied else "staged",
+                        "skill": name,
+                        "mode": mode,
+                        "changes": result.suggested_changes,
+                    }
+                return {"status": "failed", "error": result.error}
+            
+            return {"status": "error", "message": f"Mode '{mode}' not yet fully implemented for MCP."}
+        except Exception as exc:
+            return {"status": "error", "message": str(exc)}
+
+    # ── Tool 7: list_degraded_skills ──────────────────────────────────────────
+    @mcp.tool()
+    def list_degraded_skills(threshold: float = 0.8) -> list[dict]:
+        """List all skills that have fallen below a certain success threshold.
+
+        Args:
+            threshold: The success rate threshold (0.0 to 1.0, default 0.8).
+
+        Returns:
+            A list of degraded skills with their current metrics and degradation level.
+        """
+        from .services.evolution import EvolutionEngine
+        engine = EvolutionEngine(resolved_dir.parent)
+        candidates = engine.analyze_skills(threshold=threshold)
+        
+        return [
+            {
+                "name": c.name,
+                "success_rate": c.metrics.get("success_rate", 0.0),
+                "degradation_level": c.degradation_level.name if hasattr(c.degradation_level, "name") else str(c.degradation_level),
+                "failure_count": c.metrics.get("failure_count", 0),
+            }
+            for c in candidates
+        ]
+
     return mcp
 
 

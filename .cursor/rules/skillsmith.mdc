@@ -4,7 +4,7 @@ globs:
 alwaysApply: true
 ---
 
-- Read `AGENTS.md`, `.agent/STATE.md`, and `.agent/project_profile.yaml`.
+- Read `AGENTS.md`, `.agent/STATE.md`, `.agent/lessons.md`, and `.agent/project_profile.yaml`.
 - Current focus: Project using skillsmith
 - Check `.agent/context/project-context.md` before making stack assumptions.
 - Prefer relevant skills from `.agent/skills/` before implementation.

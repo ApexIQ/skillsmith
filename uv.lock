@@ -1174,7 +1174,7 @@ wheels = [
 
 [[package]]
 name = "skillsmith"
-version = "1.0.3"
+version = "1.0.9"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

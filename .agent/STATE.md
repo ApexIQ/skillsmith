@@ -1,26 +1,39 @@
-# Current State: Skillsmith v1.0.8 (Sovereign Ghost-Sync Era)
+# Current State
 
 > **CRITICAL**: AI agents MUST read this file at the start of every session.
-> **LOCKED**: 2026-03-25. The core architecture is now at 1.0.8 parity.
+> Update this file after every significant step to prevent context rot.
 
-**Last Updated:** 2026-03-25T03:32:00Z
-**Health Score:** 100/100 (Certified by `skillsmith doctor`)
+**Last Updated:** 2026-03-25
 
-## 🎯 Current Milestone: The $100M Agentic OS
-We have successfully evolved Skillsmith into a **Sovereign Ghost-Sync Platform** and conquered Phase 3 (Frontiers of Scaling).
+## Current Objective
+Keep project instructions, rules, and workflows aligned with `.agent/project_profile.yaml`.
 
-## 🏗️ Architectural Accomplishments
-- **Phase 1.5: Strategic Reasoner**: Implemented the **AND/OR Thinking Tree** recursive planning logic.
-- **Phase 2.1: Sovereign Ghost-Sync**: Launched the `ghost-content` branch with **882+ Expert Skills**.
-- **Phase 2.2: Evolution Evaluator**: Implemented `skillsmith evolve evaluate` for library benchmarking.
-- **Phase 2.3: Autonomous Promotion**: `skillsmith evolve promote --all` successfully pushed all skills to 100/100 GOLD status.
-- **Phase 3.0: Unlabeled Recon**: Discovered 120+ Universal Prototypes from external codebases.
-- **Phase 3.1: Sovereign Verification**: Integrated mathematical SHA-256 Checksum Verification into the Ghost-Sync stream.
+## Context
+- Idea: Project using skillsmith
+- Stage: existing
+- Frameworks: click, pytest
+- Target tools: antigravity, claude, codex, copilot, cursor, gemini, windsurf
+- Trusted skill sources: local
+- Allowed remote domains: github.com, skills.sh
+- Require pinned GitHub refs: true
+- Trusted publisher keys: none
+- Trusted publisher public keys: none
+- Publisher verification mode: optional
+- Publisher signature scheme mode: auto
+- Allowed publisher signature algorithms: hmac-sha256, rsa-sha256
+- Publisher key rotation: none
+- Minimum remote trust: 65
 
-## 🚀 Next Strategic Steps (Phase 4: Workflow Swarms)
-1. **Multi-Agent Orchestration**: Upgrade `/swarm` and `/team-exec` for optimal parallel execution routines.
-2. **Recursive Reasoning**: Refine the AND/OR Thinking Tree logic for complex codebase migrations.
-3. **Parameterized Acceptance Criteria**: Link workflow steps directly to testable verification points.
+## Recent Changes
+- Moved from mock reflection to **functional Log Reflection (L2)**: `evolve reflect` now distills real binary logs from `raw_events.jsonl`.
+- Implemented **Eval-to-Evolve Bridge**: Evaluation regressions trigger `EvolutionEngine` repair packets via `--auto-evolve`.
+- Integrated **Self-Correction Loop**: The `EvolutionEngine` is now wired into the `autonomy` loop for "Active Repair" of degraded skills.
+- Verified end-to-end memory loop: Work -> Log -> Reflect -> Lesson.
 
-## ⚠️ Known Issues
-- None. System is in a healthy, "Ghost-Certified" state.
+## Next Steps
+1.  **Refine Heuristics**: Move the evolution logic (FIX/DERIVE) from hardcoded templates to LLM-synthesis.
+2.  **Registry Sync**: Implement Team Marketplace/Registry sync for shared skill evolution.
+3.  **Global Integration**: Automate `log_event` (L1) across all `skillsmith` commands.
+
+## Known Issues
+- `evolve reflect` currently uses heuristic-based categorization; needs transition to `litellm` for deep semantic distillation.

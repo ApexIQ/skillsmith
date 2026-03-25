@@ -1,0 +1,247 @@
+{
+  "goal": "Refactor the entire core engine architecture to use async/await",
+  "execution_mode": "standard",
+  "reflection_max_retries": 0,
+  "verification_passes": 1,
+  "profile": {
+    "idea": "Project using skillsmith",
+    "project_stage": "existing",
+    "app_type": "library",
+    "frameworks": [
+      "click",
+      "pytest"
+    ],
+    "priorities": [
+      "testability",
+      "maintainability",
+      "verification",
+      "automation"
+    ]
+  },
+  "context_available": true,
+  "skills": [
+    "python_expert"
+  ],
+  "skill_sources": [
+    "local"
+  ],
+  "stages": [
+    {
+      "name": "discover",
+      "node_type": "AND",
+      "objective": "Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.",
+      "objectives": [
+        "Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.",
+        "Confirm the project stage, app type, frameworks, and priorities for goal: Refactor the entire core engine architecture to use async/await.",
+        "Top relevant skills: python_expert."
+      ],
+      "acceptance_checks": [
+        "Project profile and generated context are present or inferred without error.",
+        "The ranked skill list is deterministic for the current goal and profile.",
+        "Target tools and project shape are visible in the workflow output."
+      ],
+      "evidence": [
+        ".agent/project_profile.yaml",
+        ".agent/context/project-context.md",
+        ".agent/context/index.json"
+      ],
+      "summary": "Discover stage: Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.",
+      "state": "pending"
+    },
+    {
+      "name": "plan",
+      "node_type": "OR",
+      "objective": "Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+      "objectives": [
+        "Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+        "Name the touched files or subsystems before any edit is made.",
+        "Record the chosen execution mode and retry budget for the run."
+      ],
+      "acceptance_checks": [
+        "The plan names concrete files, commands, or subsystems.",
+        "Every planned step has at least one verification check.",
+        "Planner-editor mode, when selected, is reflected in the workflow text."
+      ],
+      "evidence": [
+        "selected skill names",
+        "execution mode",
+        "reflection retry budget"
+      ],
+      "summary": "Plan stage (Strategic OR Tree): Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+      "state": "pending",
+      "strategies": [
+        {
+          "id": "strategy_a",
+          "name": "Standard Recursive Approach",
+          "objectives": [
+            "Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+            "Name the touched files or subsystems before any edit is made.",
+            "Record the chosen execution mode and retry budget for the run."
+          ],
+          "node_type": "AND"
+        },
+        {
+          "id": "strategy_b",
+          "name": "Iterative Decomposition",
+          "objectives": [
+            "Fallback: Turn the goal into a minimal patch plan with explicit verification checkpoints.",
+            "Fallback: Name the touched files or subsystems before any edit is made.",
+            "Fallback: Record the chosen execution mode and retry budget for the run."
+          ],
+          "node_type": "AND",
+          "recovery_trigger": "If Strategy A enters 'Failed' state due to depth or complexity limits."
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "node_type": "OR",
+      "objective": "Implement the smallest coherent change needed for the goal.",
+      "objectives": [
+        "Implement the smallest coherent change needed for the goal.",
+        "Keep edits scoped to the selected files and avoid unrelated refactors.",
+        "For debug goals, reproduce the issue and capture the failing behavior.",
+        "For brainstorm goals, compare the candidate approaches and choose the recommended path."
+      ],
+      "acceptance_checks": [
+        "The patch changes only the files needed for the requested goal.",
+        "The requested behavior is present in the generated workflow output.",
+        "The implementation preserves the current command surface and backward compatibility."
+      ],
+      "evidence": [
+        "edited files",
+        "goal-specific behavior",
+        "workflow steps list"
+      ],
+      "summary": "Build stage (Strategic OR Tree): Implement the smallest coherent change needed for the goal.",
+      "state": "pending",
+      "strategies": [
+        {
+          "id": "strategy_a",
+          "name": "Direct Implementation",
+          "objectives": [
+            "Implement the smallest coherent change needed for the goal.",
+            "Keep edits scoped to the selected files and avoid unrelated refactors.",
+            "For debug goals, reproduce the issue and capture the failing behavior.",
+            "For brainstorm goals, compare the candidate approaches and choose the recommended path."
+          ],
+          "node_type": "AND"
+        },
+        {
+          "id": "strategy_b",
+          "name": "Isolated Module Prototype",
+          "objectives": [
+            "Fallback: Implement the smallest coherent change needed for the goal.",
+            "Fallback: Keep edits scoped to the selected files and avoid unrelated refactors.",
+            "Fallback: For debug goals, reproduce the issue and capture the failing behavior.",
+            "Fallback: For brainstorm goals, compare the candidate approaches and choose the recommended path."
+          ],
+          "node_type": "AND",
+          "recovery_trigger": "If Strategy A enters 'Failed' state due to depth or complexity limits."
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "node_type": "AND",
+      "objective": "Inspect the changed files for correctness, regressions, and missing coverage.",
+      "objectives": [
+        "Inspect the changed files for correctness, regressions, and missing coverage.",
+        "Summarize findings first when risks remain, then note any verification gaps.",
+        "Validate that the workflow still reads cleanly as a handoff artifact."
+      ],
+      "acceptance_checks": [
+        "The review names concrete risks or confirms the change is safe.",
+        "The review output is ordered and actionable for the next agent.",
+        "No unrelated files or behaviors are introduced into the plan."
+      ],
+      "evidence": [
+        "changed files",
+        "risk notes",
+        "review summary"
+      ],
+      "summary": "Review stage: Inspect the changed files for correctness, regressions, and missing coverage.",
+      "state": "pending"
+    },
+    {
+      "name": "test",
+      "node_type": "AND",
+      "objective": "Run the relevant automated tests for the changed workflow behavior.",
+      "objectives": [
+        "Run the relevant automated tests for the changed workflow behavior.",
+        "Capture the exact command output or assertion evidence for the change.",
+        "Prefer the smallest test surface that still proves the new stage structure."
+      ],
+      "acceptance_checks": [
+        "Targeted tests pass after the implementation change.",
+        "The failure mode is observable if the stage structure regresses.",
+        "The test suite still covers the existing `steps` list contract."
+      ],
+      "evidence": [
+        "test command output",
+        "passing assertions",
+        "existing compose compatibility"
+      ],
+      "summary": "Test stage: Run the relevant automated tests for the changed workflow behavior.",
+      "state": "pending"
+    },
+    {
+      "name": "ship",
+      "node_type": "AND",
+      "objective": "Make the workflow output usable as a release-grade handoff artifact.",
+      "objectives": [
+        "Make the workflow output usable as a release-grade handoff artifact.",
+        "Keep the command output deterministic for CLI and file-based use.",
+        "Preserve the current release notes, rollback, and packaging signals."
+      ],
+      "acceptance_checks": [
+        "The generated workflow includes both stage structure and the legacy `steps` list.",
+        "Compose output remains stable across repeated runs with the same inputs.",
+        "The result can be written to a file without additional cleanup."
+      ],
+      "evidence": [
+        "workflow YAML output",
+        "output file path",
+        "deterministic render"
+      ],
+      "summary": "Ship stage: Make the workflow output usable as a release-grade handoff artifact.",
+      "state": "pending"
+    },
+    {
+      "name": "reflect",
+      "node_type": "AND",
+      "objective": "Summarize what the evidence says about the current run.",
+      "objectives": [
+        "Summarize what the evidence says about the current run.",
+        "Carry forward the retry budget and feedback signals only when they exist.",
+        "Use the observed results to inform the next iteration instead of guessing."
+      ],
+      "acceptance_checks": [
+        "Reflection text is grounded in the run's actual feedback or retry state.",
+        "Any mode suggestion comes from the current evidence, not a dummy rule.",
+        "The workflow keeps the same structure if no feedback is available."
+      ],
+      "evidence": [
+        "feedback artifact",
+        "reflection retry count",
+        "mode suggestion state"
+      ],
+      "summary": "Reflect stage: Summarize what the evidence says about the current run.",
+      "state": "pending"
+    }
+  ],
+  "steps": [
+    "Read .agent/project_profile.yaml and .agent/context/project-context.md.",
+    "Confirm the requested goal against the current project stage and target tools.",
+    "[AND] Discover stage: Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action. Acceptance: Project profile and generated context are present or inferred without error.; The ranked skill list is deterministic for the current goal and profile..",
+    "[OR] Plan stage: Turn the goal into a minimal patch plan with explicit verification checkpoints. Acceptance: The plan names concrete files, commands, or subsystems.; Every planned step has at least one verification check..",
+    "[OR] Build stage: Implement the smallest coherent change needed for the goal. Acceptance: The patch changes only the files needed for the requested goal.; The requested behavior is present in the generated workflow output..",
+    "[AND] Review stage: Inspect the changed files for correctness, regressions, and missing coverage. Acceptance: The review names concrete risks or confirms the change is safe.; The review output is ordered and actionable for the next agent..",
+    "[AND] Test stage: Run the relevant automated tests for the changed workflow behavior. Acceptance: Targeted tests pass after the implementation change.; The failure mode is observable if the stage structure regresses..",
+    "[AND] Ship stage: Make the workflow output usable as a release-grade handoff artifact. Acceptance: The generated workflow includes both stage structure and the legacy `steps` list.; Compose output remains stable across repeated runs with the same inputs..",
+    "[AND] Reflect stage: Summarize what the evidence says about the current run. Acceptance: Reflection text is grounded in the run's actual feedback or retry state.; Any mode suggestion comes from the current evidence, not a dummy rule..",
+    "Load the top relevant skills: python_expert.",
+    "Verification loop: run 1 verification pass before completion.",
+    "Run the most relevant test or validation command before completion."
+  ]
+}
