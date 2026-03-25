@@ -116,38 +116,53 @@ Add 8 example project profiles with complete `.agent/` configurations:
 - Each template includes: `project_profile.yaml`, starter skill set, example workflows, example CLAUDE.md/AGENTS.md
 - Templates stored in `src/skillsmith/templates/examples/`
 
-### 2.4 Slash Command Expansion (Week 2-3)
+### 2.4 Slash Command Expansion (Week 2-3) [ACTIVE]
 
-Expand `.agent/workflows/` command bundles from current set to 25+:
+Expand `.agent/workflows/` command bundles from current set to 33+:
+- **Core Engineering**: `plan-feature`, `implement-feature`, `review-changes`, `test-changes`, `debug-issue` [DONE]
+- **Quality & Ops**: `deploy-checklist`, `security-audit`, `performance-audit`, `cleanup` [PENDING]
+- **Logic & Discovery**: `brainstorm`, `refactor`, `explain`, `search`, `context` [DONE]
+- **Advanced Swarms**: `swarm`, `team-exec` [DONE]
 
-**Development Commands:**
-- `/plan` — Implementation planning with acceptance criteria
-- `/tdd` — Test-driven development workflow
-- `/review` — Code review checklist execution
-- `/refactor` — Safe refactoring with verification
-- `/debug` — Structured debugging workflow
+### 2.5 Ecosystem Discovery (CLI Discovery Hub) [DONE]
+- [x] Implementation of `skillsmith search`
+- [x] Integrity check for `ghost-content`
+- [x] `skillsmith add --remote awesome` support
+- [x] Dynamic `SKILL.md` path resolution
 
-**Quality Commands:**
-- `/security-scan` — Security audit against OWASP patterns
-- `/test-coverage` — Coverage analysis and gap identification
-- `/perf-audit` — Performance profiling and optimization
-- `/lint-fix` — Auto-fix linting issues across project
+---
 
-**Operations Commands:**
-- `/deploy-check` — Pre-deployment verification checklist
-- `/incident` — Incident response workflow
-- `/migrate` — Database migration planning and execution
-- `/update-deps` — Dependency update with risk assessment
+## Phase 3: Frontiers of Scaling (Week 4-6) [ACTIVE]
 
-**Documentation Commands:**
-- `/doc-sync` — Sync docs with code changes
-- `/changelog` — Generate changelog from commits
-- `/api-docs` — Generate API documentation
+### 3.1 Signature Logic & Unlabeled Recon [DONE]
+- [x] Sovereign verification with SHA-256
+- [x] Ghost sync from sovereign branch
+- [x] Logic for `ghost-content` integrity
 
-**Learning Commands:**
-- `/learn` — Extract patterns from current session
-- `/evolve` — Cluster learned patterns into skills
-- `/retrospective` — Session retrospective and improvement plan
+### 3.2 Recursive Reasoning (Thinking Trees) [PLANNING]
+- Refine AND/OR logic for complex migrations.
+- Link Thinking Tree to Swarm Orchestration.
+
+---
+
+## Phase 4: Workflow Swarms (Week 7-9) [ACTIVE]
+
+### 4.1 Swarm Orchestration (`/swarm`) [INITIALIZED]
+- [x] CLI command `skillsmith swarm plan`
+- [x] Swarm assignments logic (simulated)
+- [x] Specialized role mapping (Orchestrator, Researcher, etc.)
+
+### 4.2 Team Execution (`/team-exec`) [INITIALIZED]
+- [x] CLI command `skillsmith team-exec`
+- [x] Initial handoff logic skeleton
+- [ ] Integration with .agent/MISSION.md for real state handoffs
+
+**Finding:** The upstream repository `benjaminasterA/antigravity-awesome-skills` contains an extremely structured `skills_index.json` and `CATALOG.md` that categorizes thousands of skills, tags, and AI commands (like `/plan`, `/implement`). Right now, developers manually hunt for categories in this external repo.
+
+**Integration Plan:**
+- **Dynamic Catalog Sync**: Build `skillsmith search` to natively query the remote `skills_index.json` (or our synced ghost-content equivalent) and render an interactive, Rich-formatted terminal Explorer.
+- **Frictionless Onboarding**: Enable engineers to run `skillsmith add --category "Web Frameworks"` and have the system autonomously fetch and scaffold the required `.agent/skills` and `.claude/commands` using the community taxonomy.
+- **Real-Time Recommendations**: Leverage the tags in the external index to suggest highly specific commands (`/security-audit-react`) based on the project's tech stack context.
 
 ---
 

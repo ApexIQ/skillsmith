@@ -11,14 +11,22 @@
 - [x] **Evolution Evaluator**: `skillsmith evolve evaluate` for expert benchmarking.
 - [x] **Autonomous Promotion**: `skillsmith evolve promote` for self-healing metadata repairs (Phase 2.3).
 
-## Phase 3: Frontiers of Scaling (COMPLETED)
-- [x] **Unlabeled Recon**: Run `evolve unlabeled` on industrial competitor repos to harvest patterns.
-- [x] **Signature Logic**: GPG/Checksum verification for the Ghost-Sync stream.
+## ✅ Phase 3: Frontiers of Scaling (Week 4-6) [DONE]
+- [x] Sovereign Ghost-Sync (Thin Core, Deep Content)
+- [x] Signature Logic (Verified Intelligence Streams)
+- [x] Unlabeled Recon (Supervision-free pattern discovery)
+- [x] Ecosystem Discovery hub (889+ skills searchable via CLI)
 
-## Phase 4: Workflow Swarms (ACTIVE)
-- [ ] Multi-agent orchestration with `/swarm` and `/team-exec` performance tuning.
-- [ ] Recursive Reasoning: Refine AND/OR Thinking Tree logic for complex codebase migrations.
+## 🚀 Phase 4: Workflow Swarms (Week 7-9) [ACTIVE]
+- [x] **Phase 4.1**: Multi-Agent Swarm Orchestration (`swarm`, `team-exec`, `MISSION.md`)
+- [x] **Phase 4.1.1**: Reasoning Tree Integration (`tree --output .agent/TREE.md`)
+- [ ] **Phase 4.2**: Real-time Autonomous Sub-agent Spawning (Sub-agent mission handoffs)
+- [x] Team Execution Harness (`/team-exec`)
+- [x] Specialized Role Mapping (O-R-I-R)
 - [ ] Parameterized Acceptance Criteria: Link workflows to explicit test results.
+- [x] **Reasoning Tree Export**: Save Thinking Tree logic to `.agent/TREE.md` during swarm planning.
+- [ ] **Recursive Self-Healing Swarm**: Add a `doctor --fix` task to the automatically generated swarm mission.
+- [x] 33+ Command Expansion in Workflow Templates
 
 ## Phase 5: Continuous OS (PLANNED)
 - [ ] `skillsmith doctor --fix` for self-healing agentic environments.

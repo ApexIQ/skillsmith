@@ -52,9 +52,14 @@ def swarm_plan_command(goal, agents, output):
             "status": "pending"
         })
 
-    # 3. Generate Mission Artifact
     mission_md = f"# [MISSION] {goal}\n\n"
     mission_md += f"**Swarm ID:** `{swarm_id}` | **Status:** `ACTIVE`\n\n"
+    
+    # 3.1 Inject Reasoning Tree Link
+    mission_md += "## 🌲 Reasoning Tree\n"
+    mission_md += "The strategic decomposition of this mission is documented in the Thinking Tree.\n"
+    mission_md += "- [ ] **Action:** Run `skillsmith tree --output .agent/TREE.md` to see the full reasoning path.\n\n"
+    
     mission_md += "## 📋 Swarm Task Graph\n\n"
     
     for assignment in swarm_plan["assignments"]:
