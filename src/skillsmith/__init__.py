@@ -11,9 +11,9 @@ if _package_version is not None:
     try:
         __version__ = _package_version("skillsmith")
     except Exception:
-        __version__ = "1.1.3"
+        __version__ = "1.1.4"
 else:
-    __version__ = "1.1.3"
+    __version__ = "1.1.4"
 
 __all__ = ["__version__", "compose_workflow", "doctor_summary", "init_project"]
 
