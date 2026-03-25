@@ -22,8 +22,8 @@
 | **Build** | Implement atomic changes in isolation. |
 | **Review** | Adversarial check for risks and regressions. |
 | **Test** | Identify highest-risk behavior and verify. |
-| **Ship** | Generate clean handoff; run `evolve reflect` to prepare context. |
-| **Reflect** | Distill exported reflection context into `lessons.md`. |
+| **Ship** | Generate clean handoff with evidence. |
+| **Reflect** | Record lessons and update project state. |
 
 ## 3. Execution Standard
 

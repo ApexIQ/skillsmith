@@ -113,11 +113,12 @@ Here is how you would use the most important commands in order to deliver a feat
 ## 🍳 The Skillsmith Mission Cookbook
 Find 50+ real-world "Recipes" for building, scaling, and evolving your software with agentic subagents. This is the definitive "How-to" guide for the ecosystem.
 
-### **[👉 Open the Cookbook (docs/COOKBOOK.md)](file:///c:/Users/vanam/Desktop/skills-agent/docs/COOKBOOK.md)**
+### **[👉 Open the Cookbook (docs/COOKBOOK.md)](COOKBOOK.md)**
 
 ---
 
-## 📚 Appendix: The Complete Command Registry
+<a name="appendix"></a>
+## Appendix: The Complete Command Registry
 Below is the exhaustive list of every command available in the Skillsmith ecosystem.
 
 ### 1. Management CLI Commands (`skillsmith <cmd>`)

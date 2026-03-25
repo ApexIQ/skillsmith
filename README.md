@@ -111,7 +111,7 @@ skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"
 ---
 
 ## 🌍 Codebase Knowledge (CK) Bridge
-Skillsmith now integrates **Architectural Intelligence** through the CK Bridge. By running `skillsmith understand sync --deep`, the system builds a high-fidelity **Knowledge Graph** of your repository, enabling subagents to detect architectural hotspots and hotspots before they plan a mission.
+Skillsmith now integrates **Architectural Intelligence** through the CK Bridge. By running `skillsmith understand sync --deep`, the system builds a high-fidelity **Knowledge Graph** of your repository, enabling subagents to detect architectural hotspots before they plan a mission.
 
 ---
 
@@ -120,7 +120,7 @@ For new users and teams, we have introduced a comprehensive learning path:
 
 1.  **[Bit-by-Bit Guide](docs/BIT_BY_BIT_GUIDE.md)**: A level-up journey from basic induction to autonomous evolution.
 2.  **[The Mission Cookbook](docs/COOKBOOK.md)**: 50+ real-world recipes (Goal/Tools/Recipe/Signal) for building complex software.
-3.  **[Command Registry](docs/BIT_BY_BIT_GUIDE.md#appendix-the-complete-command-registry)**: Full 77+ command map (CLI + Slash).
+3.  **[Command Registry](docs/BIT_BY_BIT_GUIDE.md#appendix)**: Full 77+ command map (CLI + Slash).
 
 ---
 

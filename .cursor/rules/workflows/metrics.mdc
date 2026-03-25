@@ -6,5 +6,5 @@ alwaysApply: false
 
 - Read `.agent/workflows/metrics.md`.
 - Goal: analyze skill quality and usage metrics for library click, pytest
-- Skills: python_expert
+- Skills: test_repair_skill
 - Follow the workflow steps, then verify with project tests or the closest validation command.
