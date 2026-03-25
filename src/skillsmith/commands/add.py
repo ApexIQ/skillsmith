@@ -281,6 +281,79 @@ def discover_skills(query: str, cwd: Path, source: str = "all", limit: int = 10)
     return results
 
 
+def _install_from_awesome(cwd: Path, skill_id: str, dest_dir: Path, overwrite: bool = False) -> bool:
+    import requests
+    from . import console
+    from .lockfile import record_skill_install
+    
+    INDEX_URL = "https://raw.githubusercontent.com/ApexIQ/skillsmith/ghost-content/skills_index.json"
+    
+    with console.status("[cyan]Searching Ghost Registry...[/cyan]"):
+        try:
+            resp = requests.get(INDEX_URL, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception as e:
+            console.print(f"[red]Failed to connect to Ghost Registry:[/red] {e}")
+            return False
+
+    skill_data = next((s for s in data if s.get("id") == skill_id), None)
+    if not skill_data:
+        console.print(f"[red]Skill '{skill_id}' not found in the awesome index.[/red]")
+        return False
+        
+    path = skill_data.get("path")
+    if not path:
+        console.print(f"[red]Skill '{skill_id}' has no path listed.[/red]")
+        return False
+        
+    if not path.endswith("SKILL.md"):
+        path = f"{path.rstrip('/')}/SKILL.md"
+
+    skill_url = f"https://raw.githubusercontent.com/ApexIQ/skillsmith/ghost-content/{path}"
+    
+    target_dir = dest_dir / skill_id
+    if target_dir.exists():
+        if not overwrite:
+            console.print(f"[yellow][SKIP][/yellow] Skill '{skill_id}' already exists in .agent/skills/")
+            return True
+        shutil.rmtree(target_dir, ignore_errors=True)
+        
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target_file = target_dir / "SKILL.md"
+    
+    with console.status(f"[bold green]Fetching {skill_id}...[/bold green]"):
+        try:
+            skill_resp = requests.get(skill_url, timeout=10)
+            skill_resp.raise_for_status()
+            target_file.write_bytes(skill_resp.content)
+        except Exception as e:
+            console.print(f"[red]Failed to download skill content:[/red] {e}")
+            return False
+
+    candidate = SkillCandidate(
+        name=skill_id,
+        description=skill_data.get("description", "Ghost Skill"),
+        source="awesome",
+        version="0.0.0",
+        install_ref=skill_id,
+        trust_score=95,
+        metadata=skill_data
+    )
+    
+    candidate = _annotate_install_candidate(
+        candidate,
+        install_kind="ghost-index",
+        selected_by="manual",
+        requested_name=skill_id,
+        selection_mode="manual",
+        profile=_load_profile(cwd)
+    )
+    record_skill_install(cwd, candidate, target_dir)
+    console.print(f"[green][OK][/green] Added skill: {skill_id} (Ghost Registry)")
+    return True
+
+
 @click.command()
 @click.argument("name_or_url")
 @click.option("--discover", "use_discovery", is_flag=True, help="Search providers and install the top match when possible")
@@ -291,13 +364,19 @@ def discover_skills(query: str, cwd: Path, source: str = "all", limit: int = 10)
     show_default=True,
     help="Discovery source",
 )
+@click.option("--remote", help="Remote source (e.g. 'awesome' to fetch from Ghost Registry)")
 @click.option("--overwrite", is_flag=True, help="Overwrite existing skill directory")
-def add_command(name_or_url, use_discovery, source, overwrite):
+def add_command(name_or_url, use_discovery, source, remote, overwrite):
     """Add a skill from local library, GitHub URL, or discovered providers."""
     cwd = Path.cwd()
     dest_dir = cwd / ".agent" / "skills"
     dest_dir.mkdir(parents=True, exist_ok=True)
     profile = _load_profile(cwd)
+
+    if remote == "awesome":
+        if _install_from_awesome(cwd, name_or_url, dest_dir, overwrite=overwrite):
+            return
+        raise click.exceptions.Exit(1)
 
     if _is_install_url(name_or_url):
         if _install_from_url(cwd, name_or_url, dest_dir, profile=profile, overwrite=overwrite):
