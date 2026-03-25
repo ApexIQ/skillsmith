@@ -2,31 +2,38 @@ idea: Project using skillsmith
 project_stage: existing
 app_type: library
 languages:
-  - python
+- python
+- typescript
+- go
+- rust
 frameworks:
-  - click
-  - pytest
+- click
+- pytest
+- arch-business-logic
+- arch-ui
+- arch-unknown
 package_manager: uv
 deployment_target: github-actions
 priorities:
-  - testability
-  - maintainability
-  - verification
-  - automation
+- maintainability
+- verification
+- testability
+- architectural-integrity
+- automation
 target_tools:
-  - antigravity
-  - claude
-  - codex
-  - copilot
-  - cursor
-  - gemini
-  - windsurf
+- antigravity
+- claude
+- codex
+- copilot
+- cursor
+- gemini
+- windsurf
 allow_remote_skills: false
 trusted_skill_sources:
-  - local
+- local
 allowed_remote_domains:
-  - github.com
-  - skills.sh
+- github.com
+- skills.sh
 blocked_skill_sources: []
 require_pinned_github_refs: true
 trusted_publisher_keys: {}
@@ -34,14 +41,35 @@ trusted_publisher_public_keys: {}
 publisher_verification_mode: optional
 publisher_signature_scheme_mode: auto
 publisher_signature_algorithms:
-  - hmac-sha256
-  - rsa-sha256
+- hmac-sha256
+- rsa-sha256
 publisher_key_rotation: {}
 min_remote_trust_score: 65
 min_remote_freshness_score: 0
 required_remote_licenses: []
 build_commands:
-  - uv build
+- uv build
 test_commands:
-  - pytest
-  - python -m unittest
+- pytest
+- python -m unittest
+_ck_hotspots:
+- path: src/skillsmith/commands/add.py
+  dependency_count: 0
+  complexity_score: 0.702
+  description: Skillsmith Baseline Auto-Scan node
+- path: src/skillsmith/commands/audit.py
+  dependency_count: 0
+  complexity_score: 0.98088
+  description: Skillsmith Baseline Auto-Scan node
+- path: src/skillsmith/commands/autonomy_runtime.py
+  dependency_count: 0
+  complexity_score: 1.0
+  description: Skillsmith Baseline Auto-Scan node
+- path: src/skillsmith/commands/context_index.py
+  dependency_count: 0
+  complexity_score: 1.0
+  description: Skillsmith Baseline Auto-Scan node
+- path: src/skillsmith/commands/doctor.py
+  dependency_count: 0
+  complexity_score: 0.78656
+  description: Skillsmith Baseline Auto-Scan node

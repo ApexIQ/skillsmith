@@ -45,8 +45,8 @@
 
 ## Project Summary
 - Idea: Project using skillsmith
-- Languages: python
-- Frameworks: click, pytest
+- Languages: python, typescript, go, rust
+- Frameworks: click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Trusted publisher public keys: none
 - Publisher signature scheme mode: auto
 

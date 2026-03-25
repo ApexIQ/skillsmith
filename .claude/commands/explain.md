@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-explain project architecture and logic for library click, pytest
+explain project architecture and logic for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/explain.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/explain.md)

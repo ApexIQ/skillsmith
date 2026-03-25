@@ -11,7 +11,7 @@ Keep project instructions, rules, and workflows aligned with `.agent/project_pro
 ## Context
 - Idea: Project using skillsmith
 - Stage: existing
-- Frameworks: click, pytest
+- Frameworks: click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Target tools: antigravity, claude, codex, copilot, cursor, gemini, windsurf
 - Trusted skill sources: local
 - Allowed remote domains: github.com, skills.sh

@@ -3,9 +3,10 @@
 > **Standard Operating Procedure**: These rules are immutable and must be applied to every tool execution.
 
 ## 1. Engineering Priorities
-- **Testability**: testability
 - **Maintainability**: maintainability
 - **Verification**: verification
+- **Testability**: testability
+- **Architectural-Integrity**: architectural-integrity
 - **Automation**: automation
 
 ## 2. Security & Trust Policy

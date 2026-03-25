@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-bootstrap a new module or service for library click, pytest
+bootstrap a new module or service for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/bootstrap.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/bootstrap.md)

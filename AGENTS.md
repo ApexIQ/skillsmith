@@ -77,11 +77,11 @@
 - Idea: Project using skillsmith
 - Stage: existing
 - App type: library
-- Languages: python
-- Frameworks: click, pytest
+- Languages: python, typescript, go, rust
+- Frameworks: click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Package manager: uv
 - Deployment target: github-actions
-- Priorities: testability, maintainability, verification, automation
+- Priorities: maintainability, verification, testability, architectural-integrity, automation
 - Target tools: antigravity, claude, codex, copilot, cursor, gemini, windsurf
 - Trusted skill sources: local
 - Allowed remote domains: github.com, skills.sh

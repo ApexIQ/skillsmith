@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-implement feature for library click, pytest
+implement feature for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/implement-feature.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/implement-feature.md)

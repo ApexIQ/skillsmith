@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-debug complex runtime issues for library click, pytest
+debug complex runtime issues for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/debug.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/debug.md)

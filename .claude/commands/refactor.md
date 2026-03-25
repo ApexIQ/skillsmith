@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-refactor project structure and technical debt for library click, pytest
+refactor project structure and technical debt for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/refactor.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/refactor.md)

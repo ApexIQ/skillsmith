@@ -4,8 +4,8 @@
 Project using skillsmith
 
 ## Tech Stack
-- Languages: python
-- Frameworks: click, pytest
+- Languages: python, typescript, go, rust
+- Frameworks: click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Package manager: uv
 - Deployment: github-actions
 - Trusted skill sources: local
@@ -25,7 +25,8 @@ Project using skillsmith
 - Generated from `.agent/project_profile.yaml`
 
 ## Priorities
-- testability
 - maintainability
 - verification
+- testability
+- architectural-integrity
 - automation

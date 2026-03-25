@@ -9,19 +9,26 @@
 
 ## Languages
 - python
+- typescript
+- go
+- rust
 
 ## Frameworks
 - click
 - pytest
+- arch-business-logic
+- arch-ui
+- arch-unknown
 
 ## Commands
 - Build: uv build
 - Test: pytest, python -m unittest
 
 ## Priorities
-- testability
 - maintainability
 - verification
+- testability
+- architectural-integrity
 - automation
 
 ## Target Tools
@@ -53,15 +60,34 @@
 - .agent
 - .claude
 - .cursor
+- .cursorrules
 - .github
+- .gitignore
+- .pytest_cache
+- .test-machine-output
+- .test-smoke
+- .test-stability
+- .test-tmp
+- .test-tmp-public-api
+- .tmp-tests
+- .tmp-unittest
+- .tmp-unittest-global
+- .uv-cache
+- .windsurf
 - .windsurfrules
 - AGENTS.md
 - CLAUDE.md
 - GEMINI.md
+- LICENSE
 - README.md
-- ROADMAP.md
-- UPCOMING_FEATURES.md
+- dist
+- docs
+- lab
 - pyproject.toml
+- scripts
+- skills.lock.json
 - src
 - tests
+- tmp
 - uv.lock
+- workflow.json

@@ -5,6 +5,6 @@ alwaysApply: false
 ---
 
 - Read `.agent/workflows/implement-feature.md`.
-- Goal: implement feature for library click, pytest
+- Goal: implement feature for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Skills: test_repair_skill
 - Follow the workflow steps, then verify with project tests or the closest validation command.

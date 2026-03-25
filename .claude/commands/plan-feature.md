@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-plan feature for library click, pytest
+plan feature for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/plan-feature.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/plan-feature.md)

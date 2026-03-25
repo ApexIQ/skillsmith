@@ -1,7 +1,7 @@
 # Workflow: review
 
 ## Summary
-- Goal: review code and architecture for library click, pytest
+- Goal: review code and architecture for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Project idea: Project using skillsmith
 - Skills: test_repair_skill
 

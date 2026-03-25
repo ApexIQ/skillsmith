@@ -1,11 +1,11 @@
 # Workflow: plan-feature
 
-- **Goal**: plan feature for library click, pytest
+- **Goal**: plan feature for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - **Idea**: Project using skillsmith
 - **Stage**: existing
 - **App type**: library
-- **Frameworks**: click, pytest
-- **Priorities**: testability, maintainability, verification, automation
+- **Frameworks**: click, pytest, arch-business-logic, arch-ui, arch-unknown
+- **Priorities**: maintainability, verification, testability, architectural-integrity, automation
 - **Skills**: test_repair_skill
 
 ## Stages
@@ -15,7 +15,7 @@
 
 **Objectives**:
 - Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.
-- Confirm the project stage, app type, frameworks, and priorities for goal: plan feature for library click, pytest.
+- Confirm the project stage, app type, frameworks, and priorities for goal: plan feature for library click, pytest, arch-business-logic, arch-ui, arch-unknown.
 - Top relevant skills: test_repair_skill.
 
 **Acceptance Checks**:

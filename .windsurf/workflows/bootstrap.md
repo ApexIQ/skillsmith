@@ -1,7 +1,7 @@
 # Workflow: bootstrap
 
 ## Summary
-- Goal: bootstrap a new module or service for library click, pytest
+- Goal: bootstrap a new module or service for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Project idea: Project using skillsmith
 - Skills: test_repair_skill
 

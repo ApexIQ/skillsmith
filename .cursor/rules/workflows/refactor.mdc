@@ -5,6 +5,6 @@ alwaysApply: false
 ---
 
 - Read `.agent/workflows/refactor.md`.
-- Goal: refactor project structure and technical debt for library click, pytest
+- Goal: refactor project structure and technical debt for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Skills: test_repair_skill
 - Follow the workflow steps, then verify with project tests or the closest validation command.

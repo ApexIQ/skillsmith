@@ -1,7 +1,7 @@
 # Workflow: plan-feature
 
 ## Summary
-- Goal: plan feature for library click, pytest
+- Goal: plan feature for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Project idea: Project using skillsmith
 - Skills: test_repair_skill
 

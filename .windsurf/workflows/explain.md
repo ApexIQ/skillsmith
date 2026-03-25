@@ -1,7 +1,7 @@
 # Workflow: explain
 
 ## Summary
-- Goal: explain project architecture and logic for library click, pytest
+- Goal: explain project architecture and logic for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Project idea: Project using skillsmith
 - Skills: test_repair_skill
 

@@ -3,7 +3,7 @@
 ## Project Overview
 - Idea: Project using skillsmith
 - Stage: existing
-- Stack: click, pytest
+- Stack: click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Required Context
 - `AGENTS.md`

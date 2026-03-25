@@ -3,7 +3,7 @@
 > This command is powered by a dynamic Skillsmith workflow bundle.
 
 ## Goal
-review code and architecture for library click, pytest
+review code and architecture for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/review.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/review.md)

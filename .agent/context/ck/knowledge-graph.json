@@ -1,0 +1,590 @@
+{
+  "nodes": [
+    {
+      "id": "src/skillsmith/api.py",
+      "path": "src/skillsmith/api.py",
+      "metadata": {
+        "layer": "ui",
+        "complexity": 0.31532,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/cli.py",
+      "path": "src/skillsmith/cli.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.13912,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/mcp_server.py",
+      "path": "src/skillsmith/mcp_server.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.62096,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/memory.py",
+      "path": "src/skillsmith/memory.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.12136,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/readiness_artifacts.py",
+      "path": "src/skillsmith/readiness_artifacts.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.2668,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/__init__.py",
+      "path": "src/skillsmith/__init__.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.02324,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/__main__.py",
+      "path": "src/skillsmith/__main__.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.003,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/add.py",
+      "path": "src/skillsmith/commands/add.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.702,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/align.py",
+      "path": "src/skillsmith/commands/align.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.02892,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/assets.py",
+      "path": "src/skillsmith/commands/assets.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.0776,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/assets_runtime.py",
+      "path": "src/skillsmith/commands/assets_runtime.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.235,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/audit.py",
+      "path": "src/skillsmith/commands/audit.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.98088,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/autonomy.py",
+      "path": "src/skillsmith/commands/autonomy.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.19152,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/autonomy_runtime.py",
+      "path": "src/skillsmith/commands/autonomy_runtime.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/budget.py",
+      "path": "src/skillsmith/commands/budget.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.09072,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/commands_cmd.py",
+      "path": "src/skillsmith/commands/commands_cmd.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.10884,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/compose.py",
+      "path": "src/skillsmith/commands/compose.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.22304,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/context_index.py",
+      "path": "src/skillsmith/commands/context_index.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/cookbook_cmd.py",
+      "path": "src/skillsmith/commands/cookbook_cmd.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.04136,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/discover.py",
+      "path": "src/skillsmith/commands/discover.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.13132,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/doctor.py",
+      "path": "src/skillsmith/commands/doctor.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.78656,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/eval_cmd.py",
+      "path": "src/skillsmith/commands/eval_cmd.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/evolve.py",
+      "path": "src/skillsmith/commands/evolve.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.9146,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/init.py",
+      "path": "src/skillsmith/commands/init.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/lint.py",
+      "path": "src/skillsmith/commands/lint.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.05828,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/list_cmd.py",
+      "path": "src/skillsmith/commands/list_cmd.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.09524,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/lockfile.py",
+      "path": "src/skillsmith/commands/lockfile.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/metrics.py",
+      "path": "src/skillsmith/commands/metrics.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.11588,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/profile.py",
+      "path": "src/skillsmith/commands/profile.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.57564,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/providers.py",
+      "path": "src/skillsmith/commands/providers.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/ready.py",
+      "path": "src/skillsmith/commands/ready.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.9116,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/rebuild.py",
+      "path": "src/skillsmith/commands/rebuild.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.08596,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/recommend.py",
+      "path": "src/skillsmith/commands/recommend.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.22468,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/registry.py",
+      "path": "src/skillsmith/commands/registry.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.94768,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/registry_service.py",
+      "path": "src/skillsmith/commands/registry_service.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/rendering.py",
+      "path": "src/skillsmith/commands/rendering.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/report.py",
+      "path": "src/skillsmith/commands/report.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/roles.py",
+      "path": "src/skillsmith/commands/roles.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.23516,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/safety.py",
+      "path": "src/skillsmith/commands/safety.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.28504,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/search_cmd.py",
+      "path": "src/skillsmith/commands/search_cmd.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.14344,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/serve.py",
+      "path": "src/skillsmith/commands/serve.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.0198,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/snapshot.py",
+      "path": "src/skillsmith/commands/snapshot.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.08132,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/start.py",
+      "path": "src/skillsmith/commands/start.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.36132,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/suggest.py",
+      "path": "src/skillsmith/commands/suggest.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.43952,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/swarm.py",
+      "path": "src/skillsmith/commands/swarm.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.49132,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/sync.py",
+      "path": "src/skillsmith/commands/sync.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.06264,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/tree.py",
+      "path": "src/skillsmith/commands/tree.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.23712,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/trust_service.py",
+      "path": "src/skillsmith/commands/trust_service.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/understand.py",
+      "path": "src/skillsmith/commands/understand.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.18816,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/update.py",
+      "path": "src/skillsmith/commands/update.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.10952,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/watch.py",
+      "path": "src/skillsmith/commands/watch.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.09332,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/workflow_engine.py",
+      "path": "src/skillsmith/commands/workflow_engine.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 1.0,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/commands/__init__.py",
+      "path": "src/skillsmith/commands/__init__.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.5026,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/core/base_command.py",
+      "path": "src/skillsmith/core/base_command.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.08592,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/core/config.py",
+      "path": "src/skillsmith/core/config.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.22384,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/core/constants.py",
+      "path": "src/skillsmith/core/constants.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.21824,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/core/exceptions.py",
+      "path": "src/skillsmith/core/exceptions.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.03936,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/core/__init__.py",
+      "path": "src/skillsmith/core/__init__.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.02612,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/services/evolution.py",
+      "path": "src/skillsmith/services/evolution.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.76056,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/services/graph_bridge.py",
+      "path": "src/skillsmith/services/graph_bridge.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.28216,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/services/metrics.py",
+      "path": "src/skillsmith/services/metrics.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.4992,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/services/__init__.py",
+      "path": "src/skillsmith/services/__init__.py",
+      "metadata": {
+        "layer": "business-logic",
+        "complexity": 0.0186,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/utils/hashing.py",
+      "path": "src/skillsmith/utils/hashing.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.0242,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/templates/skeletons/fastapi-pro/app/main.py",
+      "path": "src/skillsmith/templates/skeletons/fastapi-pro/app/main.py",
+      "metadata": {
+        "layer": "ui",
+        "complexity": 0.00672,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    },
+    {
+      "id": "src/skillsmith/templates/skeletons/cli-python-pro/src/cli.py",
+      "path": "src/skillsmith/templates/skeletons/cli-python-pro/src/cli.py",
+      "metadata": {
+        "layer": "unknown",
+        "complexity": 0.00264,
+        "description": "Skillsmith Baseline Auto-Scan node"
+      }
+    }
+  ],
+  "edges": []
+}

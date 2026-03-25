@@ -1,11 +1,11 @@
 # Workflow: lint
 
-- **Goal**: run linter and fix stylistic issues for library click, pytest
+- **Goal**: run linter and fix stylistic issues for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - **Idea**: Project using skillsmith
 - **Stage**: existing
 - **App type**: library
-- **Frameworks**: click, pytest
-- **Priorities**: testability, maintainability, verification, automation
+- **Frameworks**: click, pytest, arch-business-logic, arch-ui, arch-unknown
+- **Priorities**: maintainability, verification, testability, architectural-integrity, automation
 - **Skills**: test_repair_skill
 
 ## Stages
@@ -15,7 +15,7 @@
 
 **Objectives**:
 - Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action.
-- Confirm the project stage, app type, frameworks, and priorities for goal: run linter and fix stylistic issues for library click, pytest.
+- Confirm the project stage, app type, frameworks, and priorities for goal: run linter and fix stylistic issues for library click, pytest, arch-business-logic, arch-ui, arch-unknown.
 - Top relevant skills: test_repair_skill.
 
 **Acceptance Checks**:
@@ -142,8 +142,8 @@
 1. Read .agent/project_profile.yaml and .agent/context/project-context.md.
 2. Confirm the requested goal against the current project stage and target tools.
 3. [AND] Discover stage: Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action. Acceptance: Project profile and generated context are present or inferred without error.; The ranked skill list is deterministic for the current goal and profile..
-4. [AND] Plan stage: Turn the goal into a minimal patch plan with explicit verification checkpoints. Acceptance: The plan names concrete files, commands, or subsystems.; Every planned step has at least one verification check..
-5. [AND] Build stage: Implement the smallest coherent change needed for the goal. Acceptance: Reproduce the issue and capture the failing behavior before the fix is applied.; Implement the fix with focused verification for the affected area..
+4. [OR] Plan stage: Turn the goal into a minimal patch plan with explicit verification checkpoints. Acceptance: The plan names concrete files, commands, or subsystems.; Every planned step has at least one verification check..
+5. [OR] Build stage: Implement the smallest coherent change needed for the goal. Acceptance: Reproduce the issue and capture the failing behavior before the fix is applied.; Implement the fix with focused verification for the affected area..
 6. [AND] Review stage: Inspect the changed files for correctness, regressions, and missing coverage. Acceptance: The review names concrete risks or confirms the change is safe.; The review output is ordered and actionable for the next agent..
 7. [AND] Test stage: Run the relevant automated tests for the changed workflow behavior. Acceptance: Targeted tests pass after the implementation change.; The failure mode is observable if the stage structure regresses..
 8. [AND] Ship stage: Make the workflow output usable as a release-grade handoff artifact. Acceptance: The generated workflow includes both stage structure and the legacy `steps` list.; Compose output remains stable across repeated runs with the same inputs..

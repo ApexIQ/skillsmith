@@ -7,7 +7,7 @@ description: Review correctness, regressions, and missing verification before co
 
 ## Project Summary
 - Idea: Project using skillsmith
-- Stack: click, pytest
+- Stack: click, pytest, arch-business-logic, arch-ui, arch-unknown
 
 ## Instructions
 - Prioritize bugs, regressions, and missing tests.
