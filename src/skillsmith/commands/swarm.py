@@ -26,6 +26,9 @@ def swarm_plan_command(goal, agents, output):
     # 1. Use existing workflow engine for decomposition
     workflow = build_workflow(goal, cwd, max_skills=10)
     
+    # 1.1 Persist workflow for Reasoning Tree visualization
+    (cwd / "workflow.json").write_text(json.dumps(workflow, indent=2), encoding="utf-8")
+    
     steps = workflow.get("steps", [])
     if not steps:
         console.print("[yellow]Goal is too simple for a swarm. Recommend single-agent execution.[/yellow]")
