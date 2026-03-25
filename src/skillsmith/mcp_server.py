@@ -383,6 +383,41 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
             for c in candidates
         ]
 
+    # ── Tool 8: autonomous_mission ───────────────────────────────────────────
+    @mcp.tool()
+    def autonomous_mission(goal: str, max_iterations: int = 5) -> dict:
+        """Trigger an autonomous, multi-stage mission to achieve a specific goal.
+        
+        The mission follows the Thinking Tree (Discover -> Plan -> Build -> Review -> Test -> Ship).
+        It will automatically retry and pivot strategies if a branch fails.
+
+        Args:
+            goal: The high-level objective (e.g. 'update the documentation', 'fix the login bug').
+            max_iterations: Maximum number of self-correction attempts (default 5).
+
+        Returns:
+            The final session summary including status, score, and applied changes.
+        """
+        from .commands.autonomy_runtime import run_autonomy_session
+        
+        # We wrap the underlying runner to ensure it returns an MCP-friendly result
+        try:
+            session = run_autonomy_session(
+                cwd=resolved_dir.parent,
+                benchmark_pack={"tasks": [{"id": "mission-1", "title": "Mission", "goal": goal}]},
+                max_iterations=max_iterations,
+                domain="mission",
+            )
+            return {
+                "status": session.get("status"),
+                "session_id": session.get("session_id"),
+                "summary": session.get("summary", {}).get("text", "Mission complete."),
+                "best_score": session.get("best_score", 0.0),
+                "stop_reason": session.get("stop_reason"),
+            }
+        except Exception as exc:
+            return {"status": "error", "message": str(exc)}
+
     return mcp
 
 

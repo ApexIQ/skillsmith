@@ -8,9 +8,9 @@
 [![PyPI version](https://img.shields.io/pypi/v/skillsmith.svg?color=blue&style=flat-square)](https://pypi.org/project/skillsmith/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Stars](https://img.shields.io/github/stars/ApexIQ/skillsmith?style=social)](https://github.com/ApexIQ/skillsmith)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=flat-square&logo=discord)](https://discord.gg/skillsmith)
-
 **Standardize instructions. Evolve skills. Orchestrate swarms.**
+
+**🚀 v1.1.2 Update: 100/100 Readiness Gate & Stabilized Docs Nexus.**
 
 [Overview](#-the-vision) • [Competitive Moat](#-the-competitive-moat) • [Quick Start](#-high-velocity-setup) • [Pillars](#-architectural-pillars) • [Command Reference](docs/COMMANDS.md)
 
@@ -95,7 +95,14 @@ skillsmith doctor
 ### 4. Deploy a Swarm
 ```bash
 # Decompose a complex mission into a parallel multi-agent plan.
-skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"
+**skillsmith swarm plan "Refactor the entire auth module for OAuth2 parity"**
+```
+
+### 5. The Readiness Gate (100/100)
+Ensure your repository is technically, architecturally, and doc-ready for agent missions.
+```bash
+# Verify 4 key gates: Init, Doctor, Compose, and Report.
+skillsmith ready
 ```
 
 ---
@@ -137,7 +144,8 @@ For new users and teams, we have introduced a comprehensive learning path:
 
 - [x] **v0.9**: Autonomous Evolution (XSkill Phase 1)
 - [x] **v1.0**: Competitive Evolution (Swarms & Thinking Trees)
-- [x] **v1.1**: **Self-Healing Skills & MCP Integration**
+- [x] **v1.1**: Self-Healing Skills & MCP Integration
+- [x] **v1.1.2**: **100/100 Readiness Gate & Fixed Docs Nexus**
 - [ ] **v2.0**: **The Collective** — Decentralized skill sharing & autonomous agent economies.
 
 ---
