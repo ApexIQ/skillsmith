@@ -1,6 +1,6 @@
 [project]
 name = "skillsmith"
-version = "1.1.4"
+version = "1.1.5"
 description = "The premier operating system for AI coding agents — standardize, compose, and scale skills-as-code."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,10 +17,10 @@ classifiers = [
 ]
 keywords = ["ai", "agents", "llm", "claude-code", "cursor", "windsurf", "zencoder", "scaffolding", "skills", "productivity", "skillsmith", "ai-engineering", "mcp"]
 dependencies = [
-    "click>=8.0",
-    "rich>=10.0",
-    "requests>=2.25.0",
-    "PyYAML>=6.0",
+    "click>=8.1.0",
+    "rich>=12.0.0",
+    "requests>=2.31.0",
+    "PyYAML>=6.0.1",
 ]
 
 [project.optional-dependencies]
