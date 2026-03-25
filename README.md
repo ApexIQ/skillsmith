@@ -30,14 +30,17 @@ While LLMs are powerful, they are context-poor and structurally drift. **Skillsm
 
 Skillsmith v1.0 introduces features that place it at the absolute frontier of AI engineering:
 
+### 🌍 Ecosystem Discovery (CLI Hub)
+Stop hunting for prompts. Use `skillsmith search` to query the sovereign **Ghost-Content** index of **889+ skills** directly from your terminal. See global categories, filter by tech stack, and install them instantly.
+
 ### 🐝 Multi-Agent Swarm Orchestration
-Stop running in single-agent loops. Skillsmith can decompose massive goals into **Parallelized Task Graphs**, assigning specialized roles (**Orchestrator, Researcher, Implementer, Reviewer**) to coordinate complex missions across multiple agent threads.
+Stop running in single-agent loops. Skillsmith can decompose massive goals into **Parallelized Task Graphs** (`skillsmith swarm plan`), assigning specialized roles (**Orchestrator, Researcher, Implementer, Reviewer**) to coordinate complex missions across multiple agent threads via `skillsmith team-exec`.
 
 ### 🧬 Autonomous Evolution (XSkill)
 Your project instructions should learn from your wins. Use `skillsmith evolve` to capture structural engineering patterns from your Git history or raw source code. Skillsmith translates developer experience into repeatable, benchmarked agent skills automatically.
 
 ### 🌲 Recursive Thinking Trees
-When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR Thinking Trees** to resolve goals, exploring multiple implementation paths and strategy fallbacks before a single line of bad code is written.
+When a strategy fails, Skillsmith doesn't just retry. It uses recursive **AND/OR Thinking Trees** (`skillsmith tree`) to resolve goals, exploring multiple implementation paths and strategy fallbacks before a single line of bad code is written.
 
 ---
 
@@ -56,7 +59,18 @@ skillsmith init --bundle python-pro
 skillsmith init --guided
 ```
 
-### 3. Evolve & Evaluate (Phase 2.2) 🌌🧪
+### 3. Search & Install (Global Ecosystem) 🌍
+Explore 889+ expert skills archived in our sovereign ghost-content branch.
+```bash
+# Search for skills (v1.0.8+)
+skillsmith search --categories
+skillsmith search "authentication" --limit 5
+
+# Install directly from the sovereign index
+skillsmith add --remote awesome next-js-expert
+```
+
+### 4. Evolve & Evaluate (Phase 2.2) 🌌🧪
 Skillsmith isn't static. It autonomously captures patterns from your Git history and **scores** your entire skill library (including Ghost Skills) against industry standards.
 
 ```bash

@@ -188,7 +188,8 @@ tmp*/
 .tmp-unittest-global/
 .tmp-tests-run/
 .tmp-build/
-_manual_ctx_test*/
+ghost_test_lab/
+error.txt
 .uv-cache/
 
 # Essential Library Assets (Explicitly allow for packaging)
