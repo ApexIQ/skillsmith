@@ -25,12 +25,15 @@ Keep project instructions, rules, and workflows aligned with `.agent/project_pro
 - Minimum remote trust: 65
 
 ## Recent Changes
-- Generated or aligned project instructions from the saved profile.
+- Integrated **Arize Phoenix** for local, persistent mission observability.
+- Implemented **Mission Auditor** (`skillsmith audit`) for trace reflection and self-correction.
+- Configured persistent OTel database storage in `.phoenix/`.
+- Updated agent standards (`AGENTS.md`, `GEMINI.md`) to mandate mission auditing.
 
 ## Next Steps
-1. Update the profile when project assumptions change.
-2. Run `skillsmith align` to re-render managed files.
-3. Verify generated paths with `skillsmith doctor`.
+1. Enhance the Auditor to provide specific remediation hints for failed spans.
+2. Implement performance benchmarking using the now-persistent trace database.
+3. Stabilize the `evolve` command to use the local trace history for better reflection.
 
 ## Known Issues
-None recorded.
+- `DependencyConflict`: `openai >= 1.69.0` missing in some environments (non-blocking for observability).

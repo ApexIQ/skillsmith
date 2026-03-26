@@ -20,10 +20,13 @@ class MemoryManager:
         
         self.raw_log_path = self.log_dir / "raw_events.jsonl"
         self.lessons_path = self.agent_dir / "lessons.md"
+        self.working_memory_path = self.agent_dir / "memory.md"
         
         # Ensure files exist (Layer 1 & 2 placeholders)
         if not self.raw_log_path.exists():
             self.raw_log_path.touch()
+        if not self.working_memory_path.exists():
+            self.working_memory_path.write_text("## Working Memory\n- [ ] No active context distilled yet. Run 'evolve reflect' to initialize.", encoding="utf-8")
 
     # --- Layer 1: Observer ---
     def log_event(self, event_type: str, data: Dict):

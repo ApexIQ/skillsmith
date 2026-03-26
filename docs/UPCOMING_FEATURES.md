@@ -613,6 +613,44 @@ skillsmith compose "explore new API" --mode research
 - [ ] Continuous learning v2 with instinct lifecycle
 - [ ] 3 paying teams on team tier
 
+### 3.8 Template-Level Mission Memory [DONE]
+- [x] **Swarm Integration**: `MISSION.md` template now natively supports `## Active Memory` injection. 
+- [x] **Sovereign Profile Alignment**: `skillsmith adbce` ensures `AGENTS.md` is always current before execution.
+
 ---
 
-*Last updated: 2026-03-25 by competitive audit against OpenSpace (HKUDS) and Everything Claude Code (affaan-m).*
+## Phase 5: Self-Operating Intelligence (Weeks 10-12) [ACTIVE]
+
+**Goal:** Turn the library into a self-teaching, self-healing operating system where agents learn at every logic gate.
+
+### 5.1 Instant Reflector & Micro-Lessons (Real-Time Learning)
+- [ ] **Completion Callbacks**: Tools like `write_to_file` and `run_command` trigger an immediate "Observation" of result quality.
+- [ ] **Micro-Lesson Extraction**: If a tool call was suboptimal, the AI instantly logs a 1-sentence "Lesson" to `memory.md` to prevent immediate repeats.
+- [ ] **Bio-inspired Fact Extraction**: Heuristics to automatically categorize the last 20 events into "Strategies" vs "Errors".
+
+### 5.2 DNA Injection & Law Enforcement
+- [ ] **Protocol Middleware**: Force-inject `AGENTS.md` into the system prompt for every `skillsmith` subcommand call via MCP. 
+- [ ] **Prime Directive #9 (The Self-Evolution Directive)**: AI is mandated to optimize its own rule-set without human intervention if patterns are proven successful.
+
+### 5.3 Instruction Self-Evolution (The Darwin Engine)
+- [ ] **Dynamic AGENTS.md**: AI rewrites its own prime directives based on consistent evidence in `lessons.md`.
+- [ ] **Rule-Pack Refiner**: Self-healing for `.cursorrules` and `GEMINI.md`. If a rule is found to cause "Constructive Friction" (per PRD), it is evolved for production-grade throughput.
+
+### 5.4 Autonomous Scaffolding & CI Gates
+- [ ] **`init v2`**: All project templates (`saas-starter`, `fastapi-pro`) now scaffold with `memory.md` and `mission.md` as standard components.
+- [ ] **Self-Correcting Readiness Gaps**: If `skillsmith doctor` returns <100/100, the system automatically spawns a Researcher/Implementer swarm to repair the environment.
+
+---
+
+*Last updated: 2026-03-26 by technical decision on Agentic Autonomy, Mission Tracing, and Local State Sovereignty.*
+
+---
+
+## Phase 6: Mission Observability & Local Sovereignty (Week 13) [DONE]
+
+**Goal:** Ensure the system is "Self-Aware" by capturing and auditing its own reasoning traces locally.
+
+- [x] **6.1: Mission Control Persistence**: Discarded volatile traces in favor of a project-root `.phoenix/` database. Traces now survive terminal restarts.
+- [x] **6.2: The Resident Auditor**: Implemented `skillsmith audit` to query the local database and find "Thinking Tree" failures without needing a Web-UI.
+- [x] **6.3: Version-Independent Tracing**: Solved Arize Phoenix SDK versioning issues by building a version-agnostic Pandas query engine.
+- [x] **6.4: Goal-Correlated Audits**: Automated mapping of raw OTel spans to high-level Mission Goals (e.g. from `swarm plan`).

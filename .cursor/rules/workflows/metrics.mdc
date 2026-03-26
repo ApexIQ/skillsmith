@@ -1,7 +1,7 @@
 ---
-description: Run the metrics workflow for this project
+description: Command: /metrics - Run the metrics workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/metrics.md`.

@@ -28,7 +28,14 @@
 - [ ] **Recursive Self-Healing Swarm**: Add a `doctor --fix` task to the automatically generated swarm mission.
 - [x] 33+ Command Expansion in Workflow Templates
 
-## Phase 5: Continuous OS (PLANNED)
+## ✅ Phase 5: Continuous OS (ACTIVE)
 - [ ] `skillsmith doctor --fix` for self-healing agentic environments.
 - [ ] Real-time recommendations: Suggesting skills based on `uv` dependency changes.
 - [ ] Visual Hub: A local Web-UI for browsing the 882+ Ghost Skill library.
+
+## ✅ Phase 6: Mission Observability (COMPLETED)
+- [x] **Phase 6.1**: Integrated **Arize Phoenix** for local, persistent trace collection.
+- [x] **Phase 6.2**: Persistent Metadata Hub in `.phoenix/` to survive session loss.
+- [x] **Phase 6.3**: Developed **Mission Auditor** (`skillsmith audit`) for automated self-reflection.
+- [x] **Phase 6.4**: Version-agnostic Pandas query engine for trace extraction.
+- [x] **Phase 6.5**: Correlated goal-capture through SQL-to-Pandas fallback logic.

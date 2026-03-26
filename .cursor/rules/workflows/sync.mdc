@@ -1,7 +1,7 @@
 ---
-description: Run the sync workflow for this project
+description: Command: /sync - Run the sync workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/sync.md`.

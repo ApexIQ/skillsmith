@@ -1,7 +1,7 @@
 ---
-description: Run the refactor workflow for this project
+description: Command: /refactor - Run the refactor workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/refactor.md`.

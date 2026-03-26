@@ -1,7 +1,7 @@
 ---
-description: Run the security workflow for this project
+description: Command: /security - Run the security workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/security.md`.

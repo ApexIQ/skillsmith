@@ -265,17 +265,21 @@ def evolve_reflect_command(format, force):
         return
 
     # Markdown Handoff for Human/Agent review
-    console.print(f"[bold blue]Skillsmith Evolution: Reflection Packet Prepared[/bold blue]")
-    console.print(f"[cyan]Exported {len(raw_logs)} events for distillation.[/cyan]")
+    # Distill logs into memory.md (Layer 2)
+    # AI-Integrated Micro-Learning (Layer 2)
+    from ..services.evolution import EvolutionEngine
+    engine = EvolutionEngine(cwd)
+    facts = engine.distill_logs_semantically(mm.raw_log_path)
+    engine.update_working_memory(facts, mm.working_memory_path)
     
-    summary = [f"- Detected {len(raw_logs)} engineering events in raw logs."]
-    categories = set(log.get("type") for log in raw_logs)
-    summary.append(f"- Categories for distillation: {', '.join(categories)}")
+    # Sync Mission MD if it exists
+    from .swarm import _load_mission, _sync_mission_md
+    mission = _load_mission(cwd)
+    if mission:
+        _sync_mission_md(cwd, mission)
     
-    for item in summary:
-        console.print(f"  {item}")
-        
-    console.print(f"\n[bold green]Ready for Handoff![/bold green] Agent can now read raw logs and update [bold]lessons.md[/bold].")
+    console.print(f"\n[bold green]Reflection Complete![/bold green] working_memory updated at [bold].agent/memory.md[/bold].")
+    console.print(f"[dim]Next step: Use 'skillsmith advanced flow' to keep context lean.[/dim]")
 
 @evolve_command.command("unlabeled")
 @click.argument("directory", type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path))

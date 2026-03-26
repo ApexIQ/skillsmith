@@ -138,6 +138,16 @@ def render_agents_md(profile: dict) -> str:
 - One owner per subtask; merge results only after verification.
 - Never mark done without evidence (tests, command output, or concrete behavioral checks).
 
+## 4. Slash Command Registry (MCP Mapping)
+
+This project supports specialized engineering commands. If the user invokes them, use the corresponding MCP tool:
+- `/autonomous` -> Use `autonomous_mission`
+- `/audit`, `/security`, `/performance` -> Use `audit_repository`
+- `/explain` -> Use `explain_code`
+- `/verify` -> Use `verify_readiness`
+- `/review` -> Use `review_changes`
+- `/sync` -> Use `sync_project`
+
 ## Memory and Cost Policy (Library-First)
 
 - Optimize for `pip install skillsmith` local workflows first; external services remain optional.
@@ -554,6 +564,13 @@ def render_windsurf_rule(profile: dict) -> str:
 - Read `AGENTS.md`, `.agent/STATE.md`, and `.agent/lessons.md`.
 - Read `.agent/project_profile.yaml` and `.agent/context/project-context.md`.
 - Current focus: {profile.get("idea", "not-specified")}
+- **Slash Commands**: This project supports specialized engineering commands. If the user invokes them, use the corresponding MCP tool:
+  - `/autonomous` -> Use `autonomous_mission`
+  - `/audit`, `/security`, `/performance` -> Use `audit_repository`
+  - `/explain` -> Use `explain_code`
+  - `/verify` -> Use `verify_readiness`
+  - `/review` -> Use `review_changes`
+  - `/sync` -> Use `sync_project`
 - Prefer relevant skills from `.agent/skills/` over ad hoc instructions.
 - Use `.agent/workflows/` for reusable runbooks like `brainstorm`, `plan-feature`, `debug-issue`, and `test-changes`.
 - Trusted publisher public keys: {_publisher_public_key_ids(profile)}
@@ -583,6 +600,13 @@ alwaysApply: true
 - Read `AGENTS.md`, `.agent/STATE.md`, `.agent/lessons.md`, and `.agent/project_profile.yaml`.
 - Current focus: {profile.get("idea", "not-specified")}
 - Check `.agent/context/project-context.md` before making stack assumptions.
+- **Slash Commands**: This project supports specialized engineering commands. If the user invokes them, use the corresponding MCP tool:
+  - `/autonomous` -> Use `autonomous_mission`
+  - `/audit`, `/security`, `/performance` -> Use `audit_repository`
+  - `/explain` -> Use `explain_code`
+  - `/verify` -> Use `verify_readiness`
+  - `/review` -> Use `review_changes`
+  - `/sync` -> Use `sync_project`
 - Prefer relevant skills from `.agent/skills/` before implementation.
 - For repeatable flows, use the generated workflow rules in `.cursor/rules/workflows/`.
 - Trusted publisher public keys: {_publisher_public_key_ids(profile)}
@@ -627,9 +651,9 @@ def render_windsurf_workflow(name: str, workflow: dict) -> str:
 
 def render_cursor_workflow_rule(name: str, workflow: dict) -> str:
     return f"""---
-description: Run the {name} workflow for this project
+description: Command: /{name} - Run the {name} workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/{name}.md`.

@@ -1,18 +1,18 @@
 {
   "kind": "handoff-packet",
   "version": "1.0.0",
-  "mission_id": "ec8c6630",
+  "mission_id": "1e20ab75",
   "task_id": 2,
   "role": "Researcher",
   "assigned_skill": ".agent/skills/how_to_research/SKILL.md",
-  "objective": "Confirm the requested goal against the current project stage and target tools.",
+  "objective": "PLAN: Turn the goal into a minimal patch plan with explicit verification checkpoints.",
   "context": {
-    "goal": "Build a new analytics module",
+    "goal": "Verify the persistent Mission Auditor accurately captures project mission goals.",
     "status": "ACTIVE",
     "dependencies": [
       1
     ]
   },
   "artifacts_expected": [],
-  "generated_at": "3f11cb61-f15c-4358-9be3-37e8725013c0"
+  "generated_at": "97b74e93-bdeb-4a80-927b-2838370135ec"
 }

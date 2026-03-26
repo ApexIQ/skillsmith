@@ -509,3 +509,99 @@ class EvolutionEngine:
                     continue
 
         return history
+
+    def distill_logs_semantically(self, raw_events_path: Path) -> List[str]:
+        """Perform semantic clustering on raw events to extract high-signal 'Facts'.
+        
+        Args:
+            raw_events_path: Path to raw_events.jsonl.
+            
+        Returns:
+            List of distilled semantic facts.
+        """
+        if not raw_events_path.exists():
+            return []
+
+        events = []
+        with open(raw_events_path, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    events.append(json.loads(line))
+                except:
+                    continue
+
+        if not events:
+            return []
+
+        facts = []
+        error_signatures: Dict[str, int] = {}
+        tool_patterns: Dict[str, List[str]] = {}
+
+        for event in events:
+            etype = event.get("type", "")
+            edata = event.get("data", {})
+            
+            # 1. Cluster Errors (Failure Patterns)
+            if etype == "error" or (etype == "tool_output" and edata.get("success") is False):
+                error_msg = edata.get("error") or edata.get("output", "")
+                tool = edata.get("tool", "unknown")
+                # Extract signature (first 50 chars + type)
+                signature = f"{tool}: {str(error_msg)[:50]}"
+                error_signatures[signature] = error_signatures.get(signature, 0) + 1
+            
+            # 2. Track Successful Tool Patterns
+            elif etype in ["tool_call", "success", "file_created", "refactor", "mission_state_change", "mcp_tool_execution"]:
+                tool = edata.get("tool") or edata.get("status") or "logic"
+                if tool not in tool_patterns:
+                    tool_patterns[tool] = []
+                
+                # Capture specific detail if available
+                if "path" in edata:
+                    tool_patterns[tool].append(Path(edata["path"]).name)
+                elif "file" in edata:
+                    tool_patterns[tool].append(Path(edata["file"]).name)
+                else:
+                    tool_patterns[tool].append("system")
+
+        # 3. Synthesize Semantic Facts
+        for sig, count in error_signatures.items():
+            if count > 1:
+                facts.append(f"[PATTERN] Persistent failure detected in {sig} ({count} occurrences).")
+            else:
+                facts.append(f"[ISSUE] One-off failure in {sig}.")
+
+        for tool, items in tool_patterns.items():
+            unique_items = sorted(set(items))
+            if len(unique_items) > 3:
+                facts.append(f"[SUCCESS] High-volume usage of {tool} across {len(unique_items)} files.")
+            elif unique_items:
+                facts.append(f"[EVENT] Applied {tool} to {', '.join(unique_items)}.")
+
+        return facts
+
+    def update_working_memory(self, facts: List[str], memory_path: Path) -> bool:
+        """Update the working_memory.md file with distilled facts.
+        
+        Args:
+            facts: List of semantic facts.
+            memory_path: Path to memory.md.
+            
+        Returns:
+            True if updated successfully.
+        """
+        try:
+            timestamp = datetime.now().strftime('%Y%m%d')
+            content = f"## Reflection (v{timestamp})\n"
+            content += f"- Derived from autonomous distillation of engineering events.\n"
+            
+            if facts:
+                content += "### Semantic Facts (Micro-Learning)\n"
+                for fact in facts:
+                    content += f"- {fact}\n"
+            else:
+                content += "- [ ] No high-signal patterns identified in current cycle.\n"
+                
+            memory_path.write_text(content, encoding="utf-8")
+            return True
+        except Exception:
+            return False

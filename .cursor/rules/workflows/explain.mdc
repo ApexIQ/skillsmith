@@ -1,7 +1,7 @@
 ---
-description: Run the explain workflow for this project
+description: Command: /explain - Run the explain workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/explain.md`.

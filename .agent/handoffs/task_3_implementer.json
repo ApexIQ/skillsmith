@@ -1,18 +1,18 @@
 {
   "kind": "handoff-packet",
   "version": "1.0.0",
-  "mission_id": "ec8c6630",
+  "mission_id": "1e20ab75",
   "task_id": 3,
   "role": "Implementer",
   "assigned_skill": ".agent/skills/software_lifecycle/SKILL.md",
-  "objective": "[AND] Discover stage: Read .agent/project_profile.yaml and .agent/context/project-context.md before taking action. Acceptance: Project profile and generated context are present or inferred without error.; The ranked skill list is deterministic for the current goal and profile..",
+  "objective": "BUILD: Implement the smallest coherent change needed for the goal.",
   "context": {
-    "goal": "Build a new analytics module",
+    "goal": "Verify the persistent Mission Auditor accurately captures project mission goals.",
     "status": "ACTIVE",
     "dependencies": [
       2
     ]
   },
   "artifacts_expected": [],
-  "generated_at": "8e096534-b571-4075-b0ee-beaa8d7a08d8"
+  "generated_at": "e4f9515f-ef4c-4dd9-8069-fce32e94beaf"
 }

@@ -16,7 +16,7 @@
 4. **Review**: Adversarial check for risks and regressions.
 5. **Test**: Identify highest-risk behavior and verify.
 6. **Ship**: Generate clean handoff with evidence.
-7. **Reflect**: Record lessons and update project state.
+7. **Reflect**: **Mandatory Mission Audit** (`skillsmith audit`) + Update project state.
 
 ## Strategic Branching (Brain-Aware Tooling)
 

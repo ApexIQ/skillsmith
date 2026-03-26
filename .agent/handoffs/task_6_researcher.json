@@ -1,18 +1,18 @@
 {
   "kind": "handoff-packet",
   "version": "1.0.0",
-  "mission_id": "ec8c6630",
+  "mission_id": "1e20ab75",
   "task_id": 6,
   "role": "Researcher",
   "assigned_skill": ".agent/skills/how_to_research/SKILL.md",
-  "objective": "[AND] Review stage: Inspect the changed files for correctness, regressions, and missing coverage. Acceptance: The review names concrete risks or confirms the change is safe.; The review output is ordered and actionable for the next agent..",
+  "objective": "SHIP: Make the workflow output usable as a release-grade handoff artifact.",
   "context": {
-    "goal": "Build a new analytics module",
+    "goal": "Verify the persistent Mission Auditor accurately captures project mission goals.",
     "status": "ACTIVE",
     "dependencies": [
       5
     ]
   },
   "artifacts_expected": [],
-  "generated_at": "c92abe2a-426c-4427-a7ff-d3a125fa2853"
+  "generated_at": "3ddfd14f-661f-49e2-930d-180c4386b598"
 }

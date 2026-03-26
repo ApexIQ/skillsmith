@@ -275,6 +275,8 @@ from .tree import tree_command
 from .swarm import swarm_command, team_exec_command
 from .search_cmd import search_command
 from .understand import understand_command
+from .advanced import advanced_group, adbce_command
+from .mcp_cmd import mcp_group
 from .commands_cmd import commands_command
 from .cookbook_cmd import cookbook_command
 

@@ -31,7 +31,27 @@
 - Keep fixes minimal and focused. Avoid broad refactors unless required for correctness.
 - Delegate to subagents only for parallelizable or clearly specialized tasks.
 - One owner per subtask; merge results only after verification.
+- **Mandatory Mission Audit**: After complex executions, run `skillsmith audit` to verify trace integrity and detect background agent failures.
 - Never mark done without evidence (tests, command output, or concrete behavioral checks).
+
+## 4. Slash Command Registry (MCP Mapping)
+
+This project supports specialized engineering commands. If the user invokes them, use the corresponding MCP tool:
+- `/autonomous` -> Use `autonomous_mission`
+- `/audit` -> Run `skillsmith audit` (Mission Control) or `audit_repository` (Code Quality)
+- `/security`, `/performance` -> Use `audit_repository`
+- `/dash` -> Run `skillsmith dash` to launch the Phoenix Observability Trace UI
+- `/explain` -> Use `explain_code`
+- `/verify` -> Use `verify_readiness`
+- `/review` -> Use `review_changes`
+- `/sync` -> Use `sync_project`
+
+## 5. Mission Observability (Phoenix/Mission Control)
+
+The library is instrumented with Arize Phoenix (local) for nested OpenTelemetry tracing.
+- **Trace Persistence**: Spans are persisted to `.phoenix/phoenix.db`.
+- **Verification Loop**: Agents MUST use `skillsmith audit` to inspect the "Thinking Tree" for bottlenecks or errors in swarm/autonomous execution.
+- **Self-Correction**: If the audit reveals ERROR spans, agents must autonomously propose a fix before completing the task.
 
 ## Memory and Cost Policy (Library-First)
 

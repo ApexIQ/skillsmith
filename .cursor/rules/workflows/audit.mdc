@@ -1,7 +1,7 @@
 ---
-description: Run the audit workflow for this project
+description: Command: /audit - Run the audit workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/audit.md`.

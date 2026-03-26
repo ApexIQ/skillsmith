@@ -1,7 +1,7 @@
 ---
-description: Run the review-changes workflow for this project
+description: Command: /review-changes - Run the review-changes workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/review-changes.md`.

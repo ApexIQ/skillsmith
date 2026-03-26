@@ -1,7 +1,7 @@
 ---
-description: Run the lint workflow for this project
+description: Command: /lint - Run the lint workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/lint.md`.

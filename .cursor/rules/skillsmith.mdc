@@ -7,6 +7,13 @@ alwaysApply: true
 - Read `AGENTS.md`, `.agent/STATE.md`, `.agent/lessons.md`, and `.agent/project_profile.yaml`.
 - Current focus: Project using skillsmith
 - Check `.agent/context/project-context.md` before making stack assumptions.
+- **Slash Commands**: This project supports specialized engineering commands. If the user invokes them, use the corresponding MCP tool:
+  - `/autonomous` -> Use `autonomous_mission`
+  - `/audit`, `/security`, `/performance` -> Use `audit_repository`
+  - `/explain` -> Use `explain_code`
+  - `/verify` -> Use `verify_readiness`
+  - `/review` -> Use `review_changes`
+  - `/sync` -> Use `sync_project`
 - Prefer relevant skills from `.agent/skills/` before implementation.
 - For repeatable flows, use the generated workflow rules in `.cursor/rules/workflows/`.
 - Trusted publisher public keys: none

@@ -14,3 +14,9 @@
 - [ ] Guided setup refinements around priorities: maintainability, verification, testability, architectural-integrity, automation
 - [ ] Remote registry federation and trust scoring
 - [ ] Continuous alignment and drift detection
+
+## Milestone 4: Intelligence & Observability
+- [x] Integrated **Arize Phoenix** for persistent mission tracing.
+- [x] Developed **Mission Auditor** for automated trace reflection.
+- [x] Hardened the local OTel database against session loss.
+- [x] Codified the verification loop into agent standards.

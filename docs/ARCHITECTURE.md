@@ -23,6 +23,7 @@ skills-agent/
 │   ├── services/           # Reusable business logic
 │   │   ├── registry.py     # Skill registry service
 │   │   ├── trust.py        # Trust verification
+│   │   ├── tracing.py      # Mission Control & Phoenix Tracing
 │   │   ├── workflow.py     # Workflow engine
 │   │   └── context_index.py # Context indexing
 │   │
@@ -30,6 +31,7 @@ skills-agent/
 │   ├── utils/              # Shared utilities
 │   └── templates/          # Project templates
 │
+├── .phoenix/               # Persistent Trace Database (Arize Phoenix)
 ├── .agent/                 # Agent configuration and memory
 │   ├── skills/            # Local skill library
 │   ├── logs/              # Event logs and history
@@ -43,6 +45,12 @@ skills-agent/
 ├── tests/                  # Test suite
 └── tmp/                    # Temporary files
 ```
+
+### 5. Observability Layer (`src/skillsmith/services/tracing.py`)
+Skillsmith is instrumented with Arize Phoenix for local, persistent observability:
+- **MissionControl**: Singleton orchestrator for the OpenTelemetry TracerProvider.
+- **MissionAuditor**: Self-reflection agent that queries the local trace history to detect failures and bottlenecks.
+- **Trace Sink**: All data is persisted to `.phoenix/` to survive session restarts.
 
 ## Core Components
 

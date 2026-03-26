@@ -1,7 +1,7 @@
 ---
-description: Run the report workflow for this project
+description: Command: /report - Run the report workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/report.md`.

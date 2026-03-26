@@ -1,18 +1,18 @@
 {
   "kind": "handoff-packet",
   "version": "1.0.0",
-  "mission_id": "ec8c6630",
+  "mission_id": "1e20ab75",
   "task_id": 4,
   "role": "Reviewer",
   "assigned_skill": ".agent/skills/code_review/SKILL.md",
-  "objective": "[OR] Plan stage: Turn the goal into a minimal patch plan with explicit verification checkpoints. Acceptance: The plan names concrete files, commands, or subsystems.; Every planned step has at least one verification check..",
+  "objective": "REVIEW: Inspect the changed files for correctness, regressions, and missing coverage.",
   "context": {
-    "goal": "Build a new analytics module",
+    "goal": "Verify the persistent Mission Auditor accurately captures project mission goals.",
     "status": "ACTIVE",
     "dependencies": [
       3
     ]
   },
   "artifacts_expected": [],
-  "generated_at": "e59a98e6-3cc3-4cef-b83e-7f7c6ee9384d"
+  "generated_at": "78d5f215-9c88-4dcd-89bb-3629e6f979b4"
 }

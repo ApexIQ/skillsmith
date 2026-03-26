@@ -1,7 +1,7 @@
 ---
-description: Run the discover-project workflow for this project
+description: Command: /discover-project - Run the discover-project workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/discover-project.md`.

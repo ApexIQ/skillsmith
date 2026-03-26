@@ -38,6 +38,16 @@ def _save_mission(cwd: Path, mission: dict[str, Any]) -> None:
     path = cwd / MISSION_JSON
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(sanitize_json(mission), indent=2), encoding="utf-8")
+    
+    # Log State Change (Layer 1)
+    from ..memory import MemoryManager
+    mm = MemoryManager(cwd)
+    mm.log_event("mission_state_change", {
+        "swarm_id": mission.get("swarm_id"),
+        "status": mission.get("status"),
+        "goal": mission.get("goal")
+    })
+    
     _sync_mission_md(cwd, mission)
 
 
@@ -65,6 +75,13 @@ def _sync_mission_md(cwd: Path, mission: dict[str, Any]) -> None:
         dep_str = f" (Depends on #{deps[0]})" if deps else ""
 
         md += f"- {marker} **Task {step_id}** [{role}]: {task}{dep_str}\n"
+
+    # --- Active Memory (Token Optimized) ---
+    memory_path = cwd / ".agent" / "memory.md"
+    if memory_path.exists():
+        md += "\n## 🧠 Active Memory (Reflected)\n"
+        md += memory_path.read_text(encoding="utf-8")
+        md += "\n"
 
     md += "\n## 🧬 Role Definitions & Skills\n"
     for role, skill in ROLE_MAP.items():
@@ -231,32 +248,53 @@ def swarm_execute_command(headless: bool):
         console.print("[red][ERROR][/red] No mission found to execute.")
         return
 
-    if mission.get("status") == "COMPLETED":
-        console.print("[green]Mission already completed.[/green]")
-        return
+    from ..services.tracing import get_mission_control
+    mc = get_mission_control(cwd)
+    
+    with mc.start_span("swarm_execution", attributes={"goal": mission.get("goal"), "swarm_id": mission.get("swarm_id")}) as mission_span:
+        if mission.get("status") == "COMPLETED":
+            console.print("[green]Mission already completed.[/green]")
+            return
 
-    console.print(f"[bold magenta]Mission Execution Engine:[/bold magenta] {mission['goal']}")
+        console.print(f"[bold magenta]Mission Execution Engine:[/bold magenta] {mission['goal']}")
 
-    for i, assignment in enumerate(mission.get("assignments", [])):
-        if assignment.get("status") == "completed":
-            continue
+        for i, assignment in enumerate(mission.get("assignments", [])):
+            if assignment.get("status") == "completed":
+                continue
 
-        # 1. Verification of Dependencies
-        for dep in assignment.get("dependencies", []):
-            if mission["assignments"][dep - 1]["status"] != "completed":
-                console.print(f"[yellow]Task {assignment['step_id']} blocked by Task {dep}.[/yellow]")
-                return
+            # 1. Verification of Dependencies
+            for dep in assignment.get("dependencies", []):
+                if mission["assignments"][dep - 1]["status"] != "completed":
+                    console.print(f"[yellow]Task {assignment['step_id']} blocked by Task {dep}.[/yellow]")
+                    return
 
-        # 2. Handoff Protocol
-        assignment["status"] = "in_progress"
-        _save_mission(cwd, mission)
+            # 2. Handoff Protocol (Child Span)
+            role = assignment["role"]
+            skill = assignment["persona_skill"]
+            task = assignment["task"]
+            
+            with mc.start_span(f"handoff:{role}:{assignment['step_id']}", attributes={
+                "role": role, 
+                "skill": skill, 
+                "task": task,
+                "step_id": assignment["step_id"]
+            }):
+                assignment["status"] = "in_progress"
+                _save_mission(cwd, mission)
 
-        role = assignment["role"]
-        skill = assignment["persona_skill"]
-        task = assignment["task"]
-
-        console.print(f"\n[bold white]Handoff Protocol Active -> {role}[/bold white]")
-        console.print(f"  [dim]Assigned Skill:[/dim] .agent/skills/{skill}/SKILL.md")
+                console.print(f"\n[bold white]Handoff Protocol Active -> {role}[/bold white]")
+                console.print(f"  [dim]Assigned Skill:[/dim] .agent/skills/{skill}/SKILL.md")
+                console.print(f"  [dim]Objective:[/dim] {task}")
+                
+                # Emit Handoff Packet
+                packet_path = _emit_handoff(cwd, assignment, mission)
+                console.print(f"  [green]Packet Emitted:[/green] {packet_path.relative_to(cwd)}")
+                
+                # (Simulation) Finalizing task
+                time.sleep(1) 
+                assignment["status"] = "completed"
+                _save_mission(cwd, mission)
+                console.print(f"  [bold green]Task Verified & Signed Off.[/bold green]")
         console.print(f"  [dim]Objective:[/dim] {task}")
 
         # 3. Emit Machine-Readable Handoff Packet

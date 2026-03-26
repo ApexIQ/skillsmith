@@ -1,7 +1,7 @@
 ---
-description: Run the performance workflow for this project
+description: Command: /performance - Run the performance workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/performance.md`.

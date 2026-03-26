@@ -1,7 +1,7 @@
 ---
-description: Run the doc workflow for this project
+description: Command: /doc - Run the doc workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/doc.md`.

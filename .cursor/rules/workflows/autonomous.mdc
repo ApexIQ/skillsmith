@@ -1,7 +1,7 @@
 ---
-description: Run the autonomous workflow for this project
+description: Command: /autonomous - Run the autonomous workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/autonomous.md`.

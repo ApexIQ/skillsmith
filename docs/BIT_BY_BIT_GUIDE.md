@@ -78,6 +78,21 @@ This guide explains every command in the Skillsmith ecosystem, why you should us
 
 ---
 
+## 📊 Level 6: Mission Observability (Mission Control)
+**Goal:** Visualize and audit your your agent's reasoning in real-time.
+
+### 12. `skillsmith dash`
+*   **What is it?** The "Mission Control Center." It launches a local Arize Phoenix server that visualizes every thought, tool call, and token spent.
+*   **When to use it?** Keep this running in the background while your agent works to see the "Thinking Tree" in action.
+*   **Success Signal:** A browser opens to `localhost:6006` showing your project's trace history.
+
+### 13. `skillsmith audit`
+*   **What is it?** The "Intelligence Reflector." It queries your persistent trace history to find the latest mission and check for failures or high-latency "bottlenecks."
+*   **When to use it?** Mandatory after every major swarm run. It verifies that the "Goal" was captured and that no subagents failed silently.
+*   **Success Signal:** Terminal returns `Latest Mission Traced: [Your Goal] | Status: OK (SUCCESS)`.
+
+---
+
 ## ⚡ Level 6: The AI Command Center (Slash Commands)
 **Goal:** Direct your subagent team through 47+ specialized slash commands directly from your IDE.
 
@@ -89,7 +104,8 @@ While the `skillsmith` CLI is for **managing** your environment, these **Slash C
 | :--- | :--- | :--- |
 | **Project Induction** | `/init`, `/sync`, `/align`, `/bootstrap` | When initializing or repairing the Skillsmith link. |
 | **Feature Delivery** | `/plan-feature`, `/implement-feature`, `/ready` | To move a feature from idea to executable code. |
-| **Quality Control** | `/test`, `/review-changes`, `/lint`, `/audit` | Before merging code to ensure 100% compliance. |
+| **Observability** | `/dash`, `/audit` | To visualize agent reasoning and verify mission integrity. |
+| **Quality Control** | `/test`, `/review-changes`, `/lint` | Before merging code to ensure 100% compliance. |
 | **Refactoring** | `/refactor`, `/cleanup`, `/migrate`, `/modernize` | To pay down technical debt or upgrade frameworks. |
 | **Troubleshooting** | `/debug`, `/fix`, `/verify`, `/performance` | When code breaks or latency spikes. |
 | **Intelligence** | `/explain`, `/context`, `/search`, `/report` | To understand complex code or generate documentation. |
@@ -130,6 +146,7 @@ These commands are used in your terminal to manage the Skillsmith environment an
 | `align` | Force-sync and repair generated .agent files and workflows. |
 | `compose` | Synthesize a step-by-step agentic workflow for a specific goal. |
 | `config` | View or modify the current Skillsmith configuration. |
+| `dash` | Launch the Arize Phoenix Mission Control Dashboard (Persistent). |
 | `doctor` | Run diagnostic checks and auto-fix environment inconsistencies. |
 | `evolve` | Trigger autonomous skill synthesis or repair cycles. |
 | `init` | Initialize the .agent/ structure and infer project DNA. |

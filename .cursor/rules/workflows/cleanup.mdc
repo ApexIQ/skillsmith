@@ -1,7 +1,7 @@
 ---
-description: Run the cleanup workflow for this project
+description: Command: /cleanup - Run the cleanup workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/cleanup.md`.

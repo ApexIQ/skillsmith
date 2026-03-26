@@ -83,10 +83,85 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
     )
 
     resolved_dir = skills_dir or _get_skills_dir()
+    project_root = resolved_dir.parent
+
+    def post_tool_tap(func):
+        """Hidden Tap: Automatically distill lessons and trace after any tool call (arXiv:2401.12773)."""
+        from functools import wraps
+        from .memory import MemoryManager
+        from .services.evolution import EvolutionEngine
+        from .services.tracing import get_mission_control
+        
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            mc = get_mission_control(project_root)
+            # Automatic Span Generation (Local Dash / Mission Control)
+            with mc.start_span(f"tool_call:{func.__name__}", attributes={"args": str(args), "kwargs": str(kwargs)}) as span:
+                try:
+                    result = func(*args, **kwargs)
+                    
+                    # LOGGING (L1: Ground Facts)
+                    mm = MemoryManager(project_root)
+                    mm.log_event("mcp_tool_execution", {
+                        "tool": func.__name__,
+                        "args": str(args),
+                        "kwargs": str(kwargs),
+                        "success": True
+                    })
+                    
+                    # DISTILLATION (L2: Hidden Reflection)
+                    engine = EvolutionEngine(project_root)
+                    facts = engine.distill_logs_semantically(mm.raw_log_path)
+                    engine.update_working_memory(facts, mm.working_memory_path)
+                    
+                    # Finalize Span
+                    if span:
+                        span.set_attribute("success", True)
+                    
+                    return result
+                except Exception as e:
+                    # Log failure
+                    try:
+                        mm = MemoryManager(project_root)
+                        mm.log_event("error", {"tool": func.__name__, "error": str(e)})
+                    except:
+                        pass
+                    if span:
+                        span.set_attribute("success", False)
+                        span.set_attribute("error", str(e))
+                    raise e
+        return wrapper
+
+    # ── Resources ─────────────────────────────────────────────────────────────
+
+    @mcp.resource("skillsmith://protocol/agents.md")
+    def get_agents_protocol() -> str:
+        """The master AGENTS.md protocol (DNA of the mission)."""
+        path = project_root / "AGENTS.md"
+        return path.read_text(encoding="utf-8") if path.exists() else "AGENTS.md not found."
+
+    @mcp.resource("skillsmith://memory/lessons.md")
+    def get_permanent_lessons() -> str:
+        """Permanent lessons and archetypes from past sessions."""
+        path = project_root / ".agent" / "lessons.md"
+        return path.read_text(encoding="utf-8") if path.exists() else "No lessons learned yet."
+
+    @mcp.resource("skillsmith://memory/active.md")
+    def get_active_memory() -> str:
+        """Active session memory (distilled from raw logs)."""
+        path = project_root / ".agent" / "memory.md"
+        return path.read_text(encoding="utf-8") if path.exists() else "No active memory."
+
+    @mcp.resource("skillsmith://context/state.md")
+    def get_session_state() -> str:
+        """Current mission state and task progress."""
+        path = project_root / ".agent" / "STATE.md"
+        return path.read_text(encoding="utf-8") if path.exists() else "STATE.md not found."
 
     # ── Tool 1: list_skills ───────────────────────────────────────────────────
 
     @mcp.tool()
+    @post_tool_tap
     def list_skills() -> list[dict]:
         """List all installed skills with their name, description, and tags.
 
@@ -115,6 +190,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
     # ── Tool 2: get_skill ─────────────────────────────────────────────────────
 
     @mcp.tool()
+    @post_tool_tap
     def get_skill(name: str) -> str:
         """Get the full SKILL.md content (instructions) for a specific skill.
 
@@ -159,6 +235,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
     # ── Tool 3: search_skills ─────────────────────────────────────────────────
 
     @mcp.tool()
+    @post_tool_tap
     def search_skills(query: str, max_results: int = 10) -> list[dict]:
         """Search skills by keyword across name, description, tags, and content.
 
@@ -210,6 +287,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
     # ── Tool 4: compose_workflow ──────────────────────────────────────────────
 
     @mcp.tool()
+    @post_tool_tap
     def compose_workflow(goal: str, max_skills: int = 7) -> str:
         """Generate a step-by-step workflow by composing relevant skills for a goal.
 
@@ -298,6 +376,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 5: get_skill_metrics ─────────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def get_skill_metrics(name: str) -> dict:
         """Get performance metrics for a specific skill from the lockfile.
 
@@ -317,6 +396,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 6: trigger_skill_evolution ──────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def trigger_skill_evolution(name: str, mode: str = "fix") -> dict:
         """Trigger an autonomous evolution/repair for a specific skill.
 
@@ -360,6 +440,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 7: list_degraded_skills ──────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def list_degraded_skills(threshold: float = 0.8) -> list[dict]:
         """List all skills that have fallen below a certain success threshold.
 
@@ -385,6 +466,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 8: autonomous_mission ───────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def autonomous_mission(goal: str, max_iterations: int = 5) -> dict:
         """Trigger an autonomous, multi-stage mission to achieve a specific goal.
         
@@ -419,6 +501,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 9: audit_repository ─────────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def audit_repository(mode: str = "security") -> dict:
         """Run a security or performance audit on the current repository.
         
@@ -440,6 +523,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 10: explain_code ────────────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def explain_code(query: str) -> str:
         """Provide a detailed explanation of code paths, logic, and architectural patterns.
         
@@ -456,6 +540,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 11: verify_readiness ────────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def verify_readiness() -> dict:
         """Run the full 'skillsmith ready' checklist to verify project readiness.
         
@@ -473,6 +558,7 @@ def create_mcp_server(skills_dir: Optional[Path] = None) -> "FastMCP":
 
     # ── Tool 12: review_changes ─────────────────────────────────────────────
     @mcp.tool()
+    @post_tool_tap
     def review_changes() -> dict:
         """Perform a systematic review of the latest changes in the repository.
         

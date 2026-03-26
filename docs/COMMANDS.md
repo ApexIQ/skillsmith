@@ -33,8 +33,14 @@ A comprehensive diagnostic tool for your AI-engineering environment. It checks i
 - **Score**: Emits a `Readiness Score` out of 100.
 
 ### `skillsmith audit`
-The operator-facing integrity view. It goes deeper than `doctor`, auditing skill checksums, trust provenance, remote source policy, and security vulnerabilities.
-- **Flag `--strict`**: Ideal for CI environments to enforce 100% compliance.
+The "Intelligence Reflection" engine. Beyond checking security and trust, it performs **Mission Auditing** by querying local Phoenix traces. It identifies agent failures, bottlenecks, and "Thinking Tree" regressions.
+- **Flag `--strict`**: Enforce 100% trace integrity in CI.
+- **Use Case**: Run this after a mission to perform self-reflection and verify goal capture.
+
+### `skillsmith dash`
+The "Mission Control" Dashboard. Launches a local Arize Phoenix observability server using persistent state in `.phoenix/`. 
+- **Visualization**: View "Thinking Trees", nested agent spans, and token usage in real-time.
+- **Sovereignty**: All data stays local in your project directory.
 
 ---
 
@@ -120,8 +126,14 @@ Run local or team-scoped HTTP APIs for shared skill management and centralized t
 ### `skillsmith safety`
 Manage repository-wide safety lockdowns (freeze/guard/careful) to restrict agent mutations during sensitive release windows.
 
+## 🤖 Agent Orchestration (Swarms)
+
 ### `skillsmith swarm plan`
 The "Decomposition Engine". Breaks down a massive goal into a parallelized, multi-agent task graph (Orchestrator, Researcher, Implementer, Reviewer).
+- **Output**: Generates `.agent/mission.json`.
+
+### `skillsmith swarm execute`
+The "Mission Runner". Executes the planned swarm mission, managing handoffs, skill assignments, and artifact logging.
 
 ### `skillsmith team-exec`
 The "High-Velocity Harness". Executes a mission using the full Team Execution Protocol, simulating structured agentic handoffs and verification loops.

@@ -1,7 +1,7 @@
 ---
-description: Run the search workflow for this project
+description: Command: /search - Run the search workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/search.md`.

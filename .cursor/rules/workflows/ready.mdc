@@ -1,7 +1,7 @@
 ---
-description: Run the ready workflow for this project
+description: Command: /ready - Run the ready workflow for this project
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Read `.agent/workflows/ready.md`.

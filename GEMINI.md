@@ -21,6 +21,7 @@
 - Plan before coding for non-trivial work (3+ steps or architectural impact).
 - Keep changes minimal, explicit, and easy to verify.
 - Use subagents only when parallelism or specialization is clearly beneficial.
+- **Mandatory Mission Audit**: After complex executions, run `skillsmith audit` to verify trace integrity.
 - Verify with tests/checks before marking done.
 
 ## Memory and Cost Policy
