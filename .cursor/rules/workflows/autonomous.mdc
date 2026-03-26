@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/autonomous.md`.
 - Goal: run autonomous or benchmark workflows for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: javascript_testing_patterns, notebooklm, temporal_python_testing, autonomous_agent_patterns, uv_package_manager
 - Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/discover-project.md`.
 - Goal: discover project context library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: notebooklm, temporal_python_testing, core_components, javascript_testing_patterns, n8n_code_python
 - Follow the workflow steps, then verify with project tests or the closest validation command.

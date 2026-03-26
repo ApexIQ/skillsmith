@@ -3,7 +3,7 @@
 ## Summary
 - Goal: test and verify implementation for library click, pytest, arch-business-logic, arch-ui, arch-unknown
 - Project idea: Project using skillsmith
-- Skills: test_repair_skill
+- Skills: javascript_testing_patterns, notebooklm, temporal_python_testing, makepad_skills, loki_mode
 
 ## Steps
 1. Read .agent/project_profile.yaml and .agent/context/project-context.md.
@@ -15,6 +15,6 @@
 7. [AND] Test stage: Identify the highest-risk behavior and the smallest reliable test surface. Acceptance: Run the relevant automated tests and record the evidence.; The failure mode is observable if the stage structure regresses..
 8. [AND] Ship stage: Make the workflow output usable as a release-grade handoff artifact. Acceptance: The generated workflow includes both stage structure and the legacy `steps` list.; Compose output remains stable across repeated runs with the same inputs..
 9. [AND] Reflect stage: Summarize what the evidence says about the current run. Acceptance: Reflection text is grounded in the run's actual feedback or retry state.; Any mode suggestion comes from the current evidence, not a dummy rule..
-10. Load the top relevant skills: test_repair_skill.
+10. Load the top relevant skills: javascript_testing_patterns, notebooklm, temporal_python_testing, makepad_skills, loki_mode.
 11. Verification loop: run 1 verification pass before completion.
 12. Run the most relevant test or validation command before completion.

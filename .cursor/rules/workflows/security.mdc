@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/security.md`.
 - Goal: audit and harden security for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: notebooklm, loki_mode, javascript_testing_patterns, makepad_skills, reverse_engineer
 - Follow the workflow steps, then verify with project tests or the closest validation command.

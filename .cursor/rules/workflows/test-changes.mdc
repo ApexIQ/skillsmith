@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/test-changes.md`.
 - Goal: test and verify changes for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: javascript_testing_patterns, notebooklm, temporal_python_testing, makepad_skills, loki_mode
 - Follow the workflow steps, then verify with project tests or the closest validation command.

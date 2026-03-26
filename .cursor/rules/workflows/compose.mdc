@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/compose.md`.
 - Goal: compose multiple skills and workflows for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: javascript_testing_patterns, makepad_skills, notebooklm, temporal_python_testing, zapier_make_patterns
 - Follow the workflow steps, then verify with project tests or the closest validation command.

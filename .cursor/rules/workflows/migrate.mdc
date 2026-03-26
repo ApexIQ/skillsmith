@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/migrate.md`.
 - Goal: plan and execute migration for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: notebooklm, javascript_testing_patterns, makepad_skills, loki_mode, terraform_module_library
 - Follow the workflow steps, then verify with project tests or the closest validation command.

@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/report.md`.
 - Goal: generate a progress and readiness report for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: notebooklm, loki_mode, javascript_testing_patterns, makepad_skills, git_pr_workflows_git_workflow
 - Follow the workflow steps, then verify with project tests or the closest validation command.

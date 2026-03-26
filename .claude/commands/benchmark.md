@@ -7,7 +7,7 @@ benchmark performance for library click, pytest, arch-business-logic, arch-ui, a
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/benchmark.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/benchmark.md)
-- **Top Skills**: test_repair_skill
+- **Top Skills**: notebooklm, javascript_testing_patterns, makepad_skills, context7_auto_research, loki_mode
 
 ## Execution Plan
 1. Read .agent/project_profile.yaml and .agent/context/project-context.md.
@@ -19,7 +19,7 @@ benchmark performance for library click, pytest, arch-business-logic, arch-ui, a
 7. [AND] Test stage: Run the relevant automated tests for the changed workflow behavior. Acceptance: Targeted tests pass after the implementation change.; The failure mode is observable if the stage structure regresses..
 8. [AND] Ship stage: Make the workflow output usable as a release-grade handoff artifact. Acceptance: The generated workflow includes both stage structure and the legacy `steps` list.; Compose output remains stable across repeated runs with the same inputs..
 9. [AND] Reflect stage: Summarize what the evidence says about the current run. Acceptance: Reflection text is grounded in the run's actual feedback or retry state.; Any mode suggestion comes from the current evidence, not a dummy rule..
-10. Load the top relevant skills: test_repair_skill.
+10. Load the top relevant skills: notebooklm, javascript_testing_patterns, makepad_skills, context7_auto_research, loki_mode.
 11. Verification loop: run 1 verification pass before completion.
 12. Run the most relevant test or validation command before completion.
 

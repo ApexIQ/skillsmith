@@ -6,5 +6,5 @@ alwaysApply: true
 
 - Read `.agent/workflows/cleanup.md`.
 - Goal: cleanup obsolete code and artifacts for library click, pytest, arch-business-logic, arch-ui, arch-unknown
-- Skills: test_repair_skill
+- Skills: notebooklm, loki_mode, terraform_module_library, javascript_testing_patterns, makepad_skills
 - Follow the workflow steps, then verify with project tests or the closest validation command.

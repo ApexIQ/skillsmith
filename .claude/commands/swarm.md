@@ -7,7 +7,7 @@ swarm
 
 ## Resources
 - **Workflow Bundle**: [.agent/workflows/swarm.md](file:///C:/Users/vanam/Desktop/skills-agent/.agent/workflows/swarm.md)
-- **Top Skills**: test_repair_skill
+- **Top Skills**: notebooklm, temporal_python_testing, build_resolver, javascript_testing_patterns, github_workflow_automation
 
 ## Execution Plan
 1. Read .agent/project_profile.yaml and .agent/context/project-context.md.
@@ -19,7 +19,7 @@ swarm
 7. [AND] Test stage: Run the relevant automated tests for the changed workflow behavior. Acceptance: Targeted tests pass after the implementation change.; The failure mode is observable if the stage structure regresses..
 8. [AND] Ship stage: Make the workflow output usable as a release-grade handoff artifact. Acceptance: The generated workflow includes both stage structure and the legacy `steps` list.; Compose output remains stable across repeated runs with the same inputs..
 9. [AND] Reflect stage: Summarize what the evidence says about the current run. Acceptance: Reflection text is grounded in the run's actual feedback or retry state.; Any mode suggestion comes from the current evidence, not a dummy rule..
-10. Load the top relevant skills: test_repair_skill.
+10. Load the top relevant skills: notebooklm, temporal_python_testing, build_resolver, javascript_testing_patterns, github_workflow_automation.
 11. Verification loop: run 1 verification pass before completion.
 12. Run the most relevant test or validation command before completion.
 
